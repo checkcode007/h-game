@@ -1,0 +1,9 @@
+rootProject.name = 'h-game'
+
+include 'app'
+include 'db-mysql'
+include 'db-redis'
+include 'db-es'
+include 'model'
+include 'core'
+include 'common'

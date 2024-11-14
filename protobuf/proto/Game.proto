@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package com.z.model.proto;
+
+import "common_game.proto";
+//玩法消息
+message GameMsg {
+  int64 id = 1;//数据id
+  oneof type {
+    Game_Req_20001 req10001 = 2;
+    Game_Res_20002 res10002 = 3;
+  }
+}
+message Game_Req_20001 {
+  MahjongData mahjongData = 1; //麻将
+}
+message Game_Res_20002 {
+  MahjongData mahjongData = 1;
+}
+
+

@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package com.z.model.proto;
+
+import "common_user.proto";
+//用户消息
+message UserMsg{
+  int64 uid = 1;//用户id
+  oneof type {
+    User_Req_10001 req10001 = 2;
+    User_Req_10003 res10003 = 3;
+  }
+}
+
+//注册
+message User_Req_10001 {
+  string phone = 1;//手机号码
+  string pwd=2;//用户密码
+}
+message User_Res_10002 {
+  int32 code = 1;//返回码（200 成功）
+  string failMsg=2;//错误提示
+  int64 uid=3;//用户uid
+}
+//登录
+message User_Req_10003 {
+  int32 type = 1;//登录类型（1 用户id登录 2 用户手机号登录）
+  int64 uid = 2;//用户id
+  string phone=3;//用户手机号
+  string pwd=4;//用户密码
+}
+message User_Res_10004 {
+  int32 code = 1;//返回码（200 成功）
+  string failMsg=2;//错误提示
+  UserType type=3;//用户类型
+}
+
+//编辑用户信息
+message User_Req_10005 {
+  int64 uid = 1;//用户id
+  string name = 2;//用户名称
+  int32 iconId = 3;//头像id
+  string phone = 4;//手机号
+}
+message User_Res_100046 {
+  int32 code = 1;//返回码（200 成功）
+  string failMsg=2;//错误提示
+  int64 uid=3;//用户id
+}
+
+
+
+

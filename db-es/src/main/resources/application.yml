@@ -1,0 +1,8 @@
+# es配置
+elasticsearch:
+  rest:
+    clusterName: es-cluster
+    clusterNodes: 8.137.63.141 # 多个节点地址，用逗号分隔
+    clusterPorts: 9200
+    connection-timeout: 5000     # 可选，连接超时时间（毫秒）
+    read-timeout: 60000          # 可选，读取超时时间（毫秒）

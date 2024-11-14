@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package com.z.model.proto;
+/**
+* 公用结构体 --- 游戏玩法数据
+ */
+// 卡牌数据
+message Card {
+  int64 id = 1;
+  CardSuit suit = 2;
+}
+
+enum CardSuit {
+  Spades=0;//黑桃
+  Hearts=1;//红桃
+  Diamonds=2;//方片
+  Clubs=3;//梅花
+  BigJoker=100;//大王
+  SmallJoker=200;//小王
+}
+
+// 麻将数据
+message MahjongData {
+  int64 id = 1;
+  int64 num = 2;
+  int64 radio = 3;
+  string name = 4;
+}

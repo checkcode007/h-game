@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package com.z.model.proto;
+/**
+* 公用结构体 --- 用户数据
+ */
+message UserData {
+  int64 uid = 1;//用户id
+  string name = 2;//用户名称
+}
+/**
+ 用户类型
+ */
+enum UserType{
+   COMMON= 0;//普通用户
+   LINE_MANAGER=1;// 一级代理（每条线的总控）
+   LINE_VIP1=2;// 二级代理
+   LINE_VIP2=3;// 三级代理
+  MANAGER=10000;//总控
+}
