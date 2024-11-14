@@ -1,0 +1,9 @@
+
+bootJar {
+    enabled=true
+//    mainClass='com.z.app.AppApplication'
+}
+
+dependencies {
+    implementation project(':core')
+}

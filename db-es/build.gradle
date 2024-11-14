@@ -1,0 +1,14 @@
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+ext{
+    esVer='8.15.3'
+}
+
+dependencies {
+    implementation project(':common')
+    implementation("co.elastic.clients:elasticsearch-java:$esVer")
+}

@@ -1,0 +1,9 @@
+
+dependencies {
+    implementation project(':db-mysql')
+    implementation project(':db-redis')
+    implementation project(':db-es')
+    implementation project(':common')
+    implementation("io.netty:netty-all")// Netty 依赖
+}
+
