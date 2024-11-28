@@ -1,5 +1,7 @@
 package com.z.dbmysql.common;
 
+import com.z.model.common.ExcludeCreateTime;
+import com.z.model.common.ExcludeUpdateTime;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
