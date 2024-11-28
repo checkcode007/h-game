@@ -1,0 +1,180 @@
+package com.z.core.service.user;
+
+
+import com.google.protobuf.ByteString;
+import com.z.common.util.CodeUtil;
+import com.z.core.service.cfg.CCfgBizService;
+import com.z.dbmysql.dao.code.GCodeDao;
+import com.z.dbmysql.dao.code.GCodeSendLogDao;
+import com.z.model.common.MsgId;
+import com.z.model.common.MsgResult;
+import com.z.model.mysql.GCode;
+import com.z.model.mysql.GCodeSendLog;
+import com.z.model.mysql.GUser;
+import com.z.model.proto.CommonUser;
+import com.z.model.proto.MyMessage;
+import com.z.model.proto.User;
+import com.z.model.type.AddType;
+import lombok.extern.log4j.Log4j2;
+import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.StringJoiner;
+
+/**
+ * 兑换码
+ */
+@Log4j2
+@Service
+public class CodeBizService {
+    @Autowired
+    GCodeDao dao;
+    @Autowired
+    GCodeSendLogDao logDao;
+    @Autowired
+    UserBizService userBizService;
+    @Autowired
+    CCfgBizService cfgBizService;
+    /**
+     * 点卡生成-查询
+     */
+    public MyMessage.MyMsgRes codeCreateList(long uid) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid);
+        log.info(sj.toString());
+        MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_CREATE_LIST).setOk(true);
+        List<GCode> list = dao.findByFrom(uid);
+        GUser gUser = userBizService.findUser(uid);
+        User.S_10402.Builder b = User.S_10402.newBuilder().setLeaveCount(gUser.getCodeCount());
+        if (list != null && !list.isEmpty()) {
+            for (GCode e : list) {
+                b.addCodes(User.BindCode.newBuilder().setUid(e.getTargetId())
+                                .setTime(e.getCreateTime().getTime()).setCode(e.getCode())
+                        .build());
+            }
+
+        }
+        log.info(sj.add("success").toString());
+        return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
+    }
+    /**
+     * 点卡生成
+     */
+    public MyMessage.MyMsgRes codeCreate(long uid,long bindUid) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("bindUid:" + bindUid);
+        log.info(sj.toString());
+        MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_CREATE_CREATE).setOk(true);
+        List<GCode> list = dao.findByFrom(uid);
+        MsgResult changeRet = userBizService.changeCodeCount(AddType.SUB,uid,1);
+        if(!changeRet.isOk()){
+            log.error(sj.add("changeCount fail").toString());
+            res.setOk(false).setFailMsg(changeRet.getMessage());
+            return res.build();
+        }
+        GCode exchangeCode = create(uid,bindUid);
+        dao.save(exchangeCode);
+        GUser gUser = userBizService.findUser(uid);
+        User.S_10404.Builder b = User.S_10404.newBuilder().setLeaveCount(gUser.getCodeCount());
+        if (list != null && !list.isEmpty()) {
+            for (GCode e : list) {
+                b.addCodes(User.BindCode.newBuilder().setUid(e.getTargetId())
+                        .setTime(e.getCreateTime().getTime()).setCode(e.getCode())
+                        .build());
+            }
+
+        }
+        log.info(sj.add("success").toString());
+        return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
+    }
+    /**
+     * 点卡查询
+     */
+    public MyMessage.MyMsgRes codeQuery(long uid,long  bindUid) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("bindUid:" + bindUid);
+        log.info(sj.toString());
+        MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_QUERY).setOk(true);
+        List<GCode> list = dao.findByTarget(bindUid);
+        GUser gUser = userBizService.findUser(uid);
+        User.S_10406.Builder b = User.S_10406.newBuilder().setLeaveCount(gUser.getCodeCount());
+        if (list != null && !list.isEmpty()) {
+            for (GCode e : list) {
+                b.addCodes(User.UserCode.newBuilder().setUid(e.getTargetId()).setGold(e.getGold()).setState(CommonUser.CodeState.forNumber(e.getState()))
+                        .setExpireTime(e.getLastTime().getTime()).setUseTime(e.getUseTime()==null?0:e.getUseTime().getTime()).setCode(e.getCode())
+                        .build());
+            }
+
+        }
+        log.info(sj.add("success").toString());
+        return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
+    }
+
+
+    /**
+     * 点卡分发-列表
+     */
+    public MyMessage.MyMsgRes codeSendList(long uid) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid);
+        log.info(sj.toString());
+        MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_SEND_LIST).setOk(true);
+        List<GCodeSendLog> list = logDao.findByFrom(uid);
+        GUser gUser = userBizService.findUser(uid);
+        User.S_10408.Builder b = User.S_10408.newBuilder().setLeaveCount(gUser.getCodeCount());
+        if (list != null && !list.isEmpty()) {
+            for (GCodeSendLog e : list) {
+                b.addCodes(User.GiveCode.newBuilder().setUid(e.getTargetId()).setCount(e.getCout()).setTime(e.getLastTime().getTime())
+                        .build());
+            }
+        }
+        log.info(sj.add("success").toString());
+        return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
+    }
+
+    /**
+     * 点卡分发-分发
+     */
+    public MyMessage.MyMsgRes codeSend(long uid,long targetId,int cout) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("bindUid:" + targetId).add("cout:" + cout);
+        log.info(sj.toString());
+        MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_SEND_LIST).setOk(true);
+        List<GCodeSendLog> list = logDao.findByFrom(uid);
+        GUser gUser = userBizService.findUser(uid);
+        MsgResult changeRet = userBizService.changeCodeCout(uid,targetId,1);
+        if(!changeRet.isOk()){
+            log.error(sj.add("changeCount fail").toString());
+            res.setOk(false).setFailMsg(changeRet.getMessage());
+            return res.build();
+        }
+        User.S_10408.Builder b = User.S_10408.newBuilder().setLeaveCount(gUser.getCodeCount());
+        if (list != null && !list.isEmpty()) {
+            for (GCodeSendLog e : list) {
+                b.addCodes(User.GiveCode.newBuilder().setUid(e.getTargetId()).setCount(e.getCout()).setTime(e.getLastTime().getTime())
+                        .build());
+            }
+        }
+        log.info(sj.add("success").toString());
+        return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
+    }
+
+
+    public GCode create(long uid, long targetId){
+        DateTime now = DateTime.now();
+        Date d = now.toDate();
+        long t= d.getTime();
+        long time = new Date().getTime();
+        String code = CodeUtil.idToCode(time,15);
+        GCode record = new GCode();
+        record.setCreateTime(d);
+        record.setTargetId(targetId);
+        record.setCode(code);
+        record.setCreateTime(d);
+        record.setUpdateTime(d);
+        record.setState(CommonUser.CodeState.CS_NOUSE.getNumber());
+        int timeout = cfgBizService.getCodeTime();
+        record.setLastTime(now.plusSeconds(timeout).toDate());
+        return record;
+    }
+
+
+}

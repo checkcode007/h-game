@@ -36,11 +36,20 @@ public class GUser {
     /**
      * 头像
      */
-    private String icon;
-
+    private int icon;
+    /**
+     * 点卡生成次数
+     */
+    private int codeCount;
+    /**
+     * @see com.z.model.type.user.UserState
+     */
     private int state;
+    /**
+     * 锁定状态
+     */
+    private boolean LockState;
     private Date createTime;
-
     private Date updateTime;
 
 }

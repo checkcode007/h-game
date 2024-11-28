@@ -1,10 +1,7 @@
 package com.z.dbes.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.ElasticsearchException;
-import co.elastic.clients.elasticsearch._types.Result;
-import co.elastic.clients.elasticsearch._types.SortOptions;
-import co.elastic.clients.elasticsearch._types.Time;
+import co.elastic.clients.elasticsearch._types.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.search.Hit;
@@ -210,6 +207,7 @@ public abstract class AbstractEsService<T> {
         return false;
     }
 
+
     protected Pager<T> search(Query query, int page, int size, List<SortOptions> sorts, List<String> excludeFields, List<String> includeFields) {
         Pager<T> pager = new Pager<>();
         pager.setSize(size);
@@ -297,7 +295,7 @@ public abstract class AbstractEsService<T> {
                     .id(id)
                     .document(t)
             );
-            logger.info(getIndexAliasName()+":json=====>"+t);
+            logger.info(getIndexAliasName() + ":json=====>" + t);
             return response.result().name().equalsIgnoreCase("created");
         } catch (IOException e) {
             logger.error("add", e);
@@ -332,7 +330,7 @@ public abstract class AbstractEsService<T> {
 
     }
 
-    public boolean updateOne(String id, Query query, Map<String, Object> updateFields) {
+    public boolean updateOne(String id, Map<String, Object> updateFields) {
         checkCreate();
         try {
             // 创建更新查询请求
@@ -413,15 +411,76 @@ public abstract class AbstractEsService<T> {
         }
         return false;
     }
-public T searchById(long id,Class<T> clazz) {
 
-    try {
+    public T searchById(long id, Class<T> clazz) {
+
+        try {
+            SearchResponse<T> response = client.search(s -> s
+                            .index(getIndexAliasName())
+                            .query(q -> q
+                                    .match(t -> t
+                                            .field("id")
+                                            .query(id)
+                                    )
+                            ),
+                    clazz
+            );
+            List<T> list = response.hits().hits().stream()
+                    .map(hit -> hit.source())
+                    .collect(Collectors.toList());
+            return list.get(0);
+        } catch (Exception e) {
+            logger.error("searchById", e);
+        }
+        return null;
+    }
+
+    /**
+     * SearchResponse<T> response = client.search(s -> s
+     *         .index(getIndexAliasName())
+     *         .query(q -> q
+     *                 .bool(b -> b
+     *                         .must(m1 -> m1
+     *                                 .match(t1 -> t1
+     *                                         .field("field1") // 第一个条件的字段
+     *                                         .query("value1") // 第一个条件的值
+     *                                 )
+     *                         )
+     *                         .must(m2 -> m2
+     *                                 .match(t2 -> t2
+     *                                         .field("field2") // 第二个条件的字段
+     *                                         .query("value2") // 第二个条件的值
+     *                                 )
+     *                         )
+     *                         .should(s1 -> s1
+     *                                 .match(t3 -> t3
+     *                                         .field("field3") // 可选匹配的字段
+     *                                         .query("value3") // 可选匹配的值
+     *                                 )
+     *                         )
+     *                         .mustNot(mn -> mn
+     *                                 .term(t4 -> t4
+     *                                         .field("field4") // 排除条件的字段
+     *                                         .value("value4") // 排除条件的值
+     *                                 )
+     *                         )
+     *                 )
+     *         ),
+     *         clazz
+     * );
+     * @param fieldParam
+     * @param v
+     * @param clazz
+     * @return
+     */
+    public List<T> find(String fieldParam,Long v, Class<T> clazz) {
+        try {
         SearchResponse<T> response = client.search(s -> s
                         .index(getIndexAliasName())
                         .query(q -> q
                                 .match(t -> t
-                                        .field("id")
-                                        .query(id)
+                                        .field(fieldParam)
+                                        .query(v)
                                 )
                         ),
                 clazz
@@ -429,11 +488,77 @@ public T searchById(long id,Class<T> clazz) {
         List<T> list = response.hits().hits().stream()
                 .map(hit -> hit.source())
                 .collect(Collectors.toList());
-        return list.get(0);
-    } catch (Exception e) {
-       logger.error("searchById", e);
+        return list;
+        } catch (Exception e) {
+            logger.error("findByRoomId", e);
+        }
+        return null;
     }
-    return null;
-}
 
+    protected boolean updateScript(Script script, String id) {
+        checkCreate();
+        try {
+            // 创建更新查询请求
+            // 创建更新请求
+            UpdateRequest<Map<String, Object>, Map<String, Object>> request = UpdateRequest.of(u -> u
+                    .index(getIndexAliasName())
+                    .id(id)
+                    .script(script) // 传入更新的字段
+            );
+            // 执行更新操作
+            UpdateResponse<Map<String, Object>> response = client.update(request, Map.class);
+
+            // 处理响应
+            if (response.result() == Result.Updated) {
+
+                logger.info("Document updated successfully.");
+                return true;
+            } else {
+                logger.info("Document updated failed.");
+                return false;
+            }
+        } catch (IOException e) {
+            logger.error("updateOne", e);
+        }
+        return false;
+    }
+
+//    protected boolean updateScriptByQuery(Script script, String id) {
+//        checkCreate();
+//        try {
+//            // 创建更新查询请求
+//            // 创建更新请求
+//            QueryBuilders queryBuilders = new Query.Builder().
+//            UpdateByQueryRequest request = UpdateByQueryRequest.of(u -> u
+//                    .index(getIndexAliasName()).query(QueryBuilders.ids(new ))
+//                    .refresh(true).conflicts(Conflicts.Proceed)
+//                    .script(script) // 传入更新的字段
+//            );
+//            // 执行更新操作
+//            UpdateResponse<Map<String, Object>> response = client.updateByQuery(request);
+//
+//            // 处理响应
+//            if (response.result() == Result.Updated) {
+//
+//                logger.info("Document updated successfully.");
+//                return true;
+//            } else {
+//                logger.info("Document updated failed.");
+//                return false;
+//            }
+//        } catch (IOException e) {
+//            logger.error("updateOne", e);
+//        }
+//        return false;
+//    }
+
+//    protected long updateScriptByQuery(Script inline, QueryBuilders queryBuilder) {
+//        UpdateByQueryRequest request = new UpdateByQueryRequest(getIndexAliasName());
+//        request.setScript(inline);
+//        request.setQuery(queryBuilder);
+//        request.setBatchSize(100);
+//        request.setConflicts("proceed");
+//        request.setRefresh(true);
+//        return updateByQuery(request);
+//    }
 }

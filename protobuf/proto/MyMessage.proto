@@ -1,13 +1,44 @@
 syntax = "proto3";
 
 package com.z.model.proto;
-import "User.proto";
-import "Game.proto";
-message MyMessage {
-  int32 id = 1; //消息号
-  oneof type {
-    UserMsg userMsg = 2; // 用户 User
-    GameMsg gameMsg =3; //  玩法 game
-  }
+
+//上行 -(c->s)
+message MyMsgReq {
+  int32 id =1; //消息号-- 单数
+  repeated bytes msg=2; //消息体
 }
+//下行-（s->c）
+message MyMsgRes {
+  int32 id =1; //消息号--双数
+  repeated bytes msg =2; //消息体
+  bool ok =3; //消息是否成功 （true 成功，false 失败）
+  FailType  failType=4;//失败消息类型（可以为null，null默认普通提示显示）
+  string failMsg =5;//失败消息 （失败后的消息提示（可以是null））
+}
+
+//广播消息
+message  Broadcast{
+  BroadType  type=1;// 类型
+  string msg =2;//消息内容 （失败后的消息提示，可以是null）
+  repeated bytes specificMsg=3;//特定消息体（特殊类型使用，可以为null）
+}
+
+//失败消息类型
+enum MsgType {
+  MT_DEFAULT=0;//默认
+  MT_USER =1;//用户消息（user.proto）
+  MT_GAME =2;//游戏信息（game.proto）
+}
+//失败消息类型
+enum FailType {
+  FT_DEFAULT=0;//默认弹出提示
+  FT_EFFECT =1;//特效显示
+}
+//广播消息类型
+enum BroadType {
+  BT_DEFAULT=0;//默认
+  BT_EFFECT =1;//特效显示
+}
+
+
 

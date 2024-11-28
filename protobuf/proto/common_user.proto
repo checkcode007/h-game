@@ -16,5 +16,53 @@ enum UserType{
    LINE_MANAGER=1;// 一级代理（每条线的总控）
    LINE_VIP1=2;// 二级代理
    LINE_VIP2=3;// 三级代理
-  MANAGER=10000;//总控
+   MANAGER=10000;//总控
+}
+enum EmailType{
+  ET_DEFAULT=0;//默认的转账邮件
+  ET_SPECIAL=1;//特定邮件
+}
+//通用 0，1 状态
+enum YesNo{
+  YN_N=0;//否
+  YN_Y=1;//是
+}
+//银行金额变动类型
+enum BankType{
+  BT_DEFAULT=0;//默认
+  BT_DEPOSIT=1;//存入
+  BT_WITHDRAW=2;//取出
+  BT_TRANSFER=3;//转账
+  BT_EMAIL=4;//邮件
+  BT_REDEEM_CODE=5;//兑换码
+  BT_GM=100;//后台
+  BT_AI=200;//自动
+}
+//银行金额变动类型
+enum TransferLogType{
+  TT_DEFAULT=0;//默认
+  TT_TRANSFER=1;//转账
+  TT_REBET=2;//返利
+}
+//钱包金额变动类型
+enum GoldType{
+  GT_DEAULT=0;//默认
+  GT_DEPOSIT=1;//存入
+  GT_WITHDRAW=2;//取出
+  GT_EMAIL=3;//邮件
+  GT_GAME=4;//游戏
+  GT_GM=100;//后台
+  GT_AI=200;//自动
+}
+//修改用户信息类型
+enum ModifyUserType{
+  MUT_NAME=0;//修改名字
+  MUT_ICON=1;//修改头像
+  MUT_PHONE=2;//绑定手机号
+}
+//点卡状态
+enum CodeState{
+  CS_NOUSE=0;//未使用
+  CS_USE=1;//使用
+  CS_TIME=2;//过期
 }

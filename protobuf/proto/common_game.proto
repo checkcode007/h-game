@@ -6,7 +6,7 @@ package com.z.model.proto;
  */
 // 卡牌数据
 message Card {
-  int64 id = 1;
+  int32 id = 1;
   CardSuit suit = 2;
 }
 
@@ -19,10 +19,53 @@ enum CardSuit {
   SmallJoker=200;//小王
 }
 
-// 麻将数据
-message MahjongData {
-  int64 id = 1;
-  int64 num = 2;
-  int64 radio = 3;
-  string name = 4;
+// 游戏类型
+enum GameType {
+  GAME_sDEFUALT=0;//为定义
+  JINGDIAN_XIAOMALI = 1;   // 经典小码丽
+  BAIBIAN_XIAOMALI = 2;    // 百变小码丽
+  MAJIANG_2 = 3;           // 麻将2
+  FISH = 4;                // 捕鱼
+  JIUXIANLAWANG = 5;       // 九线拉王
+  SHUIHUZHUAN = 6;         // 水浒传
+  ALADING = 7;             // 阿拉丁
+  BAIREN_NIUNIU = 8;       // 百人牛牛
+  BINGQIUTUPO = 9;         // 冰球突破
+  SHAOLIN_ZUQIU = 10;      // 少林足球
+  JIANGSHIXINNIANG = 11;   // 僵尸新娘
+  JINZHUSONGFU = 12;       // 金猪送福8
 }
+
+enum GameState{
+    WAITING_FOR_PLAYE=0;//等待玩家
+    BETTING = 1;//下注阶段
+    DEALING=2;//发牌阶段
+    RESULT=3;//计算结果阶段
+}
+// 房间类型
+enum RoomType {
+    ONE=0;//初级
+    TWO=1;//中级
+    THREE=2;//高级
+}
+//牛牛类型
+enum NiuType {
+  NIU_ZERO = 0;   // 无牛
+  NIU_ONE = 1;    // 牛一
+  NIU_TWO = 2;    // 牛二
+  NIU_THREE = 3;  // 牛三
+  NIU_FOUR = 4;   // 牛四
+  NIU_FIVE = 5;   // 牛五
+  NIU_SIX = 6;    // 牛六
+  NIU_SEVEN = 7;  // 牛七
+  NIU_EIGHT = 8;  // 牛八
+  NIU_NINE = 9;   // 牛九
+  NIU_NIU = 10;   // 牛牛
+}
+enum WinState{
+    DRAW=0;//平局
+    WIN =1;//赢
+    FAIL = 2;//输
+}
+
+

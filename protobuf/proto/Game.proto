@@ -4,18 +4,90 @@ package com.z.model.proto;
 
 import "common_game.proto";
 //玩法消息
-message GameMsg {
-  int64 id = 1;//数据id
-  oneof type {
-    Game_Req_20001 req10001 = 2;
-    Game_Res_20002 res10002 = 3;
-  }
+
+//进入游戏（请求）
+message C_20001 {
+   GameType gameType  =1;//游戏类型
+   RoomType roomType  =2;//房间类型
 }
-message Game_Req_20001 {
-  MahjongData mahjongData = 1; //麻将
+//进入游戏（返回）
+message S_20002 {
+  repeated Room rooms=1;//房间列表
 }
-message Game_Res_20002 {
-  MahjongData mahjongData = 1;
+
+message Room{
+  int32 id =1;//房间id
+  RoomType type=2;//房间类型
+  int64 minBalance=3;//最低入场金额
 }
+
+//进入房间
+message C_20003 {
+  int64  uid= 1; //玩家id
+  GameType gameType  =2;//游戏类型
+  RoomType roomType=3;//房间类型
+}
+//进入房间（返回）
+message S_20004 {
+  int64 roomId=2;//房间id
+  int64 gameId=3;//游戏id
+  GameState state = 4;//游戏状态
+  int32 leaveTime=5;//剩余时间
+}
+
+//游戏状态切换（20006）
+message S_20006 {
+  int64 roomId=1;//房间id
+  int64 gameId=2;//游戏id
+  GameState state = 3;//游戏状态
+  int32 leaveTime=4;//剩余时间(秒)
+}
+
+//下注金额
+message C_20007 {
+  int64 roomId=1;//房间id
+  int64 gameId=2;//游戏id
+  CardSuit suit=3;//下注花色
+  int64 betGold=4;//下注金额
+}
+message S_20008 {
+  int64 gold =1;//剩余金额
+}
+//广播-下注金额（20010）
+message S_20010{
+  int64 uid=1;//下注玩家id
+  CardSuit suit=2;//下注花色
+  int64 betGold=3;//下注金额
+  repeated SuitPool suitPools=4;//奖池押注金额
+}
+
+//每个花色奖池金额
+message SuitPool{
+  CardSuit suit=1;//花色
+  int64 gold=2;//奖池金额
+}
+//广播-游戏结果
+message S_20012 {
+  int64 roomId=1;//房间id
+  int64 gameId=2;//游戏id
+  int64 gold =3;//玩家输赢金额
+  repeated SuitResult hardCards=4;//奖池的牌
+  SuitResult bankerCards=5;//庄家的牌
+}
+
+message SuitResult{
+  CardSuit suit=1;//花色
+  NiuType niu=2;//牛几
+  WinState state=3;//输赢状态
+  int64 gold=4;//输赢总金额
+  repeated Card cards=5;//玩家的手里的牌
+}
+
+//对应花色的牌
+message SuitCard{
+  CardSuit suit=1;//花色
+  repeated Card cards =4;//手里的牌
+}
+
 
 

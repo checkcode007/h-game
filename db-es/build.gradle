@@ -5,7 +5,7 @@ java {
     }
 }
 ext{
-    esVer='8.15.3'
+    esVer='8.16.0'
 }
 
 dependencies {

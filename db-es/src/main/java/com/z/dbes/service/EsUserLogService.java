@@ -5,7 +5,6 @@ import com.z.model.es.EsIndex;
 import com.z.model.es.EsUserLog;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 
 @Service
 public class EsUserLogService extends AbstractEsService<EsUserLog> {
@@ -18,7 +17,5 @@ public class EsUserLogService extends AbstractEsService<EsUserLog> {
     protected String getIndexSearchName() {
         return EsIndex.USER_LOG;
     }
-
-
 
 }

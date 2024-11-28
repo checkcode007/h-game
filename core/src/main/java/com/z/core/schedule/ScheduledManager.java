@@ -1,7 +1,9 @@
 package com.z.core.schedule;
 
 import cn.hutool.core.thread.ThreadUtil;
+import com.z.core.service.game.card.CardService;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -19,25 +21,28 @@ import java.util.concurrent.TimeUnit;
 public class ScheduledManager {
     public List<MySchedule> scheduleList = new ArrayList<>();
 
+    @Autowired
+    CardService cardService;
+
     private ScheduledManager(){
         MySchedule schedule = new MySchedule(1,"common",this::exe,20,10, TimeUnit.SECONDS);
         scheduleList.add(schedule);
-        schedule = new MySchedule(1,"ranking",this::exe1,25,5, TimeUnit.SECONDS);
+        schedule = new MySchedule(1,"card",this::exe1,25,5, TimeUnit.SECONDS);
         scheduleList.add(schedule);
 
     }
 
     public void exe(){
-        log.info("exe=>"+Thread.currentThread().getId()+" :"+Thread.currentThread().getName()+" :"+this.hashCode());
-
+//        log.info("exe=>"+Thread.currentThread().getId()+" :"+Thread.currentThread().getName()+" :"+this.hashCode());
     }
 
     public void exe1(){
-        log.info(+Thread.currentThread().getId()+" :"+Thread.currentThread().getName()+" :"+this.hashCode());
+//        log.info(+Thread.currentThread().getId()+" :"+Thread.currentThread().getName()+" :"+this.hashCode());
+//        cardService.exe();
     }
 
     public void exe2(){
-        log.info(Thread.currentThread().getId()+" :"+Thread.currentThread().getName()+" :"+this.hashCode());
+//        log.info(Thread.currentThread().getId()+" :"+Thread.currentThread().getName()+" :"+this.hashCode());
     }
 
     public void shutdown(){

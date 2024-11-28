@@ -40,7 +40,7 @@ subprojects {
         springdatacommonsVer='3.3.5'
         protobufVer='3.20.3'
         akartaVer='3.0.1'
-        esVer='8.15.3'
+        esVer='8.16.0'
 
     }
     // 如果当前项目不是 `model`，则添加 `model` 依赖
@@ -63,17 +63,34 @@ subprojects {
 
         implementation("com.google.protobuf:protobuf-java:$protobufVer")
 
-        implementation("jakarta.json.bind:jakarta.json.bind-api:$akartaVer")\
+        implementation("jakarta.json.bind:jakarta.json.bind-api:$akartaVer")
 
         implementation("co.elastic.clients:elasticsearch-java:$esVer")
+
+        implementation ("org.elasticsearch.client:elasticsearch-rest-client:$esVer")
 
         implementation 'joda-time:joda-time:2.13.0'
         implementation("cn.hutool:hutool-all:5.8.32")
         implementation 'org.springframework.cloud:spring-cloud-commons:4.1.4'
+        implementation 'com.google.guava:guava:33.3.1-jre'
+
+        implementation 'org.slf4j:slf4j-api:2.1.0-alpha1'
+        testImplementation 'org.apache.logging.log4j:log4j-slf4j-impl:3.0.0-beta2'
+
+        implementation 'org.apache.logging.log4j:log4j-core:3.0.0-beta2'
+        implementation 'org.apache.logging.log4j:log4j-api:3.0.0-beta2'
+        implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+        implementation 'javax.annotation:javax.annotation-api:1.3.2'
+//        implementation 'org.springframework:spring-context:6.2.0'
+        implementation 'org.springframework.boot:spring-boot-starter-cache:3.3.5'
+        implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.4.0'
+        implementation 'io.lettuce:lettuce-core:6.5.0.RELEASE'
+
 
     }
 
 }
+
 
 
 
