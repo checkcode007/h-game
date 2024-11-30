@@ -1,7 +1,8 @@
 package com.z.core.config;
 
 import com.z.core.schedule.ScheduledManager;
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ExitCodeGenerator;
@@ -10,10 +11,10 @@ import org.springframework.stereotype.Component;
 /**
  * 程序结束执行
  */
-@Log4j2
+//@Log4j2
 @Component
 public class DisposableBeanConfig implements DisposableBean, ExitCodeGenerator {
-
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     ScheduledManager scheduledManager;
 

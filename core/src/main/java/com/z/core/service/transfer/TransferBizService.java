@@ -1,15 +1,18 @@
 package com.z.core.service.transfer;
 
 
-import com.z.core.net.handler.wallet.TransferLog;
+import com.google.protobuf.ByteString;
 import com.z.core.service.cfg.CCfgBizService;
 import com.z.dbes.service.EsBankLogService;
 import com.z.dbmysql.dao.banktransfer.GBankTransferDao;
 import com.z.dbmysql.dao.wallet.GWalletDao;
+import com.z.model.common.MsgId;
 import com.z.model.mysql.GBankTransfer;
 import com.z.model.proto.CommonUser;
+import com.z.model.proto.MyMessage;
 import com.z.model.proto.User;
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,9 +24,9 @@ import java.util.StringJoiner;
 /**
  * 转账
  */
-@Log4j2
 @Service
 public class TransferBizService {
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     GBankTransferDao dao;
     @Autowired
@@ -83,6 +86,27 @@ public class TransferBizService {
         dao.save(record);
         log.error(sj.add("sucess").toString());
         return true;
+    }
+
+    /**
+     * 管理-转出详情
+     */
+    public MyMessage.MyMsgRes outList(long uid, long targetId) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("target:" + targetId);
+        log.info(sj.toString());
+        MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_MGR_QUERY_OUT).setOk(true);
+        List<GBankTransfer> list  = dao.findByTarget(targetId);
+        User.S_10414.Builder b = User.S_10414.newBuilder();
+        if (list != null && !list.isEmpty()) {
+            for (GBankTransfer e : list) {
+                b.addTransferLogs(User.TransforLog.newBuilder().setId(e.getId()).setType(CommonUser.TransferLogType.forNumber(e.getType()))
+                        .setFromId(e.getFromId()).setTargetId(e.getTargetId()).setState(e.isState()).setGold(e.getGold())
+                        .setTime(e.getCreateTime().getTime())
+                        .build());
+            }
+        }
+        log.info(sj.add("success").toString());
+        return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
     }
 
 }

@@ -5,16 +5,17 @@ import com.google.common.collect.Table;
 import com.z.dbmysql.dao.cfg.CCfgDao;
 import com.z.model.bo.CfgBo;
 import com.z.model.mysql.cfg.CCfg;
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Log4j2
 @Service
 public class CCfgDataBizService {
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     CCfgDao dao;
 
@@ -54,7 +55,7 @@ public class CCfgDataBizService {
     }
 
 
-//    @Scheduled(cron = "*/50 * * * * ?" )
+//    @Scheduled(cron = "*/5 * * * * ?" )
 
     @Scheduled(cron = "0 0/5 * * * ?" )
     public void exe(){

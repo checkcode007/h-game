@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true">
+    <!-- 设置日志级别 -->
+    <property name="LOG_PATH" value="logs" />
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36}[%L]- %msg%n" />
+
+    <!-- 控制台输出 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- DEBUG 日志输出到 debug.log 文件 -->
+    <appender name="DEBUG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/debug.log</file>
+
+        <!-- 日志滚动策略 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/debug-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- INFO 日志输出到 info.log 文件 -->
+    <appender name="INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/info.log</file>
+
+        <!-- 日志滚动策略 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/info-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <!-- net 日志输出到 info.log 文件 -->
+    <appender name="NET_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/net.log</file>
+
+        <!-- 日志滚动策略 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/info-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ERROR 日志输出到 error.log 文件 -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/error.log</file>
+
+        <!-- 日志滚动策略 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/error-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- DEBUG 日志配置 -->
+    <logger name="com.z" level="DEBUG" additivity="true">
+        <appender-ref ref="DEBUG_FILE" />
+    </logger>
+
+    <!-- net 日志配置 -->
+    <logger name="com.z.core.net" level="DEBUG" additivity="false">
+        <appender-ref ref="NET_FILE" />
+    </logger>
+
+    <!-- INFO 日志配置 -->
+    <logger name="com.z.core" level="INFO" additivity="false">
+        <appender-ref ref="INFO_FILE" />
+    </logger>
+
+    <!-- ERROR 日志配置 -->
+    <logger name="com.z" level="ERROR" additivity="false">
+        <appender-ref ref="ERROR_FILE" />
+    </logger>
+
+    <!-- 根日志设置，控制台输出 -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="INFO_FILE" />
+    </root>
+
+</configuration>

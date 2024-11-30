@@ -2,17 +2,17 @@ package com.z.core.service.cfg;
 
 import com.z.model.proto.CommonGame;
 import com.z.model.type.CfgEnum;
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Log4j2
 @Service
 public class CCfgBizService {
-
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     CCfgDataBizService service;
 

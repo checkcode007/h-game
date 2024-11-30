@@ -6,8 +6,9 @@ import com.z.core.service.game.card.CardGame;
 import com.z.core.service.game.card.CardPlayer;
 import com.z.dbes.service.EsGameService;
 import com.z.model.es.EsGame;
-import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +18,9 @@ import java.util.StringJoiner;
 /**
  *游戏管理类
  */
-@Log4j2
 @Service
 public class EsGameBizService {
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     EsGameService esGameService;
     public EsGame add(CardGame cardGame) {

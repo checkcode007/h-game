@@ -4,7 +4,6 @@ import com.google.protobuf.AbstractMessageLite;
 import com.google.protobuf.ByteString;
 import com.z.core.net.channel.ChannelAttributes;
 import com.z.core.net.handler.IHandler;
-import com.z.core.service.email.EmailBizService;
 import com.z.core.service.wallet.WalletBizService;
 import com.z.model.common.MsgId;
 import com.z.model.proto.MyMessage;

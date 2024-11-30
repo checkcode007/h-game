@@ -6,14 +6,11 @@ import com.z.core.net.channel.ChannelAttributes;
 import com.z.core.net.handler.IHandler;
 import com.z.core.service.wallet.WalletBizService;
 import com.z.model.common.MsgId;
-import com.z.model.mysql.GWallet;
 import com.z.model.proto.CommonUser;
 import com.z.model.proto.MyMessage;
 import com.z.model.proto.User;
-import com.z.model.type.AddType;
 import io.netty.channel.ChannelHandlerContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +21,8 @@ import java.util.List;
  */
 @Service
 public class BankWithDraw implements IHandler<User.C_10203> {
-    private static final Logger log = LogManager.getLogger(BankWithDraw.class);
+    protected org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
+//    private static final Logger log = LogManager.getLogger(BankWithDraw.class);
     @Autowired
     WalletBizService service;
 

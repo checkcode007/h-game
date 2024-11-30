@@ -19,7 +19,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class CoreApplication {
 
     public static void main(String[] args) {
-        ApplicationContext context = SpringApplication.run(CoreApplication.class, args);
+        SpringApplication.run(CoreApplication.class, args);
+//        ApplicationContext context = SpringApplication.run(CoreApplication.class, args);
 //        SpringContext.setApplicationContext(context);
     }
 

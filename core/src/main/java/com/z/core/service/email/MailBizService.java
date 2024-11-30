@@ -10,8 +10,9 @@ import com.z.model.mysql.GEmail;
 import com.z.model.proto.CommonUser;
 import com.z.model.proto.MyMessage;
 import com.z.model.proto.User;
-import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +20,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.StringJoiner;
 
-@Log4j2
 @Service
-public class EmailBizService {
+public class MailBizService {
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     GEmailDao dao;
     @Autowired
@@ -71,6 +72,9 @@ public class EmailBizService {
     }
     public void update(GEmail record){
         dao.save(record);
+    }
+    public List<GEmail> get(long uid){
+        return dao.findByUid(uid);
     }
 
 }

@@ -1,17 +1,21 @@
 package com.z.core.service.user;
 
 
+import cn.hutool.core.util.RandomUtil;
 import com.google.protobuf.ByteString;
 import com.z.common.util.NameUtils;
+import com.z.common.util.PbUtils;
 import com.z.core.net.channel.ChannelAttributes;
 import com.z.core.net.channel.UserChannelManager;
 import com.z.core.service.cfg.CCfgBizService;
+import com.z.core.service.email.MailBizService;
 import com.z.core.service.wallet.WalletBizService;
 import com.z.dbmysql.dao.agent.GAgentDao;
 import com.z.dbmysql.dao.user.GUserDao;
 import com.z.model.common.MsgId;
 import com.z.model.common.MsgResult;
 import com.z.model.mysql.GAgent;
+import com.z.model.mysql.GEmail;
 import com.z.model.mysql.GUser;
 import com.z.model.mysql.GWallet;
 import com.z.model.proto.CommonUser;
@@ -19,8 +23,9 @@ import com.z.model.proto.MyMessage;
 import com.z.model.proto.User;
 import com.z.model.type.AddType;
 import io.netty.channel.ChannelHandlerContext;
-import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -29,10 +34,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.StringJoiner;
-
-@Log4j2
+//@Log4j2
 @Service
 public class UserBizService {
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     GUserDao dao;
     @Autowired
@@ -43,6 +48,11 @@ public class UserBizService {
     CCfgBizService cfgBizService;
     @Autowired
     WalletBizService walletBizService;
+
+    @Autowired
+    MailBizService mailBizService;
+    @Autowired
+    PbUtils pbUtils;
 
     /**
      * 注册
@@ -65,11 +75,13 @@ public class UserBizService {
             res.setOk(false).setFailMsg("该用户已经注册");
             return res.build();
         }
+        int icon = RandomUtil.randomInt(1,10);
         Date date = new Date();
         user = new GUser();
         user.setPhone(phone);
         user.setPassword(pwd);
         user.setCreateTime(date);
+        user.setIcon(icon);
         user.setUpdateTime(date);
         user.setDeviceId(deviceId);
         user.setName(NameUtils.generateRandomString(8));
@@ -110,8 +122,15 @@ public class UserBizService {
         }
         esUserLogBizService.login(user);
         addChannel(ctx, user.getId());
-        User.S_10004.Builder b = User.S_10004.newBuilder().setVisitor(StringUtils.isEmpty(user.getPhone())).setType(CommonUser.UserType.forNumber(user.getType()));
-        log.info(sj.add("success").toString());
+        User.S_10004.Builder b = User.S_10004.newBuilder().setVisitor(StringUtils.isEmpty(user.getPhone()))
+                .setType(CommonUser.UserType.forNumber(user.getType()))
+                .setName(user.getName()).setUid(user.getId()).setIcon(user.getIcon()).setPhone(user.getPhone());
+        GWallet wallet = walletBizService.findById(uid);
+        if (wallet != null) {
+            b.setGold(wallet.getGold()).setBankGold(wallet.getBankGold());
+        }
+        b.setIcon(user.getIcon());
+        log.info(sj.add("res:"+pbUtils.pbToJson(b)).add("success").toString());
         return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
     }
 
@@ -183,12 +202,18 @@ public class UserBizService {
                 return res.build();
         }
         dao.update(user);
-        log.info(sj.add("success").toString());
-        return res.build();
+        GWallet wallet = walletBizService.findById(uid);
+        User.S_10006.Builder b = User.S_10006.newBuilder().setUid(uid).setPhone(user.getPhone())
+                .setName(user.getName()).setIcon(user.getIcon());
+        if(wallet!=null){
+            b.setGold(wallet.getGold()).setBankGold(wallet.getBankGold());
+        }
+        log.info(sj.add("res:"+pbUtils.pbToJson(b)).add("success").toString());
+        return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
     }
 
-    public MyMessage.MyMsgRes modifyPwd(long uid, String oldPwd, String newPwd) {
-        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("old:" + oldPwd).add("new:" + newPwd);
+    public MyMessage.MyMsgRes modifyPwd(long uid, String pwd) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("pwd:" + pwd);
         log.info(sj.toString());
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_PWD).setOk(true);
         GUser user = dao.findById(uid);
@@ -197,12 +222,7 @@ public class UserBizService {
             res.setOk(false).setFailMsg("没有该用户");
             return res.build();
         }
-        if (!user.getPassword().equals(oldPwd)) {
-            log.error(sj.add("老密码不正确:" + user.getPassword()).add(" old:" + oldPwd).toString());
-            res.setOk(false).setFailMsg("老密码不正确");
-            return res.build();
-        }
-        user.setPassword(newPwd);
+        user.setPassword(pwd);
         dao.update(user);
         log.info(sj.add("success").toString());
         return res.build();
@@ -229,7 +249,7 @@ public class UserBizService {
         boolean b_manager = from.getType() == CommonUser.UserType.MANAGER.getNumber();
         sj.add("type1:"+from.getType()).add("type2:"+target.getType()).add("mgr:"+b_manager);
         if(!b_manager){
-            if(from.getCodeCount()<cout){
+            if(from.getCodeCout()<cout){
                 log.error(sj.add("cout less").toString());
                 ret.failMsg("点卡数量不足");
                 return ret;
@@ -241,10 +261,10 @@ public class UserBizService {
                 return ret;
             }
             agentDao.add(fromId,targetId);
-            from.setCodeCount(from.getCodeCount()-cout);
+            from.setCodeCout(from.getCodeCout()-cout);
             dao.update(from);
         }
-        target.setCodeCount(target.getCodeCount()+cout);
+        target.setCodeCout(target.getCodeCout()+cout);
         dao.update(target);
         log.info(sj.add("success").toString());
         return  ret;
@@ -263,12 +283,12 @@ public class UserBizService {
         GUser gUser = findUser(uid);
         MsgResult ret = new MsgResult(true);
         if (AddType.ADD == addType) {
-            gUser.setCodeCount(count);
+            gUser.setCodeCout(count);
         } else {
-            if (gUser.getCodeCount() > count) {
-                gUser.setCodeCount(gUser.getCodeCount() - count);
+            if (gUser.getCodeCout() > count) {
+                gUser.setCodeCout(gUser.getCodeCout() - count);
             } else {
-                log.error(sj.add("count less:" + gUser.getCodeCount()).toString());
+                log.error(sj.add("count less:" + gUser.getCodeCout()).toString());
                 ret.failMsg("点卡数量不足");
                 return ret;
             }
@@ -278,6 +298,61 @@ public class UserBizService {
         log.info(sj.add("success").toString());
         return ret;
     }
+
+    /**
+     * 管理-查询
+     */
+    public MyMessage.MyMsgRes query(long uid,long targetId) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("target:" + targetId);
+        log.info(sj.toString());
+        MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_MGR_QUERY_QUERY).setOk(true);
+        GUser gUser = findUser(uid);
+        User.S_10412.Builder b = User.S_10412.newBuilder().setLeaveCount(gUser.getCodeCout());
+        GUser target = findUser(targetId);
+        if(target == null){
+            log.error(sj.add("没有该用户").toString());
+            res.setOk(false).setFailMsg("没有该用户");
+            return res.build();
+        }
+        b.setLock(target.isLockState());
+        GWallet wallet = walletBizService.findById(targetId);
+        if(wallet!=null){
+            b.setGold(wallet.getGold()).setBankGold(wallet.getBankGold());
+        }
+
+        List<GEmail> list = mailBizService.get(targetId);
+        if (list != null && !list.isEmpty()) {
+            for (GEmail e : list) {
+                b.addEmails(User.Email.newBuilder().setId(e.getId()).setType(CommonUser.EmailType.forNumber(e.getType())).setFromId(e.getFromId()).setUid(e.getUid()).setState(e.getState()).setGold(e.getGold())
+                        .setCreateTime(e.getCreateTime().getTime()).setUpdateTime(e.getUpdateTime().getTime())
+                        .build());
+            }
+        }
+        //todo 游戏收入
+
+        log.info(sj.add("success").toString());
+        return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
+    }
+    /**
+     * 管理-锁用户
+     */
+    public MyMessage.MyMsgRes lock(long uid,long targetId) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("target:" + targetId);
+        log.info(sj.toString());
+        MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_QUERY_LOCK).setOk(true);
+        GUser gUser = findUser(targetId);
+        if(gUser.isLockState()){
+            log.error(sj.add("had").toString());
+            res.setOk(false);
+            res.setFailMsg("该用户已经锁了");
+            return res.build();
+        }
+        gUser.setLockState(true);
+        dao.update(gUser);
+        log.info(sj.add("success").toString());
+        return res.build();
+    }
+
 
     private boolean b = false;
 

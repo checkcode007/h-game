@@ -3,6 +3,7 @@
     <Properties>
         <Property name="logPath">logs</Property> <!-- 日志目录 -->
         <Property name="logPattern">%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level (%F:%L) [%M] - %msg%n%throwable</Property>
+
     </Properties>
 
     <!-- Appenders 定义 -->
@@ -141,7 +142,8 @@
         <!-- Root Logger 配置 -->
         <Root level="debug">
             <AppenderRef ref="Console" />
-            <AppenderRef ref="File" />
+<!--            <AppenderRef ref="File" />
+-->
         </Root>
     </Loggers>
 </Configuration>

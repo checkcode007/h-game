@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+/**
+ * 点卡生成-列表
+ */
 @Component
 public class CodeCreateList implements IHandler<User.C_10401> {
 

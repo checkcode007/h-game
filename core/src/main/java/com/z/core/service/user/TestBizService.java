@@ -9,13 +9,14 @@ import com.z.core.service.wallet.WalletBizService;
 import com.z.dbmysql.dao.user.GUserDao;
 import com.z.model.mysql.GRoom;
 import com.z.model.proto.CommonGame;
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Log4j2
 @Service
 public class TestBizService {
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     GUserDao dao;
     @Autowired

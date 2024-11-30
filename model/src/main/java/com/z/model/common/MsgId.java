@@ -42,6 +42,19 @@ public class MsgId {
     public static final int C_CODE_SEND_SEND=10409;
     public static final int S_CODE_SEND_SEND=10410;
 
+    //查询
+    public static final int C_MGR_QUERY_QUERY =10411;
+    public static final int S_MGR_QUERY_QUERY =10412;
+
+    //查询 最近转出
+    public static final int C_MGR_QUERY_OUT =10413;
+    public static final int S_MGR_QUERY_OUT =10414;
+
+    //查询 锁用户
+    public static final int C_CODE_QUERY_LOCK=10415;
+    public static final int S_CODE_QUERY_LOCK=10416;
+
+
     //银行显示界面
     public static final int C_BANK_INFO=10201;
     public static final int S_BANK_INFO=10202;

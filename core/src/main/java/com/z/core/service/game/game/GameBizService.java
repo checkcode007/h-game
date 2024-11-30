@@ -4,7 +4,8 @@ import com.z.core.service.game.card.CardGame;
 import com.z.core.service.game.card.CardService;
 import com.z.core.service.user.UserBizService;
 import com.z.model.proto.CommonGame;
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +14,9 @@ import java.util.StringJoiner;
 /**
  *游戏管理类
  */
-@Log4j2
 @Service
 public class GameBizService {
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     EsGameBizService esGameService;
     @Autowired

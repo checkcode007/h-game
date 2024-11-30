@@ -4,7 +4,7 @@ import com.google.protobuf.AbstractMessageLite;
 import com.google.protobuf.ByteString;
 import com.z.core.net.channel.ChannelAttributes;
 import com.z.core.net.handler.IHandler;
-import com.z.core.service.email.EmailBizService;
+import com.z.core.service.email.MailBizService;
 import com.z.model.common.MsgId;
 import com.z.model.proto.MyMessage;
 import com.z.model.proto.User;
@@ -21,7 +21,7 @@ import java.util.List;
 @Service
 public class EmalList implements IHandler<User.C_10301> {
     @Autowired
-    EmailBizService service;
+    MailBizService service;
 
     @Override
     public int getMsgId() {

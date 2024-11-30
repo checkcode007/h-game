@@ -59,7 +59,12 @@ public class GBankTransferDao extends AbstractMapperService<GBankTransfer,Long> 
     public List<GBankTransfer> findByFrom(long uid){
         Map<String, Object> wheres =new HashMap<>();
         wheres.put("from_id",uid);
-        return super.findByMultiByParam(wheres,100);
+        return super.findByMultiByParam(wheres,1000);
+    }
+    public List<GBankTransfer> findByTarget(long uid){
+        Map<String, Object> wheres =new HashMap<>();
+        wheres.put("target_id",uid);
+        return super.findByMultiByParam(wheres,1000);
     }
     public Pager<GBankTransfer> page(long uid, int page, int pageSize) {
         // 构造查询条件
@@ -78,6 +83,6 @@ public class GBankTransferDao extends AbstractMapperService<GBankTransfer,Long> 
         Map<String, Object> wheres =new HashMap<>();
         wheres.put("uid",uid);
         wheres.put("state",state);
-        return super.findByMultiByParam(wheres,100);
+        return super.findByMultiByParam(wheres,1000);
     }
 }

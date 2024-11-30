@@ -9,8 +9,7 @@ import com.z.model.common.MsgId;
 import com.z.model.proto.MyMessage;
 import com.z.model.proto.User;
 import io.netty.channel.ChannelHandlerContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,8 +20,8 @@ import java.util.List;
  */
 @Component
 public class ModifyUser implements IHandler<User.C_10005> {
-
-    private static final Logger log = LogManager.getLogger(ModifyUser.class);
+    protected org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
+//    private static final Logger log = LogManager.getLogger(ModifyUser.class);
     @Autowired
     private UserBizService service;
 

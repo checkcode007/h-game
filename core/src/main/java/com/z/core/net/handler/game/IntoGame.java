@@ -2,18 +2,17 @@ package com.z.core.net.handler.game;
 
 import com.google.protobuf.AbstractMessageLite;
 import com.google.protobuf.ByteString;
+import com.z.core.net.channel.ChannelAttributes;
 import com.z.core.net.handler.IHandler;
 import com.z.core.service.game.room.RoomBizService;
-import com.z.core.net.channel.ChannelAttributes;
 import com.z.model.common.MsgId;
 import com.z.model.mysql.cfg.CRoom;
 import com.z.model.proto.CommonGame;
 import com.z.model.proto.Game;
 import com.z.model.proto.MyMessage;
 import io.netty.channel.ChannelHandlerContext;
-import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,10 +21,9 @@ import java.util.List;
 /**
  * 进入游戏
  */
-@Log4j2
 @Service
 public class IntoGame implements IHandler<Game.C_20001> {
-
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     private RoomBizService service;
 

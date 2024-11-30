@@ -5,14 +5,16 @@ import com.z.dbes.service.EsUserLogService;
 import com.z.model.es.EsUserLog;
 import com.z.model.mysql.GUser;
 import com.z.model.type.UserAction;
-import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Log4j2
+//@Log4j2
 @Service
 public class EsUserLogBizService {
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     EsUserLogService service;
 

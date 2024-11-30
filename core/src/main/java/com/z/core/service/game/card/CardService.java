@@ -6,8 +6,7 @@ import com.z.core.service.game.game.EsGameBizService;
 import com.z.core.service.user.UserBizService;
 import com.z.model.mysql.GUser;
 import com.z.model.proto.CommonGame;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class CardService {
-    private static final Logger log = LogManager.getLogger(CardService.class);
+    protected org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
+//    private static final Logger log = LogManager.getLogger(CardService.class);
     @Autowired
     UserBizService userBizService;
     @Autowired

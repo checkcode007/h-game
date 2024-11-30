@@ -42,7 +42,7 @@ public class GUserDao extends AbstractMapperService<GUser,Long> {
     public List<GUser> getAll(){
         return super.getAll(null);
     }
-    @Cacheable(cacheNames = "commonCache", key = "getTarget().cacheNamespace() + ':'  + #uid",unless = "#result == null")
+//    @Cacheable(cacheNames = "commonCache", key = "getTarget().cacheNamespace() + ':'  + #uid",unless = "#result == null")
     public GUser findById(long uid){
         return super.findById(uid);
     }
@@ -51,11 +51,11 @@ public class GUserDao extends AbstractMapperService<GUser,Long> {
     public GUser save(GUser user){
         return super.save(user);
     }
-    @Caching(evict = {
-            @CacheEvict(cacheNames = "commonCache", key = "getTarget().cacheNamespace() + #user.id"),
-            @CacheEvict(cacheNames = "commonCache", key = "getTarget().cacheNamespace() + 'phone' + ':' + #user.phone"),
-            @CacheEvict(cacheNames = "commonCache", key = "getTarget().cacheNamespace() + 'device' + ':' + #user.deviceId")
-    })
+//    @Caching(evict = {
+//            @CacheEvict(cacheNames = "commonCache", key = "getTarget().cacheNamespace() + #user.id"),
+//            @CacheEvict(cacheNames = "commonCache", key = "getTarget().cacheNamespace() + 'phone' + ':' + #user.phone"),
+//            @CacheEvict(cacheNames = "commonCache", key = "getTarget().cacheNamespace() + 'device' + ':' + #user.deviceId")
+//    })
     @Override
     public GUser update(GUser gUser) {
         return super.update(gUser);
@@ -66,13 +66,13 @@ public class GUserDao extends AbstractMapperService<GUser,Long> {
         wheres.put("state", UserState.DEFAULT.k);
         return super.findByMultiByParam(wheres,num);
     }
-    @Cacheable(cacheNames = "commonCache", key = "getTarget().cacheNamespace() + 'phone' + ':' +  #phone",unless = "#result == null")
+//    @Cacheable(cacheNames = "commonCache", key = "getTarget().cacheNamespace() + 'phone' + ':' +  #phone",unless = "#result == null")
     public GUser findByPhone(String phone){
         Map<String, Object> wheres =new HashMap<>();
         wheres.put("phone",phone);
         return super.findByOneByParam(wheres);
     }
-    @Cacheable(cacheNames = "commonCache", key = "getTarget().cacheNamespace() + 'device' + ':' +  #deviceId",unless = "#result == null")
+//    @Cacheable(cacheNames = "commonCache", key = "getTarget().cacheNamespace() + 'device' + ':' +  #deviceId",unless = "#result == null")
     public List<GUser> findByDeviceId(String deviceId){
         return this.findByMultiByWhere(" and device_id= '"+deviceId+"' and state !="+UserState.DEL.k,100);
     }

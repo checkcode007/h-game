@@ -2,9 +2,10 @@ package com.z.dbmysql.common;
 
 import com.z.model.common.ExcludeCreateTime;
 import com.z.model.common.ExcludeUpdateTime;
-import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.repository.query.Param;
 
 import java.beans.Transient;
@@ -21,8 +22,11 @@ import java.util.regex.Pattern;
 /**
  * sql适配器
  */
-@Log4j2
+//@Log4j2
 public class SqlProvider {
+    protected Logger log = LoggerFactory.getLogger(getClass());
+
+
     /**
      * 插入
      * @param tableName
@@ -208,7 +212,7 @@ public class SqlProvider {
             field.setAccessible(true);
             return  (Long) field.get(model);
         } catch (NoSuchFieldException e) {
-            log.debug("NoSuchFieldException={},auto id",e.getMessage());
+            System.err.println("NoSuchFieldException={},auto id"+e.getMessage());
             e.printStackTrace();
             return null;
         } catch (IllegalAccessException e) {

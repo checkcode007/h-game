@@ -6,7 +6,7 @@ import "common_user.proto";
 //用户消息==============
 
 //注册  返回-10002
-message C_10001 {
+message  C_10001 {
   string phone = 1;//手机号码
   string pwd=2;//用户密码
   string deviceId=3;//设备id
@@ -34,7 +34,11 @@ message S_10004 {
   int64 uid = 1;//用户id
   UserType type=2;//用户类型
   int32 icon =3;//用户头像
-  bool  visitor=4;//是否是游客（true：游客）
+  string name = 4;//用户名称
+  string phone = 5;//手机号
+  int64  gold=6;//用户账户-钱包金额
+  int64  bankGold=7;//用户账户-银行金额
+  bool  visitor=8;//是否是游客（true：游客）
 }
 
 //编辑用户信息
@@ -56,10 +60,9 @@ message S_10006 {
 
 //修改密码 --返回10008
 message C_10007 {
-  string oldPwd = 1;//老密码
-  string newPwd = 2;//新密码
+  string pwd = 1;//老密码
 }
-//绑定手机 --返回10010
+//绑定手机 --返回10010 （废弃）
 message C_10009 {
   string phone = 1;//手机号
 }
@@ -153,6 +156,7 @@ message Email{
   int32 state = 8;            // 状态
   int64 createTime = 9;       // 创建时间，使用时间戳（毫秒）
   int64 updateTime = 10;      // 更新时间，使用时间戳（毫秒）
+  int64 uid=11;      //邮件拥有者的id
 }
 //领取邮件--->返回10304 （刷新金额 10202）
 message C_10303 {
@@ -186,7 +190,7 @@ message S_10404{
 
 //点卡查询
 message C_10405{
-  int64 bindUid=1;//绑定的用户id
+  int64 bindUid=1;//绑定的用户id （-1是查询所有人）
 }
 message S_10406{
   repeated UserCode codes=1;
@@ -230,7 +234,8 @@ message S_10412{
   int64  gold =2;//钱包金额
   int64 bankGold=3;//银行金额
   int64 gameGold=4;//游戏最近收入
-  repeated Email emails=5;//邮件记录
+  bool lock=5;//是否被锁
+  repeated Email emails=6;//邮件记录
 }
 
 //查询-最近转出
@@ -241,6 +246,15 @@ message S_10414{
   repeated TransforLog transferLogs=1;//转出记录
 }
 
+//查询-锁用户-返回10416
+message C_10415{
+  int64 lockUid=1;//用户id
+}
+
+//查询-游戏详情（待定）
+message C_10417{
+  int64 findUid=1;//用户id
+}
 
 
 

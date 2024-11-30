@@ -6,7 +6,8 @@ import com.z.dbmysql.dao.walletlog.GBankLogDao;
 import com.z.model.mysql.GBankLog;
 import com.z.model.proto.CommonUser;
 import com.z.model.proto.User;
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +15,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Log4j2
 @Service
 public class BankLogBizService {
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     GBankLogDao dao;
     @Autowired

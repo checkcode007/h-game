@@ -12,8 +12,7 @@ import com.z.model.mysql.GRoom;
 import com.z.model.proto.Game;
 import com.z.model.proto.MyMessage;
 import io.netty.channel.ChannelHandlerContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,8 +23,7 @@ import java.util.List;
  */
 @Service
 public class IntoRoom implements IHandler<Game.C_20003> {
-
-    private static final Logger log = LogManager.getLogger(IntoRoom.class);
+    protected org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     RoomBizService service;
     @Autowired

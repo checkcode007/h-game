@@ -40,7 +40,7 @@ public class GUser {
     /**
      * 点卡生成次数
      */
-    private int codeCount;
+    private int codeCout;
     /**
      * @see com.z.model.type.user.UserState
      */
@@ -48,7 +48,7 @@ public class GUser {
     /**
      * 锁定状态
      */
-    private boolean LockState;
+    private boolean lockState;
     private Date createTime;
     private Date updateTime;
 

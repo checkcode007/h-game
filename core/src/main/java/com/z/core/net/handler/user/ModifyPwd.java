@@ -9,8 +9,7 @@ import com.z.model.common.MsgId;
 import com.z.model.proto.MyMessage;
 import com.z.model.proto.User;
 import io.netty.channel.ChannelHandlerContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,8 +20,7 @@ import java.util.List;
  */
 @Component
 public class ModifyPwd implements IHandler<User.C_10007> {
-
-    private static final Logger log = LogManager.getLogger(ModifyPwd.class);
+    protected org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     private UserBizService service;
 
@@ -40,7 +38,7 @@ public class ModifyPwd implements IHandler<User.C_10007> {
     @Override
     public AbstractMessageLite handleDo(ChannelHandlerContext ctx, User.C_10007 req) {
         long uid = ctx.channel().attr(ChannelAttributes.USER_ID).get();
-        return service.modifyPwd(uid,req.getOldPwd(),req.getNewPwd());
+        return service.modifyPwd(uid,req.getPwd());
     }
 
 }

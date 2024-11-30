@@ -24,10 +24,12 @@ public class UserChannelManager {
     }
 
     public static Channel getChannel(long userId) {
+        System.err.println("addChannel------->"+userId);
         return channelMap.get(userId);
     }
     //todo 离线后移除其他缓存
     public static void removeUser(long userId) {
+        System.err.println("delChannel------->"+userId);
         channelMap.remove(userId);
     }
     public static Collection<Channel> getAllChannel() {

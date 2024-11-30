@@ -1,11 +1,12 @@
 package com.z.core.net.handler;
 
 import cn.hutool.json.JSONUtil;
-import com.google.protobuf.*;
+import com.google.protobuf.AbstractMessageLite;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.z.common.util.SpringContext;
 import com.z.core.net.channel.ChannelAttributes;
 import com.z.core.net.channel.UserChannelManager;
-import com.z.model.proto.Game;
 import com.z.model.proto.MyMessage;
 import com.z.model.proto.User;
 import io.netty.buffer.Unpooled;
@@ -14,15 +15,18 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketFrame;
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.StringJoiner;
 
-@Log4j2
+//@Log4j2
 public class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
+    protected Logger log = LoggerFactory.getLogger(getClass());
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame){
         try {
@@ -36,9 +40,9 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocket
         // 获取客户端的IP地址
         String clientIp = getClientIp(ctx);
         StringJoiner sj = new StringJoiner(",").add("ip:"+clientIp).add("frame:"+frame.getClass());
-        log.debug(sj.toString());
+        log.info(sj.toString());
         if (frame instanceof TextWebSocketFrame) {
-            log.debug(sj.add("type:text").toString());
+            log.info(sj.add("type:text").toString());
             // 处理文本帧
             String request = ((TextWebSocketFrame) frame).text();
             log.debug(sj.add("rec: " + request).toString());
@@ -164,9 +168,9 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocket
             MyMessage.MyMsgReq myMessage =  MyMessage.MyMsgReq.parseFrom(bytes);
             List<ByteString> list = myMessage.getMsgList();
             User.C_10001  res =  User.C_10001.parseFrom(ByteString.copyFrom(list).toByteArray());
-            log.info("反序列化成功:{}, {}",myMessage,res);
+//            log.info("反序列化成功:{}, {}",myMessage,res);
         } catch (InvalidProtocolBufferException e) {
-            log.error("反序列化失败: {}", e.getMessage());
+//            log.error("反序列化失败: {}", e.getMessage());
         }
 
     }

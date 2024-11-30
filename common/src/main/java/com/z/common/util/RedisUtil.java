@@ -1,6 +1,6 @@
 package com.z.common.util;
 
-import lombok.extern.log4j.Log4j2;
+
 import org.springframework.data.redis.connection.RedisClusterConnection;
 import org.springframework.data.redis.connection.RedisClusterNode;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 
-@Log4j2
+//@Log4j2
 public class RedisUtil {
     public static RedisTemplate<String, Object> redisTemplate;
     // 推荐：用于字符串操作
@@ -342,7 +342,8 @@ public class RedisUtil {
                 resultList.add(hashCursor.next());
             }
         } catch (Exception e) {
-            log.error("Error occurred during Redis scan operation", e);
+            e.printStackTrace();
+//            log.error("Error occurred during Redis scan operation", e);
         }
 
         return resultList;
@@ -1202,7 +1203,8 @@ public class RedisUtil {
             }
         } catch (Exception e) {
             // 记录日志而非打印堆栈跟踪
-            log.error("Error occurred during Redis ZSet scan operation", e);
+            e.printStackTrace();
+//            log.error("Error occurred during Redis ZSet scan operation", e);
         }
         return resultList;
     }

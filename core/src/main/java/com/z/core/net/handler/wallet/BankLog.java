@@ -4,14 +4,12 @@ import com.google.protobuf.AbstractMessageLite;
 import com.google.protobuf.ByteString;
 import com.z.core.net.channel.ChannelAttributes;
 import com.z.core.net.handler.IHandler;
-import com.z.core.service.transfer.TransferBizService;
 import com.z.core.service.wallet.BankLogBizService;
 import com.z.model.common.MsgId;
 import com.z.model.proto.MyMessage;
 import com.z.model.proto.User;
 import io.netty.channel.ChannelHandlerContext;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +20,8 @@ import java.util.List;
  */
 @Service
 public class BankLog implements IHandler<User.C_10213> {
-    private static final Logger log = LogManager.getLogger(BankLog.class);
+    protected org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
+//    private static final Logger log = LogManager.getLogger(BankLog.class);
     @Autowired
     BankLogBizService service;
 

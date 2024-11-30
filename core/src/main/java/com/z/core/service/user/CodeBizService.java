@@ -4,6 +4,8 @@ package com.z.core.service.user;
 import com.google.protobuf.ByteString;
 import com.z.common.util.CodeUtil;
 import com.z.core.service.cfg.CCfgBizService;
+import com.z.core.service.email.MailBizService;
+import com.z.core.service.wallet.WalletBizService;
 import com.z.dbmysql.dao.code.GCodeDao;
 import com.z.dbmysql.dao.code.GCodeSendLogDao;
 import com.z.model.common.MsgId;
@@ -15,8 +17,9 @@ import com.z.model.proto.CommonUser;
 import com.z.model.proto.MyMessage;
 import com.z.model.proto.User;
 import com.z.model.type.AddType;
-import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,9 +30,9 @@ import java.util.StringJoiner;
 /**
  * 兑换码
  */
-@Log4j2
 @Service
 public class CodeBizService {
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     GCodeDao dao;
     @Autowired
@@ -38,6 +41,10 @@ public class CodeBizService {
     UserBizService userBizService;
     @Autowired
     CCfgBizService cfgBizService;
+    @Autowired
+    MailBizService mailBizService;
+    @Autowired
+    WalletBizService walletBizService;
     /**
      * 点卡生成-查询
      */
@@ -47,7 +54,7 @@ public class CodeBizService {
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_CREATE_LIST).setOk(true);
         List<GCode> list = dao.findByFrom(uid);
         GUser gUser = userBizService.findUser(uid);
-        User.S_10402.Builder b = User.S_10402.newBuilder().setLeaveCount(gUser.getCodeCount());
+        User.S_10402.Builder b = User.S_10402.newBuilder().setLeaveCount(gUser.getCodeCout());
         if (list != null && !list.isEmpty()) {
             for (GCode e : list) {
                 b.addCodes(User.BindCode.newBuilder().setUid(e.getTargetId())
@@ -76,7 +83,7 @@ public class CodeBizService {
         GCode exchangeCode = create(uid,bindUid);
         dao.save(exchangeCode);
         GUser gUser = userBizService.findUser(uid);
-        User.S_10404.Builder b = User.S_10404.newBuilder().setLeaveCount(gUser.getCodeCount());
+        User.S_10404.Builder b = User.S_10404.newBuilder().setLeaveCount(gUser.getCodeCout());
         if (list != null && !list.isEmpty()) {
             for (GCode e : list) {
                 b.addCodes(User.BindCode.newBuilder().setUid(e.getTargetId())
@@ -95,9 +102,14 @@ public class CodeBizService {
         StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("bindUid:" + bindUid);
         log.info(sj.toString());
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_QUERY).setOk(true);
-        List<GCode> list = dao.findByTarget(bindUid);
+        List<GCode> list;
+        if(bindUid>0){
+            list = dao.findByTarget(bindUid);
+        }else{
+            list = dao.getAll("id desc");
+        }
         GUser gUser = userBizService.findUser(uid);
-        User.S_10406.Builder b = User.S_10406.newBuilder().setLeaveCount(gUser.getCodeCount());
+        User.S_10406.Builder b = User.S_10406.newBuilder().setLeaveCount(gUser.getCodeCout());
         if (list != null && !list.isEmpty()) {
             for (GCode e : list) {
                 b.addCodes(User.UserCode.newBuilder().setUid(e.getTargetId()).setGold(e.getGold()).setState(CommonUser.CodeState.forNumber(e.getState()))
@@ -120,7 +132,7 @@ public class CodeBizService {
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_SEND_LIST).setOk(true);
         List<GCodeSendLog> list = logDao.findByFrom(uid);
         GUser gUser = userBizService.findUser(uid);
-        User.S_10408.Builder b = User.S_10408.newBuilder().setLeaveCount(gUser.getCodeCount());
+        User.S_10408.Builder b = User.S_10408.newBuilder().setLeaveCount(gUser.getCodeCout());
         if (list != null && !list.isEmpty()) {
             for (GCodeSendLog e : list) {
                 b.addCodes(User.GiveCode.newBuilder().setUid(e.getTargetId()).setCount(e.getCout()).setTime(e.getLastTime().getTime())
@@ -137,7 +149,7 @@ public class CodeBizService {
     public MyMessage.MyMsgRes codeSend(long uid,long targetId,int cout) {
         StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("bindUid:" + targetId).add("cout:" + cout);
         log.info(sj.toString());
-        MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_SEND_LIST).setOk(true);
+        MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_SEND_SEND).setOk(true);
         List<GCodeSendLog> list = logDao.findByFrom(uid);
         GUser gUser = userBizService.findUser(uid);
         MsgResult changeRet = userBizService.changeCodeCout(uid,targetId,1);
@@ -146,7 +158,7 @@ public class CodeBizService {
             res.setOk(false).setFailMsg(changeRet.getMessage());
             return res.build();
         }
-        User.S_10408.Builder b = User.S_10408.newBuilder().setLeaveCount(gUser.getCodeCount());
+        User.S_10408.Builder b = User.S_10408.newBuilder().setLeaveCount(gUser.getCodeCout());
         if (list != null && !list.isEmpty()) {
             for (GCodeSendLog e : list) {
                 b.addCodes(User.GiveCode.newBuilder().setUid(e.getTargetId()).setCount(e.getCout()).setTime(e.getLastTime().getTime())
@@ -156,6 +168,9 @@ public class CodeBizService {
         log.info(sj.add("success").toString());
         return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
     }
+
+
+
 
 
     public GCode create(long uid, long targetId){

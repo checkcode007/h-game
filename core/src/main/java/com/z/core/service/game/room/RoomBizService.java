@@ -6,7 +6,8 @@ import com.z.model.mysql.GRoom;
 import com.z.model.mysql.cfg.CRoom;
 import com.z.model.proto.CommonGame;
 import com.z.model.type.RoomState;
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -18,9 +19,9 @@ import java.util.StringJoiner;
 /**
  * 房间管理类
  */
-@Log4j2
 @Service
 public class RoomBizService {
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     GRoomDao dao;
     @Autowired

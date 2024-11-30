@@ -4,7 +4,7 @@ package com.z.core.service.wallet;
 import com.google.protobuf.ByteString;
 import com.z.core.net.channel.UserChannelManager;
 import com.z.core.service.cfg.CCfgBizService;
-import com.z.core.service.email.EmailBizService;
+import com.z.core.service.email.MailBizService;
 import com.z.core.service.transfer.TransferBizService;
 import com.z.dbmysql.dao.wallet.GWalletDao;
 import com.z.model.bo.WalletBo;
@@ -16,8 +16,9 @@ import com.z.model.proto.CommonUser;
 import com.z.model.proto.MyMessage;
 import com.z.model.proto.User;
 import com.z.model.type.AddType;
-import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -25,9 +26,9 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.StringJoiner;
 
-@Log4j2
 @Service
 public class WalletBizService {
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     GWalletDao dao;
     @Autowired
@@ -37,7 +38,7 @@ public class WalletBizService {
     @Autowired
     TransferBizService transferService;
     @Autowired
-    private EmailBizService emailBizService;
+    private MailBizService emailBizService;
 
     public MyMessage.MyMsgRes info(long uid){
         StringJoiner sj = new StringJoiner(",").add("uid:"+uid);

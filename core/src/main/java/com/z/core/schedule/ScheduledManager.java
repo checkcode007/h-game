@@ -2,7 +2,8 @@ package com.z.core.schedule;
 
 import cn.hutool.core.thread.ThreadUtil;
 import com.z.core.service.game.card.CardService;
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,11 +17,11 @@ import java.util.concurrent.TimeUnit;
  * @version 1.0.0、
  * @since 2024-08-30
  */
-@Log4j2
+//@Log4j2
 @Component
 public class ScheduledManager {
     public List<MySchedule> scheduleList = new ArrayList<>();
-
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     CardService cardService;
 
@@ -55,7 +56,7 @@ public class ScheduledManager {
     }
 
     public static void exeee(){
-        log.info("exe=>"+Thread.currentThread().getId()+" :"+Thread.currentThread().getName());
+//        log.info("exe=>"+Thread.currentThread().getId()+" :"+Thread.currentThread().getName());
 
     }
 

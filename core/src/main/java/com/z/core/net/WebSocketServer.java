@@ -15,15 +15,15 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.stream.ChunkedWriteHandler;
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-@Log4j2
 @Component
 public class WebSocketServer implements ApplicationListener<ApplicationReadyEvent> {
-
+    protected Logger log = LoggerFactory.getLogger(getClass());
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event)  {
         try {

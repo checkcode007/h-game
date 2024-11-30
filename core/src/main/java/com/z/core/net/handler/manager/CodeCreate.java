@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * 点卡生成-生成
+ */
 @Component
 public class CodeCreate implements IHandler<User.C_10403> {
 
