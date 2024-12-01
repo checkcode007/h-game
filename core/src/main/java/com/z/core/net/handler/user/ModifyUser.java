@@ -39,7 +39,7 @@ public class ModifyUser implements IHandler<User.C_10005> {
     @Override
     public AbstractMessageLite handleDo(ChannelHandlerContext ctx, User.C_10005 req) {
         long uid = ctx.channel().attr(ChannelAttributes.USER_ID).get();
-        return service.edit(uid,req.getType(),req.getName(),req.getIcon(),req.getPhone());
+        return service.edit(uid,req.getType(),req.getName(),req.getIcon(),req.getPhone(),req.getPwd());
     }
 
 }

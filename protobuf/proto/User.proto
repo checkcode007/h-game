@@ -18,7 +18,7 @@ message S_10002{
   string phone = 4;//手机号
   int64  gold=5;//用户账户-钱包金额
   int64  bankGold=6;//用户账户-银行金额
-  int64  pwd=7;//密码
+  string  pwd=7;//密码
   bool  visitor=8;//是否是游客（true：游客）
 }
 
@@ -47,6 +47,7 @@ message C_10005 {
   string name = 2;//用户名称
   int32 icon = 3;//头像id
   string phone =4;//手机号
+  string pwd =5;//绑定手机号的需要的密码
 }
 //用户信息
 message S_10006 {
@@ -60,7 +61,7 @@ message S_10006 {
 
 //修改密码 --返回10008
 message C_10007 {
-  string pwd = 1;//老密码
+  string pwd = 1;//密码
 }
 //绑定手机 --返回10010 （废弃）
 message C_10009 {
@@ -235,7 +236,7 @@ message S_10412{
   int64 bankGold=3;//银行金额
   int64 gameGold=4;//游戏最近收入
   bool lock=5;//是否被锁
-  repeated Email emails=6;//邮件记录
+  Email emails=6;//邮件-最近一条
 }
 
 //查询-最近转出
@@ -249,6 +250,7 @@ message S_10414{
 //查询-锁用户-返回10416
 message C_10415{
   int64 lockUid=1;//用户id
+  bool  state =2;// (true: 锁，false：解锁)
 }
 
 //查询-游戏详情（待定）

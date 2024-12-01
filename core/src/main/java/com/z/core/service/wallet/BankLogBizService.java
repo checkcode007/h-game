@@ -37,8 +37,15 @@ public class BankLogBizService {
     }
 
     public void add(CommonUser.BankType type, long uid, long targetId,long transferId, long gold1, long gold2, long gold){
-        GBankLog bankLog = GBankLog.builder().type(type.getNumber()).uid(uid).targetId(targetId).transferId(transferId).gold1(gold1).gold2(gold2).gold(gold).build();
-        bankLog.setLastTime(new Date());
+        GBankLog bankLog = new GBankLog();
+        bankLog.setType(type.getNumber());     // 设置 type
+        bankLog.setUid(uid);                   // 设置 uid
+        bankLog.setTargetId(targetId);         // 设置 targetId
+        bankLog.setTransferId(transferId);     // 设置 transferId
+        bankLog.setGold1(gold1);               // 设置 gold1
+        bankLog.setGold2(gold2);               // 设置 gold2
+        bankLog.setGold(gold);                 // 设置 gold
+        bankLog.setLastTime(new Date());       // 设置 lastTime
         if(type  == CommonUser.BankType.BT_EMAIL){
             bankLog.setState(false);
         }else{

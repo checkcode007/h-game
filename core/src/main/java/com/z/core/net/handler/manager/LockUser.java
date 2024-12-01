@@ -39,6 +39,6 @@ public class LockUser implements IHandler<User.C_10415> {
     @Override
     public AbstractMessageLite handleDo(ChannelHandlerContext ctx, User.C_10415 req) {
         long uid = ctx.channel().attr(ChannelAttributes.USER_ID).get();
-        return service.lock(uid, req.getLockUid());
+        return service.lock(uid, req.getLockUid(),req.getState());
     }
 }

@@ -15,8 +15,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 @Data
-public class GBankTransfer {
-    private long id;
+public class GBankTransfer extends Model {
     /**
      * @see  com.z.model.proto.CommonUser.TransferLogType
      */
@@ -25,7 +24,5 @@ public class GBankTransfer {
     private long targetId;
     private long gold;
     private boolean state;
-    private Date createTime;
-    private Date updateTime;
 
 }

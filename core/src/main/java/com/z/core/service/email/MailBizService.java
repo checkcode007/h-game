@@ -32,9 +32,16 @@ public class MailBizService {
         DateTime now = DateTime.now();
         long t = now.getMillis();
         Date d =now.toDate();
-        GEmail email = GEmail.builder().id(IdUtil.nextEmailId()).type(type.getNumber()).uid(targerId)
-                .fromId(fromId).gold(gold).transferId(transferId).state(CommonUser.YesNo.YN_N.getNumber())
-                .createTime(d).updateTime(d).build();
+        GEmail email = new GEmail();
+        email.setId(IdUtil.nextEmailId());                      // 设置 id
+        email.setType(type.getNumber());                       // 设置 type
+        email.setUid(targerId);                                // 设置 uid
+        email.setFromId(fromId);                               // 设置 fromId
+        email.setGold(gold);                                   // 设置 gold
+        email.setTransferId(transferId);                       // 设置 transferId
+        email.setState(CommonUser.YesNo.YN_N.getNumber());     // 设置 state
+        email.setCreateTime(d);                                // 设置 createTime
+        email.setUpdateTime(d);                                // 设置 updateTime
         dao.save(email);
         return true;
     }
@@ -46,7 +53,6 @@ public class MailBizService {
         log.info(sj.toString());
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_EMAIL_LIST).setOk(true);
         List<GEmail> list = null;
-        int tatal = 0;
         if(type == 1){//全部
             list = dao.findByUid(uid);
         }else{//未领取
@@ -75,6 +81,10 @@ public class MailBizService {
     }
     public List<GEmail> get(long uid){
         return dao.findByUid(uid);
+    }
+
+    public GEmail getLastOne(long uid){
+        return dao.findByUidLastOne(uid);
     }
 
 }

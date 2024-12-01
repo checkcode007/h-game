@@ -2,12 +2,9 @@ package com.z.model.mysql;
 
 import lombok.Data;
 
-import java.util.Date;
-
 
 @Data
-public class GUser {
-    private long id;
+public class GUser extends Model {
     /**
      *  类型 0 普通账号
      * @see com.z.model.proto.CommonUser.UserType
@@ -49,7 +46,5 @@ public class GUser {
      * 锁定状态
      */
     private boolean lockState;
-    private Date createTime;
-    private Date updateTime;
 
 }

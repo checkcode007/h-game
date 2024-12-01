@@ -1,18 +1,12 @@
 package com.z.model.mysql;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Date;
-
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-@Data
-public class GEmail {
-    private long id;
+@Getter
+@Setter
+public class GEmail extends Model {
     private long uid;
     private String title;
     private String content;
@@ -21,7 +15,5 @@ public class GEmail {
     private long fromId;
     private long transferId;
     private int state;
-    private Date createTime;
-    private Date updateTime;
 
 }

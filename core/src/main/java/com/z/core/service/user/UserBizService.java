@@ -3,6 +3,7 @@ package com.z.core.service.user;
 
 import cn.hutool.core.util.RandomUtil;
 import com.google.protobuf.ByteString;
+import com.z.common.util.CodeUtil;
 import com.z.common.util.NameUtils;
 import com.z.common.util.PbUtils;
 import com.z.core.net.channel.ChannelAttributes;
@@ -69,15 +70,27 @@ public class UserBizService {
             res.setOk(false).setFailMsg("已达手机注册上限");
             return res.build();
         }
-        GUser user = dao.findByPhone(phone);
-        if (user != null) {
-            log.error(sj.add("该用户已经注册").toString());
-            res.setOk(false).setFailMsg("该用户已经注册");
-            return res.build();
+        phone = phone == null?"":phone;
+        boolean isVisitor = StringUtils.isEmpty(phone);
+        if(!isVisitor){
+            GUser user = dao.findByPhone(phone);
+            if (user != null) {
+                log.error(sj.add("该用户已经注册").toString());
+                res.setOk(false).setFailMsg("该用户已经注册");
+                return res.build();
+            }
+            if (StringUtils.isEmpty(pwd)) {
+                log.error(sj.add("密码不能为空").toString());
+                res.setOk(false).setFailMsg("密码不能为空");
+                return res.build();
+            }
+        }else {
+            pwd = CodeUtil.idToCode(RandomUtil.randomLong(10000, 9000000000L), 8);
         }
+        sj.add("visit:"+isVisitor).add("pwd:"+pwd);
         int icon = RandomUtil.randomInt(1,10);
         Date date = new Date();
-        user = new GUser();
+        GUser user = new GUser();
         user.setPhone(phone);
         user.setPassword(pwd);
         user.setCreateTime(date);
@@ -88,8 +101,9 @@ public class UserBizService {
         user = dao.save(user);
         addChannel(ctx, user.getId());
         User.S_10002.Builder b = User.S_10002.newBuilder();
-        b.setUid(user.getId()).setName(user.getName()).setPhone(user.getPhone() == null ? "" : user.getPhone());
-        log.info(sj.add("success").toString());
+
+        b.setUid(user.getId()).setPwd(user.getPassword()).setName(user.getName()).setVisitor(isVisitor).setPhone(phone);
+        log.info(sj.add("res:"+pbUtils.pbToJson(b)).add("success").toString());
         esUserLogBizService.reg(user);
         return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
     }
@@ -155,8 +169,9 @@ public class UserBizService {
         return res.build();
     }
 
-    public MyMessage.MyMsgRes edit(long uid, CommonUser.ModifyUserType type, String name, int icon, String phone) {
-        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("name:" + name).add("icon:" + icon).add("phone:" + phone);
+    public MyMessage.MyMsgRes edit(long uid, CommonUser.ModifyUserType type, String name, int icon, String phone,String pwd) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("name:" + name)
+                .add("icon:" + icon).add("phone:" + phone).add("pwd:" + pwd);
         log.info(sj.toString());
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_EDIT).setOk(true);
         GUser user = dao.findById(uid);
@@ -175,6 +190,7 @@ public class UserBizService {
                 user.setName(name);
                 break;
             case CommonUser.ModifyUserType.MUT_PHONE:
+
                 if (StringUtils.isEmpty(phone)) {
                     log.error(sj.add("手机号不能为空").toString());
                     res.setOk(false).setFailMsg("手机号不能为空");
@@ -185,7 +201,13 @@ public class UserBizService {
                     res.setOk(false).setFailMsg("已经绑定手机");
                     return res.build();
                 }
+                if (StringUtils.isEmpty(pwd)) {
+                    log.error(sj.add("密码不能为空").toString());
+                    res.setOk(false).setFailMsg("密码不能为空");
+                    return res.build();
+                }
                 user.setPhone(phone);
+                user.setPassword(pwd);
                 break;
             case CommonUser.ModifyUserType.MUT_ICON:
                 if (icon < 1) {
@@ -319,15 +341,10 @@ public class UserBizService {
         if(wallet!=null){
             b.setGold(wallet.getGold()).setBankGold(wallet.getBankGold());
         }
-
-        List<GEmail> list = mailBizService.get(targetId);
-        if (list != null && !list.isEmpty()) {
-            for (GEmail e : list) {
-                b.addEmails(User.Email.newBuilder().setId(e.getId()).setType(CommonUser.EmailType.forNumber(e.getType())).setFromId(e.getFromId()).setUid(e.getUid()).setState(e.getState()).setGold(e.getGold())
-                        .setCreateTime(e.getCreateTime().getTime()).setUpdateTime(e.getUpdateTime().getTime())
-                        .build());
-            }
-        }
+        GEmail e = mailBizService.getLastOne(targetId);
+        b.setEmails(User.Email.newBuilder().setId(e.getId()).setType(CommonUser.EmailType.forNumber(e.getType())).setFromId(e.getFromId()).setUid(e.getUid()).setState(e.getState()).setGold(e.getGold())
+                .setCreateTime(e.getCreateTime().getTime()).setUpdateTime(e.getUpdateTime().getTime())
+                .build());
         //todo 游戏收入
 
         log.info(sj.add("success").toString());
@@ -336,18 +353,27 @@ public class UserBizService {
     /**
      * 管理-锁用户
      */
-    public MyMessage.MyMsgRes lock(long uid,long targetId) {
-        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("target:" + targetId);
+    public MyMessage.MyMsgRes lock(long uid,long targetId,boolean state) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("target:" + targetId).add("state:" + state);
         log.info(sj.toString());
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_QUERY_LOCK).setOk(true);
         GUser gUser = findUser(targetId);
-        if(gUser.isLockState()){
-            log.error(sj.add("had").toString());
-            res.setOk(false);
-            res.setFailMsg("该用户已经锁了");
-            return res.build();
+        if(state){
+            if(gUser.isLockState()){
+                log.error(sj.add("had").toString());
+                res.setOk(false);
+                res.setFailMsg("该用户已经锁了");
+                return res.build();
+            }
+        }else{
+            if(!gUser.isLockState()){
+                log.error(sj.add("had").toString());
+                res.setOk(false);
+                res.setFailMsg("该用户已经解锁");
+                return res.build();
+            }
         }
-        gUser.setLockState(true);
+        gUser.setLockState(state);
         dao.update(gUser);
         log.info(sj.add("success").toString());
         return res.build();

@@ -1,18 +1,16 @@
 package com.z.model.mysql;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.z.model.common.ExcludeCreateTime;
+import com.z.model.common.ExcludeUpdateTime;
+import lombok.*;
 
 import java.util.Date;
 
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
-public class GBankLog {
-    private long id;
+@Getter
+@Setter
+@ExcludeCreateTime
+@ExcludeUpdateTime
+public class GBankLog extends Model{
     private int type;
     private long uid;
     private long targetId;

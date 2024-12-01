@@ -15,19 +15,14 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 @Data
-public class GCode {
+public class GCode extends Model {
     //唯一id
-    private long id;
     private long fromId;
     private long targetId;
     private long gold;
     private String code;
     private int state;
-    private Date createTime;
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
+
     /**
      * 使用时间
      */

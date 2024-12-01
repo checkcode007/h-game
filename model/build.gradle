@@ -10,5 +10,8 @@ java {
 
 
 dependencies {
+    implementation 'javax.persistence:javax.persistence-api:2.2'
+    implementation 'org.hibernate:hibernate-core:7.0.0.Beta2'
+
 
 }
