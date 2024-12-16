@@ -16,4 +16,13 @@ public enum UserState {
         this.k = k;
         this.name = name;
     }
+
+    public static UserState getUserState(int k) {
+        for (UserState state : UserState.values()) {
+            if (state.k == k) {
+                return state;
+            }
+        }
+        return DEFAULT;
+    }
 }

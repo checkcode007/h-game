@@ -1,6 +1,6 @@
 rootProject.name = 'h-game'
 
-include 'app'
+//include 'app'
 include 'db-mysql'
 include 'db-es'
 include 'model'

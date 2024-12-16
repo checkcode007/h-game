@@ -1,0 +1,79 @@
+package com.z.core.service.game.slot;
+
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import com.z.dbmysql.dao.slot.CSlotDao;
+import com.z.model.mysql.cfg.CSlot;
+import com.z.model.proto.CommonGame;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * slot-配置
+ */
+@Service
+public class CSlotService {
+    protected Logger log = LoggerFactory.getLogger(getClass());
+    @Autowired
+    CSlotDao dao;
+
+    Table<CommonGame.GameType, Integer, List<CSlot>> table = HashBasedTable.create();
+
+    @PostConstruct
+    public void init() {
+        reload();
+    }
+
+    @Scheduled(cron = "0 0/5 * * * ?")
+    public void exe() {
+        try {
+            reload();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    public void reload() {
+        List<CSlot> allList = dao.getAll();
+        if (allList == null || allList.isEmpty()) return;
+        Table<CommonGame.GameType, Integer, List<CSlot>> table1 = HashBasedTable.create();
+        for (CSlot e : allList) {
+            CommonGame.GameType gameType = CommonGame.GameType.valueOf(e.getType());
+            if (gameType == null) continue;
+            List<CSlot> list = table1.get(gameType, e.getSymbol());
+            if(list == null){
+                list = new ArrayList<>();
+                table1.put(gameType, e.getSymbol(), list);
+            }
+            list.add(e);
+        }
+        table = table1;
+
+    }
+
+    public Map<Integer, List<CSlot>> getMap(CommonGame.GameType gameType) {
+        return table.row(gameType);
+    }
+
+    public List<CSlot> get(CommonGame.GameType gameType, int symbol) {
+        return table.get(gameType, symbol);
+    }
+
+    public CSlot get(CommonGame.GameType gameType, int symbol, int c) {
+        List<CSlot> list = table.get(gameType, symbol);
+        if (list == null || list.isEmpty()) return null;
+        for (CSlot e : list) {
+            if (e.getC() == c) return e;
+        }
+        return null;
+    }
+
+}

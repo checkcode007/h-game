@@ -2,9 +2,9 @@ package com.z.core.service.user;
 
 
 import com.z.core.service.cfg.CCfgBizService;
-import com.z.core.service.game.card.CardGame;
-import com.z.core.service.game.game.GameBizService;
-import com.z.core.service.game.room.RoomBizService;
+import com.z.core.service.game.card.SuperGame;
+import com.z.core.service.game.game.RoomBizService;
+import com.z.core.service.game.room.RoomService;
 import com.z.core.service.wallet.WalletBizService;
 import com.z.dbmysql.dao.user.GUserDao;
 import com.z.model.mysql.GRoom;
@@ -12,6 +12,7 @@ import com.z.model.proto.CommonGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,10 +24,9 @@ public class TestBizService {
     CCfgBizService cfgBizService;
     @Autowired
     WalletBizService walletBizService;
+
     @Autowired
     RoomBizService roomBizService;
-    @Autowired
-    GameBizService gameBizService;
 
     boolean b_test =false;
 //    @Scheduled(cron = "*/15 * * * * ?" )
@@ -37,9 +37,8 @@ public class TestBizService {
         b_test =true;
         log.info("b-test-->"+b_test);
         long uid = 50000L;
-        GRoom gRoom = roomBizService.intoGameRoom(uid, CommonGame.GameType.BAIREN_NIUNIU, CommonGame.RoomType.ONE);
 
-        CardGame game = gameBizService.into(uid,gRoom.getId(),CommonGame.GameType.BAIREN_NIUNIU);
+        RoomService.ins.reloadCfg();
 
     }
 //    @Scheduled(cron = "*/10 * * * * ?" )

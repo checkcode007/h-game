@@ -58,4 +58,5 @@ public class GAgentDao extends AbstractMapperService<GAgent,Long> {
         save(agent);
     }
 
+
 }

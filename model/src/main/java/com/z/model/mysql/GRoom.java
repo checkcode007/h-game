@@ -11,8 +11,16 @@ import java.util.Date;
 @AllArgsConstructor
 @Data
 public class GRoom {
-    private long id; // 房间ID
+    private String id; // 房间ID
     private int cfgId; // 房间配置id
+    /**
+     * @see  com.z.model.proto.CommonGame.RoomType
+     */
+    private int type;
+    /**
+     * @see com.z.model.proto.CommonGame.GameType
+     */
+    private int gameTpe;
     private int curPlayers; // 当前人数
     private long dealerId; // 庄家ID
     private long jackpot; // 奖池金额

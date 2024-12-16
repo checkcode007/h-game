@@ -12,9 +12,9 @@ import com.z.model.proto.User;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import io.netty.handler.codec.http.websocketx.WebSocketFrame;
+import io.netty.handler.codec.http.websocketx.*;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +30,18 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocket
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame){
         try {
-            read(ctx,frame);
+            if (frame instanceof PingWebSocketFrame) {
+                // 收到 Ping 帧，回应 Pong 帧
+                PongWebSocketFrame pong = new PongWebSocketFrame(frame.content().retain());
+                ctx.writeAndFlush(pong);
+            } else if (frame instanceof PongWebSocketFrame) {
+                // 处理 Pong 帧
+               log.info("Received Pong from client");
+            } else {
+                // 处理其他 WebSocket 帧（例如文本或二进制数据）
+//                super.channelRead(ctx, frame);
+                read(ctx,frame);
+            }
         } catch (Exception e) {
             log.error("",e);
         }
@@ -146,7 +157,20 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocket
         cause.printStackTrace();
         ctx.close();
     }
-
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        if (evt instanceof IdleStateEvent) {
+            IdleStateEvent event = (IdleStateEvent) evt;
+            if (event.state() == IdleState.READER_IDLE) {
+                // 如果连接空闲超过设定时间，触发心跳机制
+                log.info("Sending Ping to client");
+                PingWebSocketFrame ping = new PingWebSocketFrame();
+                ctx.writeAndFlush(ping);
+            }
+        } else {
+            super.userEventTriggered(ctx, evt);
+        }
+    }
     private String getClientIp(ChannelHandlerContext ctx) {
         InetSocketAddress socketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
         return socketAddress.getAddress().getHostAddress();

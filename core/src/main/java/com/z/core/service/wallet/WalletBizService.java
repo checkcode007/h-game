@@ -3,15 +3,15 @@ package com.z.core.service.wallet;
 
 import com.google.protobuf.ByteString;
 import com.z.core.net.channel.UserChannelManager;
-import com.z.core.service.cfg.CCfgBizService;
 import com.z.core.service.email.MailBizService;
 import com.z.core.service.transfer.TransferBizService;
-import com.z.dbmysql.dao.wallet.GWalletDao;
 import com.z.model.bo.WalletBo;
+import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgId;
 import com.z.model.mysql.GBankTransfer;
 import com.z.model.mysql.GEmail;
 import com.z.model.mysql.GWallet;
+import com.z.model.proto.CommonGame;
 import com.z.model.proto.CommonUser;
 import com.z.model.proto.MyMessage;
 import com.z.model.proto.User;
@@ -30,10 +30,6 @@ import java.util.StringJoiner;
 public class WalletBizService {
     protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
-    GWalletDao dao;
-    @Autowired
-    CCfgBizService cfgBizService;
-    @Autowired
     BankLogBizService bankLogBizService;
     @Autowired
     TransferBizService transferService;
@@ -44,17 +40,19 @@ public class WalletBizService {
         StringJoiner sj = new StringJoiner(",").add("uid:"+uid);
         log.info(sj.toString());
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_BANK_INFO).setOk(true);
-        GWallet gWallet = dao.findById(uid);
+        Wallet wallet = WalletService.ins.get(uid);
         User.S_10202.Builder builder = User.S_10202.newBuilder();
-        if(gWallet!=null){
-            builder.setGold(gWallet.getGold()).setBankGold(gWallet.getBankGold());
+        if(wallet!=null){
+            builder.setGold(wallet.getGold()).setBankGold(wallet.getBankGold());
         }
         log.info(sj.add("success").toString());
         return res.addMsg(ByteString.copyFrom(builder.build().toByteArray())).build();
     }
 
-
     public boolean changeGold(CommonUser.GoldType goldType, AddType addType, long uid, long gold) {
+        return changeGold(goldType,addType,uid,gold);
+    }
+    public boolean changeGold(CommonUser.GoldType goldType, AddType addType, long uid, long gold, CommonGame.GameType gameType, CommonGame.RoomType roomType) {
         StringJoiner sj = new StringJoiner(",");
         sj.add("add:" + addType).add("uid:" + uid).add("gold:" + gold);
         log.info(sj.toString());
@@ -65,32 +63,38 @@ public class WalletBizService {
         boolean create = false;
         DateTime now = DateTime.now();
         Date d = now.toDate();
-        GWallet wallet = dao.findById(uid);
+        Wallet wallet = WalletService.ins.get(uid);
         if (wallet == null) {
             create = true;
-            wallet = create(uid, d);
+            GWallet w = create(uid, d);
+            wallet = new Wallet();
+            wallet.setWallet(w);
         }
         sj.add("create:" + create);
         if (addType == AddType.ADD) {
-            wallet.setGold(wallet.getGold() + gold);
+            wallet.addGold(gold);
         } else {
             if (wallet.getGold() < gold) {
                 log.error(sj.add("not full").toString());
                 return false;
             }
-            wallet.setGold(wallet.getGold() - gold);
+            wallet.subGold(gold);
         }
         if (create) {
-            dao.save(wallet);
+            WalletService.ins.add(wallet.getWallet());
         } else {
-            dao.update(wallet);
+            WalletService.ins.offer(wallet.getId());
         }
+        //todo 添加入库金额变动记录
+
         sendWalletInfo(uid);
         log.info(sj.add("success").toString());
         return true;
     }
-
     public boolean changeBank(CommonUser.BankType bankType, long uid, long targerId, long gold) {
+        return changeBank(bankType,uid,targerId,gold,null);
+    }
+    public boolean changeBank(CommonUser.BankType bankType, long uid, long targerId, long gold,GEmail mail) {
         StringJoiner sj = new StringJoiner(",");
         sj.add("uid:" + uid).add("targerId:" + targerId).add("gold:" + gold).add("bankType:" + bankType);
         log.info(sj.toString());
@@ -102,50 +106,64 @@ public class WalletBizService {
         DateTime now = DateTime.now();
         Date d = now.toDate();
         long gold1 =0,gold2 = 0;
-        GWallet wallet = dao.findById(uid);
+        Wallet wallet = WalletService.ins.get(uid);
         if (wallet == null) {
             create = true;
-            wallet = create(uid, d);
+            GWallet w = create(uid, d);
+            wallet = new Wallet();
+            wallet.setWallet(w);
         }else{
             gold1 = wallet.getBankGold();
         }
         sj.add("create:" + create);
         long transferId = 0;
+        long mailId=0,tax= 0,realGold=0;
         switch (bankType) {
             case CommonUser.BankType.BT_DEPOSIT://存入
                 if (wallet.getGold() < gold) {
                     log.error(sj.add("gold not full").toString());
                     return false;
                 }
-                wallet.setGold(wallet.getGold() - gold);
-                wallet.setBankGold(wallet.getBankGold() + gold);
+                wallet.subGold( gold);
+                wallet.addBankGold(gold);
                 break;
             case CommonUser.BankType.BT_WITHDRAW://取出
                 if (wallet.getBankGold() < gold) {
                     log.error(sj.add("bank not full").toString());
                     return false;
                 }
-                wallet.setGold(wallet.getGold() + gold);
-                wallet.setBankGold(wallet.getBankGold() - gold);
+                wallet.addGold( gold);
+                wallet.subBankGold(gold);
                 break;
             case CommonUser.BankType.BT_TRANSFER:
                 if (wallet.getBankGold() < gold) {
                     log.error(sj.add("bank not full").toString());
                     return false;
                 }
-                wallet.setBankGold(wallet.getBankGold() - gold);
+                wallet.subBankGold(gold);
                 //转账记录
                 GBankTransfer transfer = transferService.add(uid,targerId,gold);
                 transferId = transfer.getId();
                 //发送邮件
-                emailBizService.add(CommonUser.EmailType.ET_DEFAULT,transferId,transfer.getFromId(),transfer.getTargetId(),gold);
+                GEmail gEmail = emailBizService.add(CommonUser.EmailType.ET_DEFAULT,transferId,transfer.getFromId(),transfer.getTargetId(),gold);
+                mailId = gEmail.getId();
+                tax= gEmail.getTax();
+                realGold = gEmail.getRealGold();
+                transferService.updateMail(transferId,mailId,tax,realGold);
+                break;
+            case CommonUser.BankType.BT_EMAIL:
+                wallet.addBankGold(gold);
+//                //转账记录更新状态
+//                transferService.updateState(mail.getTransferId());
+                transferId = mail.getTransferId();
+                tax= mail.getTax();
                 break;
         }
-        bankLogBizService.add(bankType,uid,targerId,transferId,gold1,wallet.getBankGold(),gold);
+        bankLogBizService.add(bankType,uid,targerId,transferId,mailId,gold1,wallet.getBankGold(),gold,tax);
         if (create) {
-            dao.save(wallet);
+            WalletService.ins.add(wallet.getWallet());
         } else {
-            dao.update(wallet);
+            WalletService.ins.offer(wallet.getId());
         }
         sendWalletInfo(uid);
         log.info(sj.add("success").toString());
@@ -168,28 +186,26 @@ public class WalletBizService {
         boolean create = false;
         DateTime now = DateTime.now();
         Date d = now.toDate();
-        GWallet wallet = dao.findById(uid);
+        Wallet wallet = WalletService.ins.get(uid);
         if (wallet == null) {
             create = true;
-            wallet = create(uid, d);
+            GWallet w = create(uid, d);
+            wallet = new Wallet();
+            wallet.setWallet(w);
         }
         sj.add("create:" + create);
 
-        wallet.setBetGold(wallet.getBetGold() + bo.getBankGold());
-        wallet.setWinGold(wallet.getWinGold() + bo.getWinGold());
-        wallet.setLosses(wallet.getLosses() + bo.getLosses());
-        wallet.setWins(wallet.getWins() + bo.getWins());
+        wallet.addBetGold(bo.getBankGold());
+        wallet.addWinGold(bo.getWinGold());
+        wallet.addLosses(bo.getLosses());
+        wallet.addWins(bo.getWins());
         if (create) {
-            dao.save(wallet);
+            WalletService.ins.add(wallet.getWallet());
         } else {
-            dao.update(wallet);
+            WalletService.ins.offer(wallet.getId());
         }
         log.info(sj.add("success").toString());
         return true;
-    }
-
-    public GWallet findById(long id) {
-        return dao.findById(id);
     }
     /**
      * 领取邮件
@@ -198,40 +214,38 @@ public class WalletBizService {
         StringJoiner sj = new StringJoiner(",").add("uid:"+uid).add("id:"+id);
         log.info(sj.toString());
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_EMAIL_RECEIVE).setOk(true);
-        GEmail gEmail = emailBizService.findById(id);
-        if(gEmail==null){
+        GEmail mail = emailBizService.findById(id);
+        if(mail==null){
             log.error(sj.add("没有该邮件").toString());
             res.setOk(false).setFailMsg("没有该邮件");
             return res.build();
         }
-        if(gEmail.getUid() != uid) {
-            log.error(sj.add("数据异常euid:"+gEmail.getUid()).toString());
+        if(mail.getUid() != uid) {
+            log.error(sj.add("数据异常euid:"+mail.getUid()).toString());
             res.setOk(false).setFailMsg("数据异常");
             return res.build();
         }
-        if(gEmail.getState() == 1) {
+        if(mail.getState() == 1) {
             log.error(sj.add("已经领取").toString());
             res.setOk(false).setFailMsg("已经领取");
             return res.build();
         }
-        if(!transferService.updateState(gEmail.getTransferId())){
+        long gold1 = mail.getGold();
+
+        if(!transferService.updateState(mail.getTransferId())){
             log.error(sj.add("转账记录数据异常").toString());
             res.setOk(false).setFailMsg("转账记录数据异常");
             return res.build();
         }
-        bankLogBizService.update(gEmail.getTransferId());
-        long gold1 = gEmail.getGold();
-        //扣除税率
-        long diff = (long)(gold1*cfgBizService.getTaxes());
-        long gold2 = gold1 - diff;
-        gEmail.setGold(gold2);
-        gEmail.setState(1);
-
-        gEmail.setUpdateTime(new Date());
-        emailBizService.update(gEmail);
-        changeBank(CommonUser.BankType.BT_EMAIL,gEmail.getFromId(),uid,gold2);
-
-        sj.add("gold1:"+gold1).add("gold2:"+gold2).add("diff:"+diff);
+        bankLogBizService.update(mail.getTransferId());
+        mail.setState(1);
+        mail.setUpdateTime(new Date());
+        emailBizService.update(mail);
+        changeBank(CommonUser.BankType.BT_EMAIL,uid,mail.getFromId(),mail.getRealGold(),mail);
+        Wallet wallet = WalletService.ins.get(uid);
+        bankLogBizService.add(CommonUser.BankType.BT_EMAIL,mail.getFromId(),mail.getUid(),mail.getTransferId(),
+                mail.getId(),gold1,wallet.getBankGold(),mail.getRealGold(),mail.getTax());
+        sj.add("gold1:"+gold1).add("realGold:"+mail.getRealGold()).add("tax:"+mail.getTax());
         log.info(sj.add("success").toString());
         sendWalletInfo(uid);
         return res.build();
@@ -240,7 +254,7 @@ public class WalletBizService {
     public void sendWalletInfo(long uid){
         StringJoiner sj = new StringJoiner(",").add("uid:"+uid);
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_BANK_INFO).setOk(true);
-        GWallet gWallet = dao.findById(uid);
+        Wallet gWallet =  WalletService.ins.get(uid);
         User.S_10202.Builder builder = User.S_10202.newBuilder();
         if(gWallet!=null){
             builder.setGold(gWallet.getGold()).setBankGold(gWallet.getBankGold());
@@ -249,4 +263,5 @@ public class WalletBizService {
         boolean b = UserChannelManager.sendMsg(uid,res.addMsg(ByteString.copyFrom(builder.build().toByteArray())).build());
         log.info(sj.add("success").toString());
     }
+
 }

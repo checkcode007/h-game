@@ -1,6 +1,8 @@
 package com.z.core.net.channel;
 
 import com.google.protobuf.AbstractMessageLite;
+import com.z.common.util.SpringContext;
+import com.z.core.service.game.game.RoomBizService;
 import com.z.model.proto.MyMessage;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -31,6 +33,7 @@ public class UserChannelManager {
     public static void removeUser(long userId) {
         System.err.println("delChannel------->"+userId);
         channelMap.remove(userId);
+        SpringContext.getBean(RoomBizService.class).out(userId);
     }
     public static Collection<Channel> getAllChannel() {
         return channelMap.values();

@@ -4,10 +4,8 @@ import com.google.protobuf.AbstractMessageLite;
 import com.google.protobuf.ByteString;
 import com.z.core.net.channel.ChannelAttributes;
 import com.z.core.net.handler.IHandler;
-import com.z.core.service.game.card.CardService;
-import com.z.core.service.wallet.WalletBizService;
+import com.z.core.service.game.game.RoomBizService;
 import com.z.model.common.MsgId;
-import com.z.model.mysql.GWallet;
 import com.z.model.proto.Game;
 import com.z.model.proto.MyMessage;
 import io.netty.channel.ChannelHandlerContext;
@@ -18,43 +16,28 @@ import java.util.List;
 
 
 /**
- * 下注
+ * 百变玛丽下注
  */
 @Service
-public class Bet implements IHandler<Game.C_20007> {
+public class Bet implements IHandler<Game.C_20103> {
     @Autowired
-    CardService service;
-    @Autowired
-    WalletBizService walletService;
+    RoomBizService service;
 
     @Override
     public int getMsgId() {
-        return MsgId.C_BET;
+        return MsgId.C_SLOT_BET;
     }
 
     @Override
     public AbstractMessageLite handle(ChannelHandlerContext ctx, MyMessage.MyMsgReq msgReq) throws Exception {
         List<ByteString> list = msgReq.getMsgList();
-        Game.C_20007  req =  Game.C_20007.parseFrom(ByteString.copyFrom(list).toByteArray());
+        Game.C_20103  req =  Game.C_20103.parseFrom(ByteString.copyFrom(list).toByteArray());
         return handleDo(ctx,req);
     }
 
     @Override
-    public AbstractMessageLite handleDo(ChannelHandlerContext ctx, Game.C_20007 req) {
+    public AbstractMessageLite handleDo(ChannelHandlerContext ctx, Game.C_20103 req) {
         long uid = ctx.channel().attr(ChannelAttributes.USER_ID).get();
-        MyMessage.MyMsgRes.Builder res =MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_INTOGAME);
-        boolean b_bet = service.bet(uid,req.getRoomId(),req.getGameId(),req.getSuit(),req.getBetGold());
-        if(!b_bet){
-            res.setOk(false).setFailMsg("进入异常");
-            return res.build();
-        }
-        GWallet wallet = walletService.findById(uid);
-        long gold =0L;
-        if(wallet!=null){
-            gold = wallet.getGold();
-        }
-        Game.S_20008.Builder b = Game.S_20008.newBuilder().setGold(gold);
-        res.setOk(true).addMsg(ByteString.copyFrom(b.build().toByteArray()));
-        return res.build();
+        return service.bet(uid,req.getGold(),req.getFree());
     }
 }

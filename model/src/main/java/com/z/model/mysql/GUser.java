@@ -1,9 +1,12 @@
 package com.z.model.mysql;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 
-@Data
+@Getter
+@Setter
 public class GUser extends Model {
     /**
      *  类型 0 普通账号
@@ -46,5 +49,6 @@ public class GUser extends Model {
      * 锁定状态
      */
     private boolean lockState;
-
+    int game;
+    int room;
 }

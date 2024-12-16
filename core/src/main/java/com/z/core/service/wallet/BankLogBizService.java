@@ -30,21 +30,24 @@ public class BankLogBizService {
             for (GBankLog e : list1) {
                 list.add(User.BankLog.newBuilder().setId(e.getId()).setGold(e.getGold()).setGold1(e.getGold1()).setGold2(e.getGold2())
                                 .setType(CommonUser.BankType.forNumber(e.getType())).setState(e.isState()).setLastTime(e.getLastTime().getTime())
+                                .setMailId(e.getMailId()).setTax(e.getTax())
                         .build());
             }
         }
         return list;
     }
 
-    public void add(CommonUser.BankType type, long uid, long targetId,long transferId, long gold1, long gold2, long gold){
+    public void add(CommonUser.BankType type, long uid, long targetId,long transferId,long mailId, long gold1, long gold2, long gold,long tax){
         GBankLog bankLog = new GBankLog();
         bankLog.setType(type.getNumber());     // 设置 type
         bankLog.setUid(uid);                   // 设置 uid
         bankLog.setTargetId(targetId);         // 设置 targetId
         bankLog.setTransferId(transferId);     // 设置 transferId
+        bankLog.setMailId(mailId);
         bankLog.setGold1(gold1);               // 设置 gold1
         bankLog.setGold2(gold2);               // 设置 gold2
         bankLog.setGold(gold);                 // 设置 gold
+        bankLog.setTax(tax);
         bankLog.setLastTime(new Date());       // 设置 lastTime
         if(type  == CommonUser.BankType.BT_EMAIL){
             bankLog.setState(false);

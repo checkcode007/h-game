@@ -20,7 +20,9 @@ public class MsgId {
     //绑定手机
     public static final int C_PHONE=10009;
     public static final int S_PHONE=10010;
-
+    //重新连接
+    public static final int C_RECONNECT=10011;
+    public static final int S_RECONNECT=10012;
     //点卡生成-列表
     public static final int C_CODE_CREATE_LIST=10401;
     public static final int S_CODE_CREATE_LIST=10402;
@@ -87,6 +89,9 @@ public class MsgId {
     public static final int S_EMAIL_RECEIVE=10304;
 
 
+    public static final int C_GM_ADDGOLD=10321;
+    public static final int S_GM_ADDGOLD=10322;
+
     //-----------游戏-----
     //进入游戏
     public static final int C_INTOGAME=20001;
@@ -101,6 +106,33 @@ public class MsgId {
     //下注
     public static final int C_BET=20007;
     public static final int S_BET=20008;
+
+
+    //-------进入游戏后的初始化显示
+    public static final int C_ENTER_INIT=20101;
+    public static final int S_ENTER_INIT=20102;
+
+
+    //下注
+    public static final int C_SLOT_BET=20103;
+    public static final int S_SLOT_BET=20104;
+    //退出房间
+    public static final int C_OUT_ROON=20105;
+    public static final int S_OUT_ROON=20106;
+
+    //----捕鱼----
+    //读取指定房间的捕鱼火力的配置
+    public static final int C_FISH_INIT=20201;
+    public static final int S_FISH_INIT=20202;
+
+    //捕鱼-捕获到鱼
+    public static final int C_FISH_GET=20203;
+    public static final int S_FISH_GET=20204;
+
+    //捕鱼-开火
+    public static final int C_FISH_FIRE=20205;
+    public static final int S_FISH_FIRE=20206;
+
 
 
 }

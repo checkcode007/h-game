@@ -1,9 +1,15 @@
 package com.z.model.common;
 
-public class MsgResult {
+public class MsgResult<T> {
     boolean ok;
     int code;
     String message;
+    T t;
+
+    public MsgResult(T t) {
+        this.ok = true;
+        this.t = t;
+    }
 
     public MsgResult(boolean ok) {
         this.ok = ok;
@@ -18,10 +24,17 @@ public class MsgResult {
         this.code = code;
         this.message = message;
     }
-
+    public MsgResult(String failMsg) {
+        this.ok = false;
+        this.message = failMsg;
+    }
     public void failMsg(String failMsg){
         this.ok = false;
         this.message = failMsg;
+    }
+    public void ok(T t){
+        this.ok = true;
+        this.t = t;
     }
 
     public boolean isOk() {
@@ -46,5 +59,9 @@ public class MsgResult {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public T getT() {
+        return t;
     }
 }

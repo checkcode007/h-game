@@ -11,20 +11,18 @@ import com.z.model.proto.MyMessage;
 import com.z.model.type.PlayerState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class CardGame {
+public class CardGame extends SuperGame {
     private static final Logger logger = LogManager.getLogger(CardGame.class);
-    private long id;
-    private long roomId;
-    private long round;
     private Deck deck;//牌组
     private CardPlayer banker; // 庄家
-    private CommonGame.GameState state; // 当前游戏状态
+
     private Map<CommonGame.GameState, Integer> timeMap = new HashMap<>();
     private long time;
     private Map<Long, CardPlayer> playerMap = new ConcurrentHashMap<>();
@@ -34,29 +32,29 @@ public class CardGame {
     private Game.SuitCard bankerCard;
     private Map<CommonGame.CardSuit, Game.SuitCard> cardPool = new ConcurrentHashMap<>();
 
-    long bet=0;
+    long bet = 0;
     AtomicBoolean stop = new AtomicBoolean(false);
 
-    /**
-     * 每个玩家进来要等待下一场
-     */
-    public CardGame(long id, long roomId, CardPlayer banker, Map<CommonGame.GameState, Integer> timeMap) {
-        this.id = id;
-        this.roomId = roomId;
-        this.banker = banker;
+    public CardGame(long id, long roomId, CommonGame.RoomType roomType, CommonGame.GameType gameType) {
+        super(id, roomId, roomType, gameType);
+    }
+
+    public void init(CardPlayer banker, Map<CommonGame.GameState, Integer> timeMap){
         this.deck = new Deck();
         this.state = CommonGame.GameState.WAITING_FOR_PLAYE;
         this.timeMap = timeMap;
         this.time = System.currentTimeMillis() + timeMap.getOrDefault(state, 0) * 1000;
         this.stop.getAndSet(false);
     }
-    public void nextRound(){
+
+    public void nextRound() {
         round++;
-        round = round<0?1:round;
+        round = round < 0 ? 1 : round;
     }
+
     public void addReady(long uid) {
         readyMap.put(uid, System.currentTimeMillis());
-        if(stop.get()){
+        if (stop.get()) {
             stop.getAndSet(false);
             this.time = System.currentTimeMillis() + timeMap.getOrDefault(state, 0) * 1000;
         }
@@ -68,7 +66,7 @@ public class CardGame {
     }
 
     public void addPlayer(long uid) {
-        CardPlayer player = new CardPlayer(uid, 1000, true,false);
+        CardPlayer player = new CardPlayer(uid, 1000, true, false);
         playerMap.put(player.getUid(), player);
     }
 
@@ -82,7 +80,7 @@ public class CardGame {
     public void addBet(long uid, CommonGame.CardSuit suit, long gold) {
         CardPlayer player = playerMap.get(uid);
         player.placeBet(suit, gold);
-        bet+=gold;
+        bet += gold;
     }
 
     public void exe(long now) {
@@ -95,9 +93,9 @@ public class CardGame {
 
     public void exeDo(long now) {
         if (now < time) return;
-        StringJoiner sj = new StringJoiner(",").add("id:" + id).add("roomId:" + roomId).add("state1" + state).add("stop:"+stop);
+        StringJoiner sj = new StringJoiner(",").add("id:" + id).add("roomId:" + roomId).add("state1" + state).add("stop:" + stop);
         logger.info(sj.add("start").toString());
-        if(stop.get()){
+        if (stop.get()) {
             return;
         }
         state = CommonGame.GameState.forNumber(state.getNumber() + 1);
@@ -106,7 +104,7 @@ public class CardGame {
         }
         time = now + timeMap.getOrDefault(state, 0) * 1000;
 
-        sj.add("state2:" + state +" players--->"+playerMap.size());
+        sj.add("state2:" + state + " players--->" + playerMap.size());
         logger.info(sj.toString());
         Game.S_20006 stateMsg = Game.S_20006.newBuilder().setState(state).setGameId(id).setRoomId(roomId).setLeaveTime(getLeaveTime()).build();
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_GAME_STATE).setOk(true);
@@ -132,35 +130,36 @@ public class CardGame {
         }
         logger.info(sj.add("sucess").toString());
     }
+
     /**
      * 获取下一局的时间
+     *
      * @return
      */
-    public int getNextTime(){
+    @Override
+    public int getNextTime() {
         long diff = 0l;
-
-//        if(CommonGame.GameState.WAITING_FOR_PLAYE == state){
-//            diff =time - System.currentTimeMillis();
-//        }else{
-            diff =time - System.currentTimeMillis();
-            for (CommonGame.GameState value : CommonGame.GameState.values()) {
-                if(value == CommonGame.GameState.UNRECOGNIZED) continue;
-                if(value.getNumber()>state.getNumber()){
-                    diff+=timeMap.getOrDefault(value.getNumber(),0)*1000;
-                }
+        diff = time - System.currentTimeMillis();
+        for (CommonGame.GameState value : CommonGame.GameState.values()) {
+            if (value == CommonGame.GameState.UNRECOGNIZED) continue;
+            if (value.getNumber() > state.getNumber()) {
+                diff += timeMap.getOrDefault(value.getNumber(), 0) * 1000;
             }
-//        }
-        diff = diff<0?0:diff;
-        return  (int) (diff / 1000);
+        }
+        diff = diff < 0 ? 0 : diff;
+        return (int) (diff / 1000);
     }
+
     public int getLeaveTime() {
-        long diff =time - System.currentTimeMillis();
-        diff = diff<0?0:diff;
-        return  (int) (diff / 1000);
+        long diff = time - System.currentTimeMillis();
+        diff = diff < 0 ? 0 : diff;
+        return (int) (diff / 1000);
     }
+
     public void ready() {
-        StringJoiner sj = new StringJoiner(",").add("id:" + id).add("roomId:" + roomId).add("round:"+round);;
-        logger.info(sj.add("readys:"+readyMap.size()).add("start").toString());
+        StringJoiner sj = new StringJoiner(",").add("id:" + id).add("roomId:" + roomId).add("round:" + round);
+        ;
+        logger.info(sj.add("readys:" + readyMap.size()).add("start").toString());
         for (Long uid : readyMap.keySet()) {
             addPlayer(uid);
         }
@@ -175,18 +174,20 @@ public class CardGame {
         for (Long id : delList) {
             playerMap.remove(id);
         }
-        logger.info(sj.add("players:"+playerMap.size()).add("end").toString());
+        logger.info(sj.add("players:" + playerMap.size()).add("end").toString());
     }
 
     public void bet() {
         //通知玩家下注
-        StringJoiner sj = new StringJoiner(",").add("id:" + id).add("roomId:" + roomId).add("round:"+round);;
+        StringJoiner sj = new StringJoiner(",").add("id:" + id).add("roomId:" + roomId).add("round:" + round);
+        ;
         logger.info(sj.add("start").toString());
         logger.info(sj.add("end").toString());
     }
 
     public void deal() {
-        StringJoiner sj = new StringJoiner(",").add("id:" + id).add("roomId:" + roomId).add("round:"+round);;
+        StringJoiner sj = new StringJoiner(",").add("id:" + id).add("roomId:" + roomId).add("round:" + round);
+        ;
         logger.info(sj.add("start").toString());
         deck.shuffle(); // 洗牌
         dealCards(); // 发牌
@@ -196,7 +197,8 @@ public class CardGame {
 
     //todo 发牌逻辑
     private void dealCards() {
-        StringJoiner sj = new StringJoiner(",").add("id:" + id).add("roomId:" + roomId).add("round:"+round);;
+        StringJoiner sj = new StringJoiner(",").add("id:" + id).add("roomId:" + roomId).add("round:" + round);
+        ;
         logger.info(sj.add("start").toString());
         //庄家发牌
         Game.SuitCard.Builder b = Game.SuitCard.newBuilder().setSuit(CommonGame.CardSuit.Hearts);
@@ -220,7 +222,8 @@ public class CardGame {
 
     //todo 输赢的概率，倍数，每个池子的倍率
     private void calculateResults() {
-        StringJoiner sj = new StringJoiner(",").add("id:" + id).add("roomId:" + roomId).add("round:"+round);;
+        StringJoiner sj = new StringJoiner(",").add("id:" + id).add("roomId:" + roomId).add("round:" + round);
+        ;
         logger.info(sj.add("start").toString());
         //庄家
         List<CardNN> list = new ArrayList<>();
@@ -282,7 +285,7 @@ public class CardGame {
     }
 
     private void gameOver() {
-        StringJoiner sj = new StringJoiner(",").add("id:" + id).add("roomId:" + roomId).add("round:"+round);
+        StringJoiner sj = new StringJoiner(",").add("id:" + id).add("roomId:" + roomId).add("round:" + round);
         logger.info(sj.add("start").toString());
 
         for (CardPlayer player : playerMap.values()) {
@@ -294,18 +297,18 @@ public class CardGame {
         deck = new Deck();
         bet = 0;
         nextRound();
-        if(isEmpty()){
+        if (isEmpty()) {
             stop.getAndSet(true);
         }
         logger.info(sj.add("end").toString());
     }
 
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         boolean isEmpty1 = playerMap.isEmpty();
         boolean isEmpty2 = readyMap.isEmpty();
-        if(isEmpty2){
+        if (isEmpty2) {
             for (CardPlayer p : playerMap.values()) {
-                if(!p.isRobot()){
+                if (!p.isRobot()) {
                     return false;
                 }
             }

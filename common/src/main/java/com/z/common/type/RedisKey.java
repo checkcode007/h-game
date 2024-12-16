@@ -5,4 +5,6 @@ public class RedisKey {
 
     public static final String EMAIL_ID =G+"mail:id";
 
+    public static final String ROOM_ID =G+"room:id";
+
 }

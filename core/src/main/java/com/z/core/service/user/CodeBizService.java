@@ -8,15 +8,15 @@ import com.z.core.service.email.MailBizService;
 import com.z.core.service.wallet.WalletBizService;
 import com.z.dbmysql.dao.code.GCodeDao;
 import com.z.dbmysql.dao.code.GCodeSendLogDao;
+import com.z.model.bo.user.User;
 import com.z.model.common.MsgId;
 import com.z.model.common.MsgResult;
 import com.z.model.mysql.GCode;
 import com.z.model.mysql.GCodeSendLog;
-import com.z.model.mysql.GUser;
 import com.z.model.proto.CommonUser;
 import com.z.model.proto.MyMessage;
-import com.z.model.proto.User;
 import com.z.model.type.AddType;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,11 +53,11 @@ public class CodeBizService {
         log.info(sj.toString());
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_CREATE_LIST).setOk(true);
         List<GCode> list = dao.findByFrom(uid);
-        GUser gUser = userBizService.findUser(uid);
-        User.S_10402.Builder b = User.S_10402.newBuilder().setLeaveCount(gUser.getCodeCout());
+        User user = UserService.ins.get(uid);
+        com.z.model.proto.User.S_10402.Builder b = com.z.model.proto.User.S_10402.newBuilder().setLeaveCount(user.getUser().getCodeCout());
         if (list != null && !list.isEmpty()) {
             for (GCode e : list) {
-                b.addCodes(User.BindCode.newBuilder().setUid(e.getTargetId())
+                b.addCodes(com.z.model.proto.User.BindCode.newBuilder().setUid(e.getTargetId())
                                 .setTime(e.getCreateTime().getTime()).setCode(e.getCode())
                         .build());
             }
@@ -82,11 +82,11 @@ public class CodeBizService {
         }
         GCode exchangeCode = create(uid,bindUid);
         dao.save(exchangeCode);
-        GUser gUser = userBizService.findUser(uid);
-        User.S_10404.Builder b = User.S_10404.newBuilder().setLeaveCount(gUser.getCodeCout());
+        User user = UserService.ins.get(uid);
+        com.z.model.proto.User.S_10404.Builder b = com.z.model.proto.User.S_10404.newBuilder().setLeaveCount(user.getUser().getCodeCout());
         if (list != null && !list.isEmpty()) {
             for (GCode e : list) {
-                b.addCodes(User.BindCode.newBuilder().setUid(e.getTargetId())
+                b.addCodes(com.z.model.proto.User.BindCode.newBuilder().setUid(e.getTargetId())
                         .setTime(e.getCreateTime().getTime()).setCode(e.getCode())
                         .build());
             }
@@ -98,21 +98,23 @@ public class CodeBizService {
     /**
      * 点卡查询
      */
-    public MyMessage.MyMsgRes codeQuery(long uid,long  bindUid) {
-        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("bindUid:" + bindUid);
+    public MyMessage.MyMsgRes codeQuery(long uid,int type,long  bindUid,String code) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("type").add("bindUid:" + bindUid).add("code:" + code);
         log.info(sj.toString());
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_QUERY).setOk(true);
         List<GCode> list;
-        if(bindUid>0){
+        if(type == 1 &&  bindUid>0 ){
             list = dao.findByTarget(bindUid);
+        }else if (type == 2 && StringUtils.isNotEmpty(code)){
+            list = dao.findByCode(code);
         }else{
             list = dao.getAll("id desc");
         }
-        GUser gUser = userBizService.findUser(uid);
-        User.S_10406.Builder b = User.S_10406.newBuilder().setLeaveCount(gUser.getCodeCout());
+        User user = UserService.ins.get(uid);
+        com.z.model.proto.User.S_10406.Builder b = com.z.model.proto.User.S_10406.newBuilder().setLeaveCount(user.getUser().getCodeCout());
         if (list != null && !list.isEmpty()) {
             for (GCode e : list) {
-                b.addCodes(User.UserCode.newBuilder().setUid(e.getTargetId()).setGold(e.getGold()).setState(CommonUser.CodeState.forNumber(e.getState()))
+                b.addCodes(com.z.model.proto.User.UserCode.newBuilder().setUid(e.getTargetId()).setGold(e.getGold()).setState(CommonUser.CodeState.forNumber(e.getState()))
                         .setExpireTime(e.getLastTime().getTime()).setUseTime(e.getUseTime()==null?0:e.getUseTime().getTime()).setCode(e.getCode())
                         .build());
             }
@@ -131,11 +133,11 @@ public class CodeBizService {
         log.info(sj.toString());
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_SEND_LIST).setOk(true);
         List<GCodeSendLog> list = logDao.findByFrom(uid);
-        GUser gUser = userBizService.findUser(uid);
-        User.S_10408.Builder b = User.S_10408.newBuilder().setLeaveCount(gUser.getCodeCout());
+        User user = UserService.ins.get(uid);
+        com.z.model.proto.User.S_10408.Builder b = com.z.model.proto.User.S_10408.newBuilder().setLeaveCount(user.getUser().getCodeCout());
         if (list != null && !list.isEmpty()) {
             for (GCodeSendLog e : list) {
-                b.addCodes(User.GiveCode.newBuilder().setUid(e.getTargetId()).setCount(e.getCout()).setTime(e.getLastTime().getTime())
+                b.addCodes(com.z.model.proto.User.GiveCode.newBuilder().setUid(e.getTargetId()).setCount(e.getCout()).setTime(e.getLastTime().getTime())
                         .build());
             }
         }
@@ -151,17 +153,17 @@ public class CodeBizService {
         log.info(sj.toString());
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_SEND_SEND).setOk(true);
         List<GCodeSendLog> list = logDao.findByFrom(uid);
-        GUser gUser = userBizService.findUser(uid);
+        User user = UserService.ins.get(uid);
         MsgResult changeRet = userBizService.changeCodeCout(uid,targetId,1);
         if(!changeRet.isOk()){
             log.error(sj.add("changeCount fail").toString());
             res.setOk(false).setFailMsg(changeRet.getMessage());
             return res.build();
         }
-        User.S_10408.Builder b = User.S_10408.newBuilder().setLeaveCount(gUser.getCodeCout());
+        com.z.model.proto.User.S_10408.Builder b = com.z.model.proto.User.S_10408.newBuilder().setLeaveCount(user.getUser().getCodeCout());
         if (list != null && !list.isEmpty()) {
             for (GCodeSendLog e : list) {
-                b.addCodes(User.GiveCode.newBuilder().setUid(e.getTargetId()).setCount(e.getCout()).setTime(e.getLastTime().getTime())
+                b.addCodes(com.z.model.proto.User.GiveCode.newBuilder().setUid(e.getTargetId()).setCount(e.getCout()).setTime(e.getLastTime().getTime())
                         .build());
             }
         }

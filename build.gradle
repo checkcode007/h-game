@@ -65,14 +65,8 @@ subprojects {
 //                implementation 'org.slf4j:slf4j-api:2.1.0-alpha1'
         testImplementation 'org.apache.logging.log4j:log4j-slf4j-impl:3.0.0-beta2'
 
-//        implementation 'org.apache.logging.log4j:log4j-core:3.0.0-beta2'
+//        implementation 'org.apache.logging.log4j:log4j-core:3.0.0-beta3'
 //        implementation 'org.apache.logging.log4j:log4j-api:3.0.0-beta2'
-//        // 排除旧的 SLF4J 实现，防止冲突
-//        implementation('org.springframework.boot:spring-boot-starter-logging') {
-//            exclude group: 'org.slf4j', module: 'slf4j-api'
-//        }
-//        implementation 'org.springframework.cloud:spring-cloud-starter:4.1.5'
-
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
         implementation("org.apache.commons:commons-lang3:$commonlanVer")

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class GRoomDao extends AbstractMapperService<GRoom,Long> {
+public class GRoomDao extends AbstractMapperService<GRoom,String> {
     @Autowired
     GRoomMaper maper;
 
@@ -24,15 +24,14 @@ public class GRoomDao extends AbstractMapperService<GRoom,Long> {
     }
 
     @Override
-    protected IMapper<GRoom, Long> getMapper() {
+    protected IMapper<GRoom, String> getMapper() {
         return maper;
     }
 
     @Override
-    protected String getTableName(Long id) {
+    protected String getTableName(String s) {
         return TABLE_NAME;
     }
-
     @Override
     protected String[] getAllTableName() {
         return new String[]{TABLE_NAME};
@@ -41,7 +40,7 @@ public class GRoomDao extends AbstractMapperService<GRoom,Long> {
         return super.getAll(null);
     }
 
-    public GRoom findById(long id){
+    public GRoom findById(String id){
         return super.findById(id);
     }
 

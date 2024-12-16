@@ -38,6 +38,6 @@ public class CodeQuery implements IHandler<User.C_10405> {
     @Override
     public AbstractMessageLite handleDo(ChannelHandlerContext ctx, User.C_10405 req) {
         long uid = ctx.channel().attr(ChannelAttributes.USER_ID).get();
-        return service.codeQuery(uid,req.getBindUid());
+        return service.codeQuery(uid,req.getType(),req.getBindUid(),req.getCode());
     }
 }

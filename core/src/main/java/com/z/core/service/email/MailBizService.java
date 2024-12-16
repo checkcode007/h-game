@@ -28,9 +28,12 @@ public class MailBizService {
     @Autowired
     CCfgBizService cfgBizService;
 
-    public boolean add(CommonUser.EmailType type,long transferId, long fromId, long targerId,long gold){
+    public GEmail add(CommonUser.EmailType type,long transferId, long fromId,
+                      long targerId,long gold){
+        //扣除税率
+        long tax = (long)(gold*cfgBizService.getTaxes());
+        long gold2 = gold - tax;
         DateTime now = DateTime.now();
-        long t = now.getMillis();
         Date d =now.toDate();
         GEmail email = new GEmail();
         email.setId(IdUtil.nextEmailId());                      // 设置 id
@@ -38,12 +41,13 @@ public class MailBizService {
         email.setUid(targerId);                                // 设置 uid
         email.setFromId(fromId);                               // 设置 fromId
         email.setGold(gold);                                   // 设置 gold
+        email.setRealGold(gold2);
+        email.setTax(tax);
         email.setTransferId(transferId);                       // 设置 transferId
         email.setState(CommonUser.YesNo.YN_N.getNumber());     // 设置 state
         email.setCreateTime(d);                                // 设置 createTime
         email.setUpdateTime(d);                                // 设置 updateTime
-        dao.save(email);
-        return true;
+        return dao.save(email);
     }
     /**
      * 获取邮件列表

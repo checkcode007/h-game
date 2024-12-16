@@ -51,9 +51,9 @@ public class TransferBizService {
     }
 
     public GBankTransfer add(long fromId, long targerId,long gold) {
-        StringJoiner sj = new StringJoiner(",").add("fromId:" + fromId).add("targerId:" + targerId).add("gold:" + gold);
+        StringJoiner sj = new StringJoiner(",").add("fromId:" + fromId).add("targerId:" + targerId)
+                .add("gold:" + gold);
         log.info(sj.toString());
-
         GBankTransfer record = create(fromId, targerId, gold);
         record = dao.save(record);
         log.info(sj.add("success").toString());
@@ -68,6 +68,21 @@ public class TransferBizService {
         record.setCreateTime(d);
         record.setUpdateTime(d);
         return record;
+    }
+    public boolean updateMail(long id,long mailId,long tax,long realGold){
+        StringJoiner sj = new StringJoiner(",").add("id:" + id).add("mailId:" + mailId).add("tax:" + tax).add("realGold:" + realGold);
+        log.info(sj.toString());
+        GBankTransfer record = dao.findById(id);
+        if(record == null) {
+            log.error(sj.add("record null").toString());
+            return false;
+        }
+        record.setMailId(mailId);
+        record.setTax(tax);
+        record.setRealGold(realGold);
+        dao.save(record);
+        log.error(sj.add("sucess").toString());
+        return true;
     }
 
     public boolean updateState(long id){

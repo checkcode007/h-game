@@ -3,6 +3,7 @@ syntax = "proto3";
 package com.z.model.proto;
 
 import "common_user.proto";
+import "common_game.proto";
 //用户消息==============
 
 //注册  返回-10002
@@ -68,6 +69,13 @@ message C_10009 {
   string phone = 1;//手机号
 }
 
+//重新连接进入
+message C_10011{
+  int64 uid=1; //用户id
+  string pwd=2;//密码
+  GameType gameType=3;//游戏类型
+  RoomType roomType=4;//房间类型
+}
 //银行----------
 //显示界面-显示请求10201
 message C_10201 {
@@ -123,12 +131,16 @@ message BankLog{
   BankType type=2;//类型
   int64 uid=3;//
   int64 targetId=4;
-  int64 gold=5; //变动金额
+  int64 gold=5; //变动金额 (也是凭证里显示的实际收入金额)
   int64 gold1=6;//变动前
   int64 gold2=7;//变动后
   bool state=8;//是否已经领取
-  int64 lastTime=9;//时间
+  int64 lastTime=9;//时间 （也是凭证里的交易时间）
+  int64 mailId = 10;//邮件id大于0 显示凭证
+  int64 tax=11;//扣除的税金 （凭证里显示）
 }
+
+
 //兑换码-----------------
 //请求兑换--返回10252 并且刷新金额-10202
 message C_10251 {
@@ -164,6 +176,11 @@ message C_10303 {
   int64 id = 1;//邮件id
 }
 
+//测试加金币命令 返回-10322
+message C_10321 {
+  int64 uid =1;// 加金币点用户id
+  int64 gold =2;// 加钱包金币
+}
 //管理界面----------------
 //点卡生成 -列表
 message C_10401{
@@ -191,7 +208,9 @@ message S_10404{
 
 //点卡查询
 message C_10405{
-  int64 bindUid=1;//绑定的用户id （-1是查询所有人）
+  int32 type=1;//1 uid查询，2 点卡查询
+  int64 bindUid=2;//绑定的用户id （-1是查询所有人）
+  string code= 3;//点卡查询（不传）
 }
 message S_10406{
   repeated UserCode codes=1;

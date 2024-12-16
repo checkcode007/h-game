@@ -1,9 +1,6 @@
 package com.z.model.mysql;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 
@@ -14,7 +11,8 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Data
+@Getter
+@Setter
 public class GBankTransfer extends Model {
     /**
      * @see  com.z.model.proto.CommonUser.TransferLogType
@@ -23,6 +21,9 @@ public class GBankTransfer extends Model {
     private long fromId;
     private long targetId;
     private long gold;
+    private long  mailId;
+    private long tax;
+    private long realGold;
     private boolean state;
 
 }

@@ -59,10 +59,10 @@ public class CCfgDataBizService {
 
     @Scheduled(cron = "0 0/5 * * * ?" )
     public void exe(){
-        log.info("----------->start");
+//        log.info("----------->start");
         reload();
         print();
-        log.info("----------->end");
+//        log.info("----------->end");
     }
     public <T> T get(String name,Class<?> clazz){
         if(table.isEmpty()) reload();
@@ -75,8 +75,7 @@ public class CCfgDataBizService {
             String rowKey = cell.getRowKey();
             Class<?> columnKey = cell.getColumnKey();
             CfgBo<?> value = cell.getValue();
-
-           log.info("RowKey: {}, ColumnKey: {}, Value: {}", rowKey, columnKey.getSimpleName(), value.getV());
+//           log.debug("RowKey: {}, ColumnKey: {}, Value: {}", rowKey, columnKey.getSimpleName(), value.getV());
         }
     }
 }

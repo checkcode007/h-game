@@ -25,7 +25,8 @@ public class CRoom {
      */
     private int gameType;
     private int maxPlayers; // 最大人数
-    private long minBalance; // 最低入场资金
+    private long minBalance; // 门槛-最低入场资金
+    private long minBet; // 底分
     private int betRadio; // 倍率
     private long jackpot; // 奖池金额
 }

@@ -15,11 +15,14 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class WebSocketServer implements ApplicationListener<ApplicationReadyEvent> {
@@ -53,6 +56,7 @@ public class WebSocketServer implements ApplicationListener<ApplicationReadyEven
                             pipeline.addLast(new WebSocketFrameAggregator(65536)); // 添加帧聚合器
                             pipeline.addLast(new ProtobufDecoder(MyMessage.MyMsgReq.getDefaultInstance()));
                             pipeline.addLast(new ProtobufEncoder());
+                            pipeline.addLast(new IdleStateHandler(30,30,0, TimeUnit.SECONDS));
                             pipeline.addLast(new WebSocketFrameHandler());
                             pipeline.addLast(new SimpleChannelInboundHandler<BinaryWebSocketFrame>() {
                                 @Override

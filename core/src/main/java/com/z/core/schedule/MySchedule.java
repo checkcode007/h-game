@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
  * @version 0.0.1
  * @since 2024-08-30
  */
-//@Log4j2
 public class MySchedule extends ScheduledThreadPoolExecutor {
     protected Logger log = LoggerFactory.getLogger(getClass());
     //关闭等待时间（分钟）

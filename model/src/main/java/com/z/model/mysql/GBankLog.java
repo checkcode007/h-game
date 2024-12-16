@@ -15,9 +15,11 @@ public class GBankLog extends Model{
     private long uid;
     private long targetId;
     private long transferId;
+    private long tax;
     private long gold;
     private long gold1;
     private long gold2;
+    private long mailId;
     private boolean state;
     private Date lastTime;
 

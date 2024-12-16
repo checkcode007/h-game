@@ -4,7 +4,7 @@ import com.google.protobuf.AbstractMessageLite;
 import com.google.protobuf.ByteString;
 import com.z.core.net.channel.ChannelAttributes;
 import com.z.core.net.handler.IHandler;
-import com.z.core.service.game.room.RoomBizService;
+import com.z.core.service.game.room.RoomService;
 import com.z.model.common.MsgId;
 import com.z.model.mysql.cfg.CRoom;
 import com.z.model.proto.CommonGame;
@@ -24,9 +24,6 @@ import java.util.List;
 @Service
 public class IntoGame implements IHandler<Game.C_20001> {
     protected Logger log = LoggerFactory.getLogger(getClass());
-    @Autowired
-    private RoomBizService service;
-
     @Override
     public int getMsgId() {
         return MsgId.C_INTOGAME;
@@ -42,20 +39,8 @@ public class IntoGame implements IHandler<Game.C_20001> {
     @Override
     public AbstractMessageLite handleDo(ChannelHandlerContext ctx, Game.C_20001 req) {
         long uid = ctx.channel().attr(ChannelAttributes.USER_ID).get();
-        List<CRoom> list = service.into(uid,req.getGameType());
 
-        Game.S_20002.Builder b = Game.S_20002.newBuilder();
-        if(list!=null){
-            for (CRoom cRoom : list) {
-                Game.Room.Builder room = Game.Room.newBuilder();
-                log.info(cRoom.toString());
-                room.setId(cRoom.getId()).setType(CommonGame.RoomType.forNumber(cRoom.getType())).setMinBalance(cRoom.getMinBalance());
-                b.addRooms(room.build());
-            }
-        }
-        MyMessage.MyMsgRes.Builder res =MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_INTOGAME);
-        res.setOk(true).addMsg(ByteString.copyFrom(b.build().toByteArray()));
-        return  res.build();
+        return  RoomService.ins.intoGame(uid,req.getGameType());
     }
 
 

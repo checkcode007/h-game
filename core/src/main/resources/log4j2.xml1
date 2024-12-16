@@ -48,7 +48,7 @@
         </RollingFile>
 
         <!-- Game 日志 -->
-        <RollingFile name="GameInfoAppender" fileName="${logPath}/game-info.log" filePattern="${logPath}/game-info-%d{yyyy-MM-dd}-%i.log.gz">
+        <RollingFile name="GameInfoAppender" fileName="${logPath}/gameMali-info.log" filePattern="${logPath}/gameMali-info-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout pattern="${logPattern}" />
 <!--            <Filters>-->
 <!--                <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" />-->
@@ -59,7 +59,7 @@
             </Policies>
         </RollingFile>
 
-        <RollingFile name="GameErrorAppender" fileName="${logPath}/game-error.log" filePattern="${logPath}/game-error-%d{yyyy-MM-dd}-%i.log.gz">
+        <RollingFile name="GameErrorAppender" fileName="${logPath}/gameMali-error.log" filePattern="${logPath}/gameMali-error-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout pattern="${logPattern}" />
             <Filters>
                 <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY" />
@@ -70,7 +70,7 @@
             </Policies>
         </RollingFile>
 
-        <RollingFile name="GameDebugAppender" fileName="${logPath}/game-debug.log" filePattern="${logPath}/game-debug-%d{yyyy-MM-dd}-%i.log.gz">
+        <RollingFile name="GameDebugAppender" fileName="${logPath}/gameMali-debug.log" filePattern="${logPath}/gameMali-debug-%d{yyyy-MM-dd}-%i.log.gz">
             <PatternLayout pattern="${logPattern}" />
 <!--            <Filters>-->
 <!--                <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" />-->
@@ -126,7 +126,7 @@
         </Logger>
 
         <!-- Game 日志 -->
-        <Logger name="com.z.game" level="debug" additivity="true">
+        <Logger name="com.z.gameMali" level="debug" additivity="true">
             <AppenderRef ref="GameDebugAppender" level="debug" />
             <AppenderRef ref="GameInfoAppender" level="info" />
             <AppenderRef ref="GameErrorAppender" level="error" />

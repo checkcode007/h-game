@@ -2,6 +2,8 @@ package com.z.core.schedule;
 
 import cn.hutool.core.thread.ThreadUtil;
 import com.z.core.service.game.card.CardService;
+import com.z.core.service.user.UserService;
+import com.z.core.service.wallet.WalletService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,6 @@ import java.util.concurrent.TimeUnit;
  * @version 1.0.0、
  * @since 2024-08-30
  */
-//@Log4j2
 @Component
 public class ScheduledManager {
     public List<MySchedule> scheduleList = new ArrayList<>();
@@ -29,6 +30,8 @@ public class ScheduledManager {
         MySchedule schedule = new MySchedule(1,"common",this::exe,20,10, TimeUnit.SECONDS);
         scheduleList.add(schedule);
         schedule = new MySchedule(1,"card",this::exe1,25,5, TimeUnit.SECONDS);
+        scheduleList.add(schedule);
+        schedule = new MySchedule(1,"mali",this::exe2,10,1, TimeUnit.SECONDS);
         scheduleList.add(schedule);
 
     }
@@ -44,12 +47,37 @@ public class ScheduledManager {
 
     public void exe2(){
 //        log.info(Thread.currentThread().getId()+" :"+Thread.currentThread().getName()+" :"+this.hashCode());
+        try {
+            UserService.ins.exe();
+        } catch (Exception e) {
+            log.error(e.getMessage(),e);
+        }
+        try {
+            WalletService.ins.exe();
+        } catch (Exception e) {
+            log.error(e.getMessage(),e);
+        }
     }
 
     public void shutdown(){
         log.info("shutdown1");
         for (MySchedule schedule : scheduleList) {
-            schedule.shutdown();
+            try {
+                schedule.shutdown();
+            } catch (Exception e) {
+                log.error(e.getMessage(),e);
+            }
+        }
+        try {
+            UserService.ins.shutDown();
+        } catch (Exception e) {
+            log.error(e.getMessage(),e);
+        }
+
+        try {
+            WalletService.ins.shutDown();
+        } catch (Exception e) {
+            log.error(e.getMessage(),e);
         }
 
         log.info("shutdown2");

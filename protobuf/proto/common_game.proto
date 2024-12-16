@@ -11,17 +11,17 @@ message Card {
 }
 
 enum CardSuit {
-  Spades=0;//黑桃
-  Hearts=1;//红桃
-  Diamonds=2;//方片
-  Clubs=3;//梅花
-  BigJoker=100;//大王
-  SmallJoker=200;//小王
+  Spades = 0;//黑桃
+  Hearts = 1;//红桃
+  Diamonds = 2;//方片
+  Clubs = 3;//梅花
+  BigJoker = 100;//大王
+  SmallJoker = 200;//小王
 }
 
 // 游戏类型
 enum GameType {
-  GAME_sDEFUALT=0;//为定义
+  GAME_DEFUALT = 0;//为定义
   JINGDIAN_XIAOMALI = 1;   // 经典小码丽
   BAIBIAN_XIAOMALI = 2;    // 百变小码丽
   MAJIANG_2 = 3;           // 麻将2
@@ -37,16 +37,17 @@ enum GameType {
 }
 
 enum GameState{
-    WAITING_FOR_PLAYE=0;//等待玩家
-    BETTING = 1;//下注阶段
-    DEALING=2;//发牌阶段
-    RESULT=3;//计算结果阶段
+  WAITING_FOR_PLAYE = 0;//等待玩家
+  BETTING = 1;//下注阶段
+  DEALING = 2;//发牌阶段
+  RESULT = 3;//计算结果阶段
 }
 // 房间类型
 enum RoomType {
-    ONE=0;//初级
-    TWO=1;//中级
-    THREE=2;//高级
+  ONE = 0;//初级
+  TWO = 1;//中级
+  THREE = 2;//高级
+  FOUR = 3;//大师
 }
 //牛牛类型
 enum NiuType {
@@ -63,9 +64,85 @@ enum NiuType {
   NIU_NIU = 10;   // 牛牛
 }
 enum WinState{
-    DRAW=0;//平局
-    WIN =1;//赢
-    FAIL = 2;//输
+  DRAW = 0;//平局
+  WIN = 1;//赢
+  FAIL = 2;//输
 }
 
+
+enum Symbol {
+  SYMBOL_UNSPECIFIED = 0;  // 默认值，未指定的符号
+  WILD = 1;                // 珍珠
+  GOLD_WILD = 2;            // 黄金珍珠
+  BONUS = 3;                // 橙子
+  SCARRER = 4;              // 7
+  BANANA = 5;                //香蕉
+  WATERMELON = 6;          // 西瓜
+  LEMON = 7;               // 柠檬
+  GRAPE = 8;              // 葡萄
+  ANANAS = 9;              // 菠萝
+  BELL = 10;                //铃铛
+  CHERRY = 11;              // 樱桃
+  BAR = 12;                // BAR
+}
+//----------麻将2-------
+//麻将符号
+enum MJ {
+  DEFAULT = 0;      // 默认值，未指定的符号
+  FA = 1;                // 发
+  ZHO = 2;            // 中
+  KUANG = 3;              // 框
+  W_8 = 4;              // 8万
+  B_5 = 5;                // 五饼
+  T_5 = 6;           // 五条
+  B_3 = 7;              //三饼
+  B_2 = 8;              // 2饼
+  T_2 = 9;              // 2条
+  HU = 50;                //胡
+  BAIDA = 60;             // 百搭
+}
+
+//-------捕鱼---------
+
+// FishType 枚举
+enum FishType {
+  FT_DEFAULT = 0;      // 默认
+
+  KONG_QUE_YU = 1;    // 孔雀鱼
+  XIAO_CHOU_YU = 2;   // 小丑鱼
+  XIAO_LAN_YU = 3;    // 小蓝鱼
+  XIAO_QING_YU = 4;   // 小青鱼
+  XIAO_HUANG_YU = 5;  // 小黄鱼
+  CAI_YUN_YU = 6;     // 彩云鱼
+  JIN_QIANG_YU = 7;   // 金枪鱼
+  DENG_LONG_YU = 8;  // 灯笼鱼
+  DA_YAN_JING_YU = 9; // 大眼睛鱼
+  CI_WEI_YU = 10;   // 刺猬鱼
+  SHI_BAN_YU = 11;    // 石斑鱼
+  SHEN_XIAN_YU = 12;  // 神仙鱼
+  HU_DIE_YU = 13;     // 蝴蝶鱼
+  XI_SHUAI_YU = 14;   // 蟋蟀鱼
+
+  MO_GUI_YU = 15;     // 魔鬼鱼
+  WU_GUI = 16;      // 乌龟
+  YIN_SHA_YU = 17;    // 银色鲨鱼
+  JIN_SHA_YU = 18;    // 金色鲨鱼
+
+
+}
+
+// 火力类型
+enum FishFire {
+  FFT_DEFAULT=0;// 默认
+  FFT_1= 1;      // 普通炮弹- 1
+  FFT_2 = 2;   // 普通炮弹- 2
+  FFT_3 = 3;   // 普通炮弹- 3
+  FFT_4 = 4;   //普通炮弹- 4
+  FFT_5 = 5;   //普通炮弹- 5
+  FFT_6 = 6;
+  FFT_7 = 7;
+  FFT_8 = 8;
+  FFT_9 = 9;
+  FFT_10 = 10;
+}
 

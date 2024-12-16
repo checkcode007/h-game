@@ -65,6 +65,11 @@ public class GCodeDao extends AbstractMapperService<GCode,Long> {
         wheres.put("target_id",uid);
         return super.findByMultiByParam(wheres,1000);
     }
+    public List<GCode> findByCode(String code){
+        Map<String, Object> wheres =new HashMap<>();
+        wheres.put("code",code);
+        return super.findByMultiByParam(wheres,1000);
+    }
     public Pager<GCode> page(long uid, int page, int pageSize) {
         // 构造查询条件
         Map<String, Object> wheres = new HashMap<>();

@@ -4,6 +4,7 @@ import com.z.common.util.SnowflakeId;
 import com.z.core.service.cfg.CCfgBizService;
 import com.z.core.service.game.game.EsGameBizService;
 import com.z.core.service.user.UserBizService;
+import com.z.core.service.user.UserService;
 import com.z.model.mysql.GUser;
 import com.z.model.proto.CommonGame;
 import org.slf4j.LoggerFactory;
@@ -27,12 +28,13 @@ public class CardService {
     Map<Long,CardGame> map = new ConcurrentHashMap<>();
     Map<Long,List<CardGame>> roomMap = new ConcurrentHashMap<>();
 
-    public CardGame createGame(long gameId,long roomId){
-        List<GUser> robots = userBizService.getRobot(1);
+    public CardGame createGame(long gameId, long roomId, CommonGame.RoomType roomType, CommonGame.GameType gameType) {
+        List<GUser> robots = UserService.ins.findRobot(1);
         GUser robot = robots.get(0);
         CardPlayer banker = new CardPlayer(robot.getId(),1000,true,false);
         long id = SnowflakeId.ins.gameId();
-        CardGame cardGame = new CardGame(id,roomId,banker,cfgBizService.getNiuniuTime());
+        CardGame cardGame = new CardGame(id,roomId,roomType,gameType);
+        cardGame.init(banker,cfgBizService.getNiuniuTime());
         map.put(id,cardGame);
         List<CardGame> list = roomMap.getOrDefault(roomId,new ArrayList<>());
         list.add(cardGame);
@@ -43,10 +45,10 @@ public class CardService {
        CardGame cardGame =  map.remove(id);
        roomMap.remove(cardGame.getRoomId());
     }
-    public CardGame into(long uid,long gameId,long roomId){
+    public CardGame enter(long uid, long gameId, long roomId, CommonGame.RoomType roomType, CommonGame.GameType gameType) {
         CardGame game = map.get(gameId);
         if(game == null){
-            game = createGame(gameId,roomId);
+            game = createGame(gameId,roomId,roomType,gameType);
             map.put(game.getId(),game);
         }
         game.addReady(uid);
