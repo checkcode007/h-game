@@ -31,7 +31,4 @@ public enum MsgManger {
         return map.get(msgId);
     }
 
-    public static void main(String[] args) {
-        System.err.println(User.C_10001.class);
-    }
 }

@@ -4,7 +4,7 @@ package com.z.core.service.wallet;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.z.common.util.SpringContext;
+import com.z.core.util.SpringContext;
 import com.z.dbmysql.dao.wallet.GWalletDao;
 import com.z.model.bo.user.Wallet;
 import com.z.model.mysql.GWallet;

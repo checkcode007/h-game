@@ -7,85 +7,85 @@ import "common_game.proto";
 
 //进入游戏（请求）
 message C_20001 {
-   GameType gameType  =1;//游戏类型
+  GameType gameType = 1;//游戏类型
 }
 //进入游戏（返回）
 message S_20002 {
-  repeated Room rooms=1;//房间列表
+  repeated Room rooms = 1;//房间列表
 }
 
 message Room{
-  int32 id =1;//房间id
-  RoomType type=2;//房间类型
-  int64 minBalance=3;//门槛
-  int64 minBet=4;//底分
+  int32 id = 1;//房间id
+  RoomType type = 2;//房间类型
+  int64 minBalance = 3;//门槛
+  int64 minBet = 4;//底分
 }
 
 //进入房间
 message C_20003 {
-  int64  uid= 1; //玩家id
-  GameType gameType  =2;//游戏类型
-  RoomType roomType=3;//房间类型
+  int64  uid = 1; //玩家id
+  GameType gameType = 2;//游戏类型
+  RoomType roomType = 3;//房间类型
 }
 //进入房间（返回）
 message S_20004 {
-  int64 roomId=1;//房间id
+  int64 roomId = 1;//房间id
   GameState state = 2;//游戏状态（牛牛使用）
-  int32 leaveTime=3;//剩余时间 （牛牛使用）
+  int32 leaveTime = 3;//剩余时间 （牛牛使用）
 }
 
 //游戏状态切换（20006）
 message S_20006 {
-  int64 roomId=1;//房间id
-  int64 gameId=2;//游戏id
+  int64 roomId = 1;//房间id
+  int64 gameId = 2;//游戏id
   GameState state = 3;//游戏状态
-  int32 leaveTime=4;//剩余时间(秒)
+  int32 leaveTime = 4;//剩余时间(秒)
 }
 
 //下注金额
 message C_20007 {
-  int64 roomId=1;//房间id
-  int64 gameId=2;//游戏id
-  CardSuit suit=3;//下注花色
-  int64 betGold=4;//下注金额
+  int64 roomId = 1;//房间id
+  int64 gameId = 2;//游戏id
+  CardSuit suit = 3;//下注花色
+  int64 betGold = 4;//下注金额
 }
 message S_20008 {
-  int64 gold =1;//剩余金额
+  int64 gold = 1;//剩余金额
 }
 //广播-下注金额（20010）
 message S_20010{
-  int64 uid=1;//下注玩家id
-  CardSuit suit=2;//下注花色
-  int64 betGold=3;//下注金额
-  repeated SuitPool suitPools=4;//奖池押注金额
+  int64 uid = 1;//下注玩家id
+  CardSuit suit = 2;//下注花色
+  int64 betGold = 3;//下注金额
+  repeated SuitPool suitPools = 4;//奖池押注金额
 }
 
 //每个花色奖池金额
 message SuitPool{
-  CardSuit suit=1;//花色
-  int64 gold=2;//奖池金额
+  CardSuit suit = 1;//花色
+  int64 gold = 2;//奖池金额
 }
 //广播-游戏结果
 message S_20012 {
-  int64 roomId=1;//房间id
-  int64 gameId=2;//游戏id
-  int64 gold =3;//玩家输赢金额
-  repeated SuitResult hardCards=4;//奖池的牌
-  SuitResult bankerCards=5;//庄家的牌
+  int64 roomId = 1;//房间id
+  int64 gameId = 2;//游戏id
+  int64 gold = 3;//玩家输赢金额
+  repeated SuitResult hardCards = 4;//奖池的牌
+  SuitResult bankerCards = 5;//庄家的牌
 }
 
 message SuitResult{
-  CardSuit suit=1;//花色
-  NiuType niu=2;//牛几
-  WinState state=3;//输赢状态
-  int64 gold=4;//输赢总金额
-  repeated Card cards=5;//玩家的手里的牌
+  CardSuit suit = 1;//花色
+  NiuType niu = 2;//牛几
+  WinState state = 3;//输赢状态
+  int64 gold = 4;//输赢总金额
+  repeated Card cards = 5;//玩家的手里的牌
 }
 
 //对应花色的牌
 message SuitCard{
-  CardSuit suit=1;//花色
-  repeated Card cards =4;//手里的牌
+  CardSuit suit = 1;//花色
+  repeated Card cards = 4;//手里的牌
 }
 
 
@@ -95,19 +95,23 @@ message C_20101 {
 }
 //消息返回
 message S_20102 {
-  repeated MjModel mjs=1;//麻将显示
+  repeated MjModel mjs = 1;//麻将显示
 }
 
 //下注
 message C_20103 {
-  int64 gold=1;//下注金额
-  bool free=2;//免费次数押注
+  int64 gold = 1;//下注金额
+  bool free = 2;//免费次数押注
 }
 
 //下注结果
 message S_20104 {
-    MaliBetMsg mali=1;//玛丽下注返回
-    MjBetMsg   mj=2;//麻将下注返回
+  MaliBetMsg mali = 1;//玛丽下注返回
+  MaliHighMsg   hightMali = 2;//小玛丽高级玩法返回
+  MjBetMsg   mj = 3;//麻将下注返回
+  Line9BetMsg line9=4;//九线拉王下注返回
+  FootBallMsg  footBall=5;//少林足球
+  AladdinMsg   aladdin=6;//阿拉丁
 }
 
 //退出房间->返回20106
@@ -116,57 +120,76 @@ message C_20105 {
 }
 
 
-
 //-----------百变小玛丽-------start
+//高级玩法下注结果
+message MaliHighMsg {
+  MaliHigher type = 1;//外层圈子中奖的符号
+  repeated MaliHigher pools = 2;//池子里的符号
+  int64 leaveGold = 3;//剩余金额
+  int64 gold = 4;//中奖的金额
+  int32 rate = 5;//中奖的倍率
+  int32 leaveC = 6;//小玛丽剩余次数
+}
+
 //下注结果
 message MaliBetMsg {
-  repeated Symbol reel1=1;//第一个轮子的显示水果
-  repeated Symbol reel2=2;//第二个轮子的显示水果
-  repeated Symbol reel3=3;//第三个轮子的显示水果
-  repeated Symbol reel4=4;//第四个轮子的显示水果
-  repeated Symbol reel5=5;//第五个轮子的显示水果
-  int64 leaveGold=6;//剩余金额
-  int64 gold=7;//中奖的金额
-  int32 rate=8;//中奖后的倍率
-  repeated PayLine lines=9;// 中奖的支付线
-  int64 roundId=10;//轮数id
+  int64 roundId = 1;//轮数id
+  int64 leaveGold = 2;//剩余金额
+  int64 gold = 3;//中奖的金额
+  int32 rate = 4;//中奖的倍率
+  repeated Spot spots = 5;//显示水果
+  repeated PayLine lines = 6;// 中奖的支付线
+  int32 addFreeC = 7;//增加的免费次数
+  int32 totalFreeC = 8;//总免费次数
+  int32 highC = 9;//高级玩法次数
 }
 
 //支付线
 message PayLine{
-    Symbol symbol=1;//符号
-    int32  index=2;//支付线的下标
-    int32  count=3;//中奖的个数
-    int32  rate=4;//倍率
+  int32 lineId = 1;//第几条线
+  int32  rate = 2;//倍率
+  int64  gold = 3;//中奖金额
+  repeated Spot spots = 4;//支付线上的点
+  int32 highC=5;//每条线上的高级玩法次数
+}
+//显示的每个点
+message  Spot{
+  int32 symbol = 1;//符号
+  int32 x = 2; //列 （第几列）
+  int32 y = 3;//行。 （列中的第几行）
+  int32 changeType=4;//要变成的符号（金色珍珠周围变成普通珍珠，少林足球要变的类型）
+}
+message Point{
+  int32 x = 1; //列 （第几列）
+  int32 y = 2;//行。 （列中的第几行）
 }
 //-----------百变小玛丽--------end
 
 //-----------麻将--------start
 //下注结果
 message MjBetMsg {
-  int64 roundId=1;//轮数id
-  int64 leaveGold=2;//剩余金额
-  int64 gold=3;//中奖的金额
-  repeated MjOne mjOnes=4;//麻将每次消除
-  repeated MjModel mjs=5;//最后显示
-  bool free=6;//是否免费
-  int32 addFreeC=7;//增加的免费次数
-  int32 totalFreeC=8;//总免费次数
-
-
+  int64 roundId = 1;//轮数id
+  int64 leaveGold = 2;//剩余金额
+  int64 gold = 3;//中奖的金额
+  repeated MjOne mjOnes = 4;//麻将每次消除
+  repeated MjModel mjs = 5;//最后显示
+  bool free = 6;//是否免费
+  int32 addFreeC = 7;//增加的免费次数
+  int32 totalFreeC = 8;//总免费次数
 }
 //麻将的每次显示（包括消除后）
 message  MjOne{
-  repeated MjModel goals=1;//中奖的麻将
-  repeated MjModel mjs=2;//麻将显示（消除后的显示）
-  int64  gold =3;//获取的金币
+  repeated MjModel mjs = 1;//麻将显示（消除后的显示）
+  repeated MjModel goals = 2;//中奖的麻将
+  int64  gold = 3;//获取的金币
+  int32 rowRadio = 4;//连续倍率
 }
 
 message MjModel{
-  MJ type=1; //麻将符号
-  int32 x=2; // 第几列
-  int32 y=3; //列的第几个
-  bool gold=4;//是否是金色牌
+  MJ type = 1; //麻将符号
+  int32 x = 2; // 第几列
+  int32 y = 3; //列的第几个
+  bool gold = 4;//是否是金色牌
 }
 //-----------麻将--------end
 
@@ -174,45 +197,107 @@ message MjModel{
 //---------捕鱼------------start
 //捕鱼的配置数据
 message C_20201 {
-  RoomType roomType =1;//房间类型
+  RoomType roomType = 1;//房间类型
 }
 
 message S_20202 {
-  repeated FishFireModel fires=1;//火力数据
+  repeated FishFireModel fires = 1;//火力数据
 
 }
 //捕鱼炮弹网中的鱼
 message C_20203 {
-  FishFire fireType=1;//活力类型
-  repeated  Fish fishs=2;//鱼
+  FishFire fireType = 1;//活力类型
+  repeated  Fish fishs = 2;//鱼
 }
 message S_20204 {
-  int64 leaveGold=1;//钱包剩余金额
-  repeated FishGoal fishs=2;
+  int64 leaveGold = 1;//钱包剩余金额
+  repeated FishGoal fishs = 2;
 }
 //捕鱼炮弹-开火->返回20206
 message C_20205 {
-  FishFire fireType=1;//活力类型
+  FishFire fireType = 1;//活力类型
 }
 //捕鱼炮弹-开火
 message S_20206 {
-  int64 leaveGold=1;//剩余的金币
+  int64 leaveGold = 1;//剩余的金币
 }
 
 message Fish{
-  int64  id=1;//鱼的唯一id
-  FishType type=2;//类型
+  int64  id = 1;//鱼的唯一id
+  FishType type = 2;//类型
 }
 message FishGoal{
-  int64  id=1;//鱼的唯一id
-  FishType type=2;//类型
-  int64 gold=3;//获取的金额
+  int64  id = 1;//鱼的唯一id
+  FishType type = 2;//类型
+  int64 gold = 3;//获取的金额
 }
 //火力
 message FishFireModel{
-    FishFire type=1;//火力类型
-    int32 gold=2;//消耗金币
+  FishFire type = 1;//火力类型
+  int32 gold = 2;//消耗金币
 }
 //---------捕鱼------------end
+
+
+//---------九线拉王------------start
+//下注结果
+message Line9BetMsg {
+  int64 roundId = 1;//轮数id
+  int64 leaveGold = 2;//剩余金额
+  int64 gold = 3;//中奖的金额
+  int32 rate = 4;//中奖的倍率
+  repeated Spot spots = 5;//显示水果
+  repeated PayLine lines = 6;// 中奖的支付线
+  bool free = 7;//是否免费
+  int32 addFreeC = 8;//增加的免费次数
+  int32 totalFreeC = 9;//总免费次数
+}
+//幸运玩家请求20301
+message C_20301 {
+}
+//幸运玩家20302
+message S_20302 {
+  repeated Line9Luck lucks = 1;//幸运玩家集合
+}
+//幸运玩家
+message Line9Luck{
+  int64  uid=1;//玩家id
+  int32 icon =2;//头像
+  string name=3;//名字
+  int64 gold=4;//中奖金额
+  int64 time=5;//中奖时间
+
+}
+//刷新宝箱奖池金额
+message S_20304 {
+  int64 gold = 1;//宝箱奖池金额
+}
+
+//---------九线拉王------------end
+
+
+//---------少林足球------------start
+//下注结果
+message FootBallMsg {
+  int64 roundId = 1;//轮数id
+  int64 leaveGold = 2;//剩余金额
+  int64 gold = 3;//中奖的金额
+  int32 rate = 4;//中奖的倍率
+  repeated Spot spots = 5;//显示水果
+  repeated PayLine lines = 6;// 中奖的支付线
+}
+//---------少林足球------------end
+
+//---------阿拉丁------------start
+//下注结果
+message AladdinMsg {
+  int64 roundId = 1;//轮数id
+  int64 leaveGold = 2;//剩余金额
+  int64 gold = 3;//中奖的金额
+  int32 rate = 4;//中奖的倍率
+  repeated Spot spots = 5;//显示水果
+  repeated PayLine lines = 6;// 中奖的支付线
+}
+//---------少林足球------------end
 
 

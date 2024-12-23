@@ -14,8 +14,8 @@ import org.slf4j.LoggerFactory;
 public class FishRoom extends SuperRoom {
     protected Logger log = LoggerFactory.getLogger(getClass());
 
-    public FishRoom(CRoom cRoom) {
-        super(cRoom);
+    public FishRoom(CRoom cRoom,long uid) {
+        super(cRoom,uid);
     }
 
     @Override

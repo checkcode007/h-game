@@ -2,12 +2,10 @@ package com.z.dbmysql.dao.slot;
 
 import com.z.dbmysql.common.AbstractMapperService;
 import com.z.dbmysql.common.IMapper;
-import com.z.dbmysql.dao.mali.CMaliMaper;
-import com.z.model.mysql.cfg.CMali;
+import com.z.model.mysql.GUser;
 import com.z.model.mysql.cfg.CSlot;
 import com.z.model.type.user.UserState;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -43,6 +41,11 @@ public class CSlotDao extends AbstractMapperService<CSlot, Integer> {
     }
     public List<CSlot> getAll(){
         return super.getAll(null);
+    }
+    public List<CSlot> getAllCommon(){
+        Map<String, Object> wheres =new HashMap<>();
+        wheres.put("state", 0);
+        return super.findByMultiByParam(wheres,10000);
     }
     public CSlot findById(Integer id){
         return super.findById(id);

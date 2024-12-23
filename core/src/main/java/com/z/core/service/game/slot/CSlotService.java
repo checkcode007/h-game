@@ -27,6 +27,7 @@ public class CSlotService {
 
     Table<CommonGame.GameType, Integer, List<CSlot>> table = HashBasedTable.create();
 
+
     @PostConstruct
     public void init() {
         reload();
@@ -42,7 +43,7 @@ public class CSlotService {
     }
 
     public void reload() {
-        List<CSlot> allList = dao.getAll();
+        List<CSlot> allList = dao.getAllCommon();
         if (allList == null || allList.isEmpty()) return;
         Table<CommonGame.GameType, Integer, List<CSlot>> table1 = HashBasedTable.create();
         for (CSlot e : allList) {
@@ -54,6 +55,7 @@ public class CSlotService {
                 table1.put(gameType, e.getSymbol(), list);
             }
             list.add(e);
+
         }
         table = table1;
 
@@ -68,6 +70,23 @@ public class CSlotService {
     }
 
     public CSlot get(CommonGame.GameType gameType, int symbol, int c) {
+        List<CSlot> list = table.get(gameType, symbol);
+        if (list == null || list.isEmpty()) return null;
+        for (CSlot e : list) {
+            if (e.getC() == c) return e;
+        }
+        return null;
+    }
+
+    public Map<Integer, List<CSlot>> getSubMap(CommonGame.GameType gameType) {
+        return table.row(gameType);
+    }
+
+    public List<CSlot> getSub(CommonGame.GameType gameType, int symbol) {
+        return table.get(gameType, symbol);
+    }
+
+    public CSlot getSub(CommonGame.GameType gameType, int symbol, int c) {
         List<CSlot> list = table.get(gameType, symbol);
         if (list == null || list.isEmpty()) return null;
         for (CSlot e : list) {

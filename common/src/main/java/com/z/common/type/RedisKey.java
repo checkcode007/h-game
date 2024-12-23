@@ -7,4 +7,7 @@ public class RedisKey {
 
     public static final String ROOM_ID =G+"room:id";
 
+
+    public static final String LINE9_RANK =G+"line9:rank";
+
 }

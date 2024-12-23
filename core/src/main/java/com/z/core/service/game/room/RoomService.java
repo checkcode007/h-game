@@ -4,11 +4,16 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.protobuf.AbstractMessageLite;
 import com.google.protobuf.ByteString;
-import com.z.common.util.SpringContext;
+import com.z.core.service.game.aladdin.AladdinRoom;
 import com.z.core.service.game.fish.FishRoom;
+import com.z.core.service.game.football.BallRoom;
+import com.z.core.service.game.line9.Line9Room;
 import com.z.core.service.game.majiang.MaJiangRoom;
+import com.z.core.service.game.mali.MaliHigherRoom;
 import com.z.core.service.game.mali.MaliRoom;
 import com.z.core.service.game.game.SuperRoom;
+import com.z.core.service.game.slot.SlotRoom;
+import com.z.core.util.SpringContext;
 import com.z.dbmysql.dao.room.CRoomDao;
 import com.z.model.common.MsgId;
 import com.z.model.mysql.cfg.CRoom;
@@ -17,14 +22,9 @@ import com.z.model.proto.Game;
 import com.z.model.proto.MyMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Scheduled;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 房间管理类
@@ -35,8 +35,6 @@ public enum RoomService {
 
     Map<Long, SuperRoom> map = new ConcurrentHashMap<>();
     Table<CommonGame.GameType, CommonGame.RoomType, CRoom> table = HashBasedTable.create();
-
-    AtomicLong roomId = new AtomicLong(0);
 
     RoomService() {
         init();
@@ -78,17 +76,40 @@ public enum RoomService {
     public synchronized SuperRoom addRoom(long uid, CommonGame.GameType gameType, CommonGame.RoomType roomType) {
         CRoom cRoom = getCfg(gameType,roomType);
         if (cRoom == null) return null;
-        if (gameType == CommonGame.GameType.BAIBIAN_XIAOMALI) {
-            MaliRoom room = new MaliRoom(cRoom);
+        if (gameType == CommonGame.GameType.BAIBIAN_XIAOMALI || gameType == CommonGame.GameType.JINGDIAN_XIAOMALI) {
+            MaliRoom room = new MaliRoom(cRoom,uid);
             map.put(room.getId(), room);
+            room.init(cRoom);
             return room;
-        } else if (gameType == CommonGame.GameType.MAJIANG_2) {
-            MaJiangRoom room = new MaJiangRoom(cRoom);
+        } else if (gameType == CommonGame.GameType.JIUXIANLAWANG) {
+            Line9Room room = new Line9Room(cRoom,uid);
             map.put(room.getId(), room);
+            room.init(cRoom);
+            return room;
+        }else if (gameType == CommonGame.GameType.MAJIANG_2) {
+            MaJiangRoom room = new MaJiangRoom(cRoom,uid);
+            map.put(room.getId(), room);
+            room.init(cRoom);
             return room;
         }else if (gameType == CommonGame.GameType.FISH) {
-            FishRoom room = new FishRoom(cRoom);
+            FishRoom room = new FishRoom(cRoom,uid);
             map.put(room.getId(), room);
+            room.init(cRoom);
+            return room;
+        }else if (gameType == CommonGame.GameType.BAIBIAN_XIAOMALI_HIGHER) {
+            MaliHigherRoom room = new MaliHigherRoom(cRoom,uid);
+            map.put(room.getId(), room);
+            room.init(cRoom);
+            return room;
+        }else if (gameType == CommonGame.GameType.SHAOLIN_ZUQIU) {
+            BallRoom room = new BallRoom(cRoom,uid);
+            map.put(room.getId(), room);
+            room.init(cRoom);
+            return room;
+        }else if (gameType == CommonGame.GameType.ALADING) {
+            AladdinRoom room = new AladdinRoom(cRoom,uid);
+            map.put(room.getId(), room);
+            room.init(cRoom);
             return room;
         }
         return null;
@@ -115,11 +136,8 @@ public enum RoomService {
 
     }
 
-
-    @Scheduled(cron = "0 0/10 * * * ?")
     public void exe() {
         reloadCfg();
-
     }
 
     public CRoom getCfg(CommonGame.GameType gameType, CommonGame.RoomType roomType  ) {
@@ -137,5 +155,13 @@ public enum RoomService {
     }
 
     //todo 退出房间
+    public void update(long now){
+        List<SuperRoom>  list = new ArrayList<>(map.values());
+        if(list == null || list.isEmpty()) return;
+        for (SuperRoom room : list) {
+            room.update(now);
+        }
+    }
+
 
 }

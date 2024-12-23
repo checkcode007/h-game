@@ -3,16 +3,16 @@ package com.z.core.service.game.game;
 import com.google.protobuf.AbstractMessageLite;
 import com.google.protobuf.ByteString;
 import com.z.common.util.PbUtils;
+import com.z.core.service.game.aladdin.AladdinRoom;
+import com.z.core.service.game.football.BallRoom;
+import com.z.core.service.game.line9.Line9Room;
 import com.z.core.service.game.majiang.MaJiangRoom;
+import com.z.core.service.game.mali.MaliHigherRoom;
 import com.z.core.service.game.mali.MaliRoom;
 import com.z.core.service.game.room.RoomService;
 import com.z.core.service.user.UserService;
 import com.z.core.service.wallet.WalletBizService;
-import com.z.core.service.wallet.WalletService;
-import com.z.model.bo.mali.BetResult;
-import com.z.model.bo.mali.WinOneLine;
 import com.z.model.bo.user.User;
-import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgId;
 import com.z.model.common.MsgResult;
 import com.z.model.proto.CommonGame;
@@ -83,6 +83,7 @@ public class RoomBizService {
         }
         room.out(uid);
         RoomService.ins.removeRoom(room.getId());
+        log.info(sj.add("success").toString());
         return res.build();
     }
 
@@ -134,26 +135,35 @@ public class RoomBizService {
             res.setFailMsg("房间数据错误");
             return res.build();
         }
-        if(free){
-            if(user.getFree()<1){
-                log.error(sj.add("free fail").toString());
+        CommonGame.GameType gameType = user.getGameType();
+        if(gameType == CommonGame.GameType.BAIBIAN_XIAOMALI_HIGHER){
+            if(user.getHighC()<1){
+                log.error(sj.add("higher fail").toString());
                 res.setOk(false).setFailMsg("没有免费次数了");
                 res.setFailMsg("没有免费次数了");
                 return res.build();
             }
         }else{
-            if (!walletBizService.changeGold(CommonUser.GoldType.GT_GAME, AddType.SUB, uid, gold,null,null)) {
-                log.error(sj.add("sub gold fail").toString());
-                res.setOk(false).setFailMsg("扣除金币失败");
-                res.setFailMsg("扣除金币失败");
-                return res.build();
+            if(free){
+                if(user.getFree()<1){
+                    log.error(sj.add("free fail").toString());
+                    res.setOk(false).setFailMsg("没有免费次数了");
+                    res.setFailMsg("没有免费次数了");
+                    return res.build();
+                }
+            }else{
+                if (!walletBizService.changeGold(CommonUser.GoldType.GT_GAME, AddType.SUB, uid, gold,gameType,user.getRoomType())) {
+                    log.error(sj.add("sub gold fail").toString());
+                    res.setOk(false).setFailMsg("扣除金币失败");
+                    res.setFailMsg("扣除金币失败");
+                    return res.build();
+                }
             }
         }
 
-        CommonGame.GameType gameType = user.getGameType();
         MsgResult msgResult = null;
         Game.S_20104.Builder b = Game.S_20104.newBuilder();
-        if (gameType == CommonGame.GameType.BAIBIAN_XIAOMALI) {
+        if (gameType == CommonGame.GameType.BAIBIAN_XIAOMALI || gameType == CommonGame.GameType.JINGDIAN_XIAOMALI ) {
             msgResult = maliBet((MaliRoom) room, uid, gold,free);
             if(msgResult.isOk()) {
                 b.setMali((Game.MaliBetMsg) msgResult.getT());
@@ -163,7 +173,28 @@ public class RoomBizService {
             if(msgResult.isOk()) {
                 b.setMj((Game.MjBetMsg) msgResult.getT());
             }
+        } else if (gameType == CommonGame.GameType.JIUXIANLAWANG) {
+            msgResult = line9Bet((Line9Room) room, uid, gold,free);
+            if(msgResult.isOk()) {
+                b.setLine9((Game.Line9BetMsg) msgResult.getT());
+            }
+        } else if (gameType == CommonGame.GameType.BAIBIAN_XIAOMALI_HIGHER) {
+            msgResult = maliHighBet((MaliHigherRoom) room, uid, gold,free);
+            if(msgResult.isOk()) {
+                b.setHightMali((Game.MaliHighMsg) msgResult.getT());
+            }
+        }else if (gameType == CommonGame.GameType.SHAOLIN_ZUQIU) {
+            msgResult = footBallBet((BallRoom) room, uid, gold,free);
+            if(msgResult.isOk()) {
+                b.setHightMali((Game.MaliHighMsg) msgResult.getT());
+            }
+        }else if (gameType == CommonGame.GameType.ALADING) {
+            msgResult = aladdinBet((AladdinRoom) room, uid, gold,free);
+            if(msgResult.isOk()) {
+                b.setAladdin((Game.AladdinMsg) msgResult.getT());
+            }
         }
+
         if (!msgResult.isOk()) {
             log.error(sj.add("bet fail").toString());
             res.setOk(false).setFailMsg(msgResult.getMessage());
@@ -174,33 +205,56 @@ public class RoomBizService {
         return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
     }
 
-    public MsgResult maliBet(MaliRoom maliRoom, long uid, long gold,boolean free) {
+    public MsgResult<Game.MaliBetMsg> maliBet(MaliRoom maliRoom, long uid, long gold,boolean free) {
         StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("gold:" + gold).add("free:" + free);
-        MsgResult<BetResult> msgRet = maliRoom.bet(uid, 0, gold,free);
+        MsgResult<Game.MaliBetMsg> msgRet = maliRoom.bet(uid, 0, gold,free);
         if (!msgRet.isOk()) {
             log.error(sj.add("bet fail").toString());
             return msgRet;
         }
-        BetResult betRet = msgRet.getT();
-        walletBizService.changeGold(CommonUser.GoldType.GT_GAME, AddType.ADD, uid, betRet.getGold(),null,null);
-        Game.MaliBetMsg.Builder b = Game.MaliBetMsg.newBuilder();
-        for (WinOneLine win : betRet.getWins()) {
-            b.addLines(Game.PayLine.newBuilder().setIndex(win.getIndex()).setSymbol(win.getSymbol()).setCount(win.getC()).setRate(win.getRate()).build());
+        return msgRet;
+    }
+    public MsgResult<Game.MaliHighMsg> maliHighBet(MaliHigherRoom maliRoom, long uid, long gold,boolean free) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("gold:" + gold).add("free:" + free);
+        MsgResult<Game.MaliHighMsg> msgRet = maliRoom.bet(uid,  gold);
+        if (!msgRet.isOk()) {
+            log.error(sj.add("bet fail").toString());
+            return msgRet;
         }
-        Wallet wallet = WalletService.ins.get(uid);
-        b.setRate(betRet.getRate()).setGold(betRet.getGold()).setLeaveGold(wallet.getGold())
-                .addAllReel1(betRet.getReels().get(0))
-                .addAllReel2(betRet.getReels().get(1))
-                .addAllReel3(betRet.getReels().get(2))
-                .addAllReel4(betRet.getReels().get(3))
-                .addAllReel5(betRet.getReels().get(4))
-        ;
-        return new MsgResult(b.build());
+        return msgRet;
     }
 
     public MsgResult<Game.MjBetMsg> majiangBet(MaJiangRoom room, long uid, long gold,boolean free) {
         StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("gold:" + gold).add("free:" + free);
         MsgResult<Game.MjBetMsg> msgRet = room.bet(uid, gold,free);
+        if (!msgRet.isOk()) {
+            log.error(sj.add("bet fail").toString());
+            return msgRet;
+        }
+        return msgRet;
+    }
+
+    public MsgResult<Game.Line9BetMsg> line9Bet(Line9Room room, long uid, long gold, boolean free) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("gold:" + gold).add("free:" + free);
+        MsgResult<Game.Line9BetMsg> msgRet = room.bet(uid, 0, gold,free);
+        if (!msgRet.isOk()) {
+            log.error(sj.add("bet fail").toString());
+            return msgRet;
+        }
+        return msgRet;
+    }
+    public MsgResult<Game.FootBallMsg> footBallBet(BallRoom room, long uid, long gold, boolean free) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("gold:" + gold).add("free:" + free);
+        MsgResult<Game.FootBallMsg> msgRet = room.bet(uid, 0, gold,free);
+        if (!msgRet.isOk()) {
+            log.error(sj.add("bet fail").toString());
+            return msgRet;
+        }
+        return msgRet;
+    }
+    public MsgResult<Game.AladdinMsg> aladdinBet(AladdinRoom room, long uid, long gold, boolean free) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("gold:" + gold).add("free:" + free);
+        MsgResult<Game.AladdinMsg> msgRet = room.bet(uid, 0, gold,free);
         if (!msgRet.isOk()) {
             log.error(sj.add("bet fail").toString());
             return msgRet;

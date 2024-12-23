@@ -1,7 +1,9 @@
 package com.z.dbmysql.common;
 
+import com.z.dbmysql.dao.pool.GPoolDao;
 import com.z.model.common.ExcludeCreateTime;
 import com.z.model.common.ExcludeUpdateTime;
+import com.z.model.mysql.cfg.GPool;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
@@ -210,7 +212,7 @@ public class SqlProvider {
                 return null;
             }
             field.setAccessible(true);
-            return  (Long) field.get(model);
+            return  Long.valueOf(field.get(model).toString());
         } catch (NoSuchFieldException e) {
             System.err.println("NoSuchFieldException={},auto id"+e.getMessage());
             e.printStackTrace();
@@ -219,6 +221,12 @@ public class SqlProvider {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static void main(String[] args) {
+        GPool pool = new GPool();
+//        pool.setId(100);
+        getFieldID(pool);
     }
 
     private static Pattern humpPattern = Pattern.compile("[A-Z]");

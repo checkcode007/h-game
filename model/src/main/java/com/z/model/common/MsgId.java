@@ -133,6 +133,13 @@ public class MsgId {
     public static final int C_FISH_FIRE=20205;
     public static final int S_FISH_FIRE=20206;
 
+    //九线拉王-幸运玩家
+    public static final int C_LINE9_RANK=20301;
+    public static final int S_LINE9_RANK=20302;
+
+
+    //九线拉王-推送宝箱奖池数据
+    public static final int S_LINE9_BOX_POOL=20204;
 
 
 }

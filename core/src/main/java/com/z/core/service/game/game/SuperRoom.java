@@ -65,14 +65,13 @@ public abstract class SuperRoom implements IRoom{
     protected AtomicInteger roundIndex = new AtomicInteger(0);
 
     static AtomicLong  atomicLong = new AtomicLong(0);
+    protected long uid;
 
-
-
-    public SuperRoom(CRoom cRoom) {
+    public SuperRoom(CRoom cRoom,long uid) {
         this.gameType = CommonGame.GameType.forNumber(cRoom.getGameType());
         this.roomType = CommonGame.RoomType.forNumber(cRoom.getType());
         this.id = atomicLong.incrementAndGet();
-        init(cRoom);
+        this.uid = uid;
     }
 
 
@@ -152,6 +151,11 @@ public abstract class SuperRoom implements IRoom{
     public MsgResult settle(){
         return new MsgResult(true);
     }
+
+    public void update(long now){
+
+    }
+
     @Override
     public int getRadio(int type) {
         return radioMap.getOrDefault(type,0);
@@ -197,5 +201,9 @@ public abstract class SuperRoom implements IRoom{
 
     public CommonGame.RoomType getRoomType() {
         return roomType;
+    }
+
+    public long getUid() {
+        return uid;
     }
 }

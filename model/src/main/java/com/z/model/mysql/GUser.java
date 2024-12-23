@@ -8,6 +8,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class GUser extends Model {
+
+    Long id;
     /**
      *  类型 0 普通账号
      * @see com.z.model.proto.CommonUser.UserType
@@ -51,4 +53,24 @@ public class GUser extends Model {
     private boolean lockState;
     int game;
     int room;
+
+    @Override
+    public String toString() {
+        return "GUser{" +getId()+
+                "type=" + type +
+                ", robot=" + robot +
+                ", name='" + name + '\'' +
+                ", password='" + password + '\'' +
+                ", deviceId='" + deviceId + '\'' +
+                ", ip='" + ip + '\'' +
+                ", lv=" + lv +
+                ", phone='" + phone + '\'' +
+                ", icon=" + icon +
+                ", codeCout=" + codeCout +
+                ", state=" + state +
+                ", lockState=" + lockState +
+                ", game=" + game +
+                ", room=" + room +
+                '}';
+    }
 }

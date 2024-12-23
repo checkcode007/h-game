@@ -4,7 +4,7 @@ package com.z.core.service.user;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.z.common.util.SpringContext;
+import com.z.core.util.SpringContext;
 import com.z.dbmysql.dao.agent.GAgentDao;
 import com.z.model.bo.user.AgentBo;
 import com.z.model.mysql.GAgent;

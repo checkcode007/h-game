@@ -51,6 +51,10 @@ public interface IMapper<T , ID extends Serializable>  {
     @Select(value = "select * from ${tableName} ${order}")
     List<T> getAll(@Param("tableName") String tableName,@Param("order")String order);
 
+    @Transactional(readOnly = true)
+    @Select(value = "select * from ${tableName}  ${order} limit #{limit}")
+    List<T> getTop(@Param("tableName") String tableName,@Param("order")String order , @Param("limit") int limit);
+
     @Transactional
     @InsertProvider(type = SqlProvider.class,method = "insert")
     void save(@Param("tableName") String tableName, @Param("t") T t);

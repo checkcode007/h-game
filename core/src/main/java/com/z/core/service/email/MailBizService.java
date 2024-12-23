@@ -2,8 +2,8 @@ package com.z.core.service.email;
 
 
 import com.google.protobuf.ByteString;
-import com.z.common.util.IdUtil;
 import com.z.core.service.cfg.CCfgBizService;
+import com.z.core.util.IdUtil;
 import com.z.dbmysql.dao.email.GEmailDao;
 import com.z.model.common.MsgId;
 import com.z.model.mysql.GEmail;

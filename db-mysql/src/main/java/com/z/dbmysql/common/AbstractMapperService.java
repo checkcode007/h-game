@@ -77,6 +77,12 @@ public abstract class AbstractMapperService<T, ID extends Serializable> {
         else
             return getMapper().getAll(getAllTableName()[0],"");
     }
+    public List<T> getTop(String order,int limit){
+        if (order != null)
+            return getMapper().getAll(getAllTableName()[0]," order by "+order);
+        else
+            return getMapper().getAll(getAllTableName()[0],"");
+    }
 
     protected T get(ID id) {
         return findById(id);
@@ -164,5 +170,10 @@ public abstract class AbstractMapperService<T, ID extends Serializable> {
 //        pager.setList(page.getContent());
 //        return pager;
 //    }
+
+    public static void main(String[] args) {
+        Long k = 109999L;
+        System.out.println(Integer.valueOf(k.toString()));
+    }
 
 }

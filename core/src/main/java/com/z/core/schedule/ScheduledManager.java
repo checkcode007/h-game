@@ -1,12 +1,16 @@
 package com.z.core.schedule;
 
 import cn.hutool.core.thread.ThreadUtil;
+import com.z.core.service.game.PoolService;
 import com.z.core.service.game.card.CardService;
+import com.z.core.service.game.room.RoomService;
 import com.z.core.service.user.UserService;
 import com.z.core.service.wallet.WalletService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -20,22 +24,35 @@ import java.util.concurrent.TimeUnit;
  * @since 2024-08-30
  */
 @Component
-public class ScheduledManager {
+public class ScheduledManager implements ApplicationListener<ApplicationReadyEvent> {
     public List<MySchedule> scheduleList = new ArrayList<>();
     protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     CardService cardService;
 
+
+
     private ScheduledManager(){
+    }
+    @Override
+    public void onApplicationEvent(ApplicationReadyEvent event) {
         MySchedule schedule = new MySchedule(1,"common",this::exe,20,10, TimeUnit.SECONDS);
         scheduleList.add(schedule);
         schedule = new MySchedule(1,"card",this::exe1,25,5, TimeUnit.SECONDS);
         scheduleList.add(schedule);
-        schedule = new MySchedule(1,"mali",this::exe2,10,1, TimeUnit.SECONDS);
+        schedule = new MySchedule(1,"mali",this::exe2,25,1, TimeUnit.SECONDS);
         scheduleList.add(schedule);
 
-    }
+        schedule = new MySchedule(1,"cfg",this::exeCfg,10,10, TimeUnit.MINUTES);
+        scheduleList.add(schedule);
 
+        schedule = new MySchedule(1,"update",this::exe5,10,5, TimeUnit.SECONDS);
+        scheduleList.add(schedule);
+
+
+        schedule = new MySchedule(1,"goldPool",this::exe6,10,5, TimeUnit.MINUTES);
+        scheduleList.add(schedule);
+    }
     public void exe(){
 //        log.info("exe=>"+Thread.currentThread().getId()+" :"+Thread.currentThread().getName()+" :"+this.hashCode());
     }
@@ -44,9 +61,28 @@ public class ScheduledManager {
 //        log.info(+Thread.currentThread().getId()+" :"+Thread.currentThread().getName()+" :"+this.hashCode());
 //        cardService.exe();
     }
-
+    public void exe5(){
+        try {
+            RoomService.ins.update(System.currentTimeMillis());
+        } catch (Exception e) {
+            log.error(e.getMessage(),e);
+        }
+    }
+    public void exe6(){
+        try {
+            PoolService.ins.exe();
+        } catch (Exception e) {
+            log.error(e.getMessage(),e);
+        }
+    }
+    public void exeCfg(){
+        try {
+            RoomService.ins.exe();
+        } catch (Exception e) {
+            log.error(e.getMessage(),e);
+        }
+    }
     public void exe2(){
-//        log.info(Thread.currentThread().getId()+" :"+Thread.currentThread().getName()+" :"+this.hashCode());
         try {
             UserService.ins.exe();
         } catch (Exception e) {
@@ -95,4 +131,6 @@ public class ScheduledManager {
         }
         ThreadUtil.safeSleep(5000);
     }
+
+
 }

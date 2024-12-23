@@ -4,8 +4,8 @@ package com.z.core.service.user;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.z.common.util.SpringContext;
 import com.z.core.service.wallet.WalletBizService;
+import com.z.core.util.SpringContext;
 import com.z.dbmysql.dao.user.GUserDao;
 import com.z.model.bo.user.User;
 import com.z.model.mysql.GUser;
@@ -69,6 +69,8 @@ public enum UserService {
         Map<Long, User> map = cache.asMap();
         for (User bo : map.values()) {
             if(bo.isChange()){
+                log.info("==========>"+bo.getUser().toString());
+                System.err.println(bo.getUser().toString());
                 dao.update(bo.getUser());
                 bo.setChange(false);
             }

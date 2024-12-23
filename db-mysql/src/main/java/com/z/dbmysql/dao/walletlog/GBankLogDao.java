@@ -24,7 +24,7 @@ public class GBankLogDao extends AbstractMapperService<GBankLog,Long> {
     }
 
     @Override
-    protected IMapper<GBankLog, Long> getMapper() {
+    protected GBankLogMaper getMapper() {
         return maper;
     }
 
