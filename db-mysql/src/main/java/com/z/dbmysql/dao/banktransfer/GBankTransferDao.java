@@ -79,10 +79,16 @@ public class GBankTransferDao extends AbstractMapperService<GBankTransfer,Long> 
     }
 
 
+
     public List<GBankTransfer> find(long uid,int state){
         Map<String, Object> wheres =new HashMap<>();
         wheres.put("uid",uid);
         wheres.put("state",state);
         return super.findByMultiByParam(wheres,1000);
+    }
+
+    @Override
+    public GBankTransfer update(GBankTransfer gBankTransfer) {
+        return super.update(gBankTransfer);
     }
 }

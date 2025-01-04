@@ -4,7 +4,9 @@ import cn.hutool.core.util.RandomUtil;
 import com.google.common.collect.Table;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
+import com.z.model.bo.user.User;
 import com.z.model.proto.CommonGame;
+import com.z.model.proto.Game;
 import com.z.model.type.PosType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,14 +28,6 @@ public enum SlotCommon {
     public static final int diffHighW1 = 5;
 
     public static final int BASE = 9;
-    /**
-     * 轮子个数
-     */
-    public static final int REEL_SIZE = 5;
-    /**
-     * 每个轮子显示个数
-     */
-    public static final int SYMBOL_SIZE = 3;
 
     SlotCommon() {
         init();
@@ -53,35 +47,51 @@ public enum SlotCommon {
      *                 低 RTP 情况：符号池稀有符号比例增加，减少普通中奖
      * @return
      */
-    public Slot random(CommonGame.GameType gameType, Table<Integer,Integer,SlotModel> board, Map<Integer, Slot> slots, Set<Integer> goals, int x) {
+    public Slot random(CommonGame.GameType gameType, Table<Integer,Integer,SlotModel> board, Map<Integer, Slot> slots, Set<Integer> goals,
+                       int x,boolean free, User user) {
         List<Slot> list = new ArrayList<>(slots.values());
 
-        list = checkGame(gameType,board,list);
 
+        list = checkGame(gameType,board,list,free);
+        checkCount(board,list,x);
         checkPos(list,x);
-        int totalW1 = 0;
+        Map<Integer, Integer> map = new HashMap();
         for (Slot s : list) {
             // 降低的概率
             boolean isGoal = goals != null && goals.contains(s.getK());
-            if (isGoal) {
-                s.subW1(diffW1);
-            } else {
-                s.addW2(diffW1);
+            // 动态调整权重变化：目标符号增加的幅度比非目标符号小
+            int adjustFactor = isGoal ? diffW1 : (int) (diffW1 * 0.2); // 目标符号调整幅度小于非目标符号
+            if (s.getK() == CommonGame.MJ.BAIDA.getNumber() || s.getK() == CommonGame.MJ.HU.getNumber()) {
+                adjustFactor = isGoal ? diffW1 * 5 : diffW1 / 5;
             }
-            totalW1 += s.getW1();
+            if (isGoal) {
+                s.subW1(adjustFactor);
+            } else {
+                s.addW1(adjustFactor);
+            }
+            map.put(s.getK(), s.getW1());
         }
-
+        map = freeWeight( map,user,slots, x);
+        int totalW1 = 0;
+        for (Integer v : map.values()) {
+            totalW1 += v;
+        }
         // 生成一个随机数
         int randomW1 = RandomUtil.randomInt(1, totalW1);
         // 根据随机数选择元素
         int curW1 = 0;
         Slot target = null;
-        for (Slot s : list) {
-            curW1 += s.getW1();
+        Iterator<Map.Entry<Integer, Integer>> iterator = map.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, Integer> entry = iterator.next();
+            int k = entry.getKey();
+            int w1 = entry.getValue();
+            curW1 += w1;
             if (randomW1 < curW1) {
-                target = s;
+                target = slots.get(k);
                 break;
             }
+
         }
         if (target == null) {
             int randomIndex = RandomUtil.randomInt(0, list.size());
@@ -89,8 +99,39 @@ public enum SlotCommon {
         }
         return target;
     }
-
-    public List<Slot> checkGame(CommonGame.GameType gameType, Table<Integer,Integer,SlotModel> board, List<Slot> list){
+    public  Map<Integer, Integer> freeWeight( Map<Integer, Integer> map,User user,Map<Integer, Slot> slots,int x){
+        if(user!=null) {
+            if (user.getFree() > 0) {
+                for (Slot s : slots.values()) {
+                    int k = s.getK();
+                    if (s.isBonus()) {
+                        if (map.containsKey(k)) {
+                            map.put(k, s.getW1() / 2);
+                        }
+                    } else if (s.isBaida()) {
+                        if (map.containsKey(k)) {
+                            map.put(k, s.getW1() / 2);
+                        }
+                    }
+                }
+            } else if (user.getFree() > 5) {
+                for (Slot s : slots.values()) {
+                    int k = s.getK();
+                    if (s.isBonus()) {
+                        if (map.containsKey(k)) {
+                            map.put(k, 0);
+                        }
+                    } else if (s.isBaida()) {
+                        if (map.containsKey(k)) {
+                            map.put(k, 0);
+                        }
+                    }
+                }
+            }
+        }
+        return map;
+    }
+    public List<Slot> checkGame(CommonGame.GameType gameType, Table<Integer,Integer,SlotModel> board, List<Slot> list,boolean free){
         if(gameType == CommonGame.GameType.JIUXIANLAWANG){
             for (SlotModel v : board.values()) {
                 if(v.getType() == CommonGame.LINE9.L9_7_VALUE){
@@ -101,17 +142,29 @@ public enum SlotCommon {
         } else if (gameType == CommonGame.GameType.BAIBIAN_XIAOMALI) {
             int scatterC = 0;
             for (SlotModel v : board.values()) {
-                if(v.getType() == CommonGame.Mali.SCARRER_VALUE){
+                if(v.isScatter()){
                     scatterC++;
                 }
             }
             if (scatterC > 1) {
-                list.removeIf(slot -> slot.getK() == CommonGame.Mali.SCARRER_VALUE);
+                list.removeIf(slot -> slot.isScatter());
+            }
+        }else if (gameType == CommonGame.GameType.SHAOLIN_ZUQIU) {
+            //免费处理
+            if(free){
+                int randomType = RandomUtil.randomInt(CommonGame.FOOTBALL.FT_MONK1_VALUE,CommonGame.FOOTBALL.FT_MONK5_VALUE+1);
+                list.removeIf(slot -> slot.getK() != randomType);
             }
         }
         return list;
     }
 
+    /**
+     * 元素坐标检查
+     * @param list
+     * @param x
+     * @return
+     */
     public List<Slot> checkPos(List<Slot> list,int x){
         Predicate<Slot> filter = new Predicate<Slot>() {
             @Override
@@ -135,6 +188,31 @@ public enum SlotCommon {
         list.removeIf(filter);
         return list;
     }
+
+    /**
+     * 检查每轴的个数
+     * @param list
+     * @param x
+     * @return
+     */
+    public List<Slot> checkCount(Table<Integer,Integer,SlotModel> board,List<Slot> list,int x){
+        Set<Integer> onlySet = new HashSet<>(list.size());
+        for (Slot slot : list) {
+            if(slot.isOnly()){
+                onlySet.add(slot.getK());
+            }
+        }
+        if(onlySet.isEmpty()) return list;
+        Set<Integer> delSet = new HashSet<>(list.size());
+        for (SlotModel m : board.row(x).values()) {
+            if(onlySet.contains(m.getType())){
+               delSet.add(m.getType());
+            }
+        }
+        if(delSet.isEmpty()) return list;
+        list.removeIf(e->delSet.contains(e.getK()));
+        return list;
+    }
     /**
      * 高级玩法随机符号
      *
@@ -151,9 +229,10 @@ public enum SlotCommon {
         if(x != 0){ //炸弹只留在外层循环
             if(gameType == CommonGame.GameType.BAIBIAN_XIAOMALI_HIGHER){
                 list.removeIf(slot -> slot.getK() == CommonGame.MaliHigher.H_DINAMITE_VALUE);
+            } else if (gameType == CommonGame.GameType.SHUIHUZHUAN_HIGHER) {
+                list.removeIf(slot -> slot.getK() == CommonGame.WMHigher.WH_EXIT_VALUE);
             }
         }
-
         Map<Integer,Integer> map = new HashMap<>();
 
         for (Slot s : list) {
@@ -222,6 +301,23 @@ public enum SlotCommon {
             });
             log.info(sj.toString());
         });
+    }
+
+    public List<Game.Spot> allToModelTable(Table<Integer, Integer, SlotModel> board) {
+        List<Game.Spot> list = new ArrayList<>();
+        board.values().forEach(e -> {
+            if (e != null) {
+                list.add(Game.Spot.newBuilder().setSymbol(e.getType())
+                        .setX(e.getX()).setY(e.getY())
+                        .setGold(e.isGold()).setChangeType(e.getChangeType()).build());
+            }
+        });
+        return list;
+    }
+
+    public SlotModel toModel(Slot s,int x,int y) {
+       return SlotModel.builder().type(s.getK()).x(x).y(y).gold(s.isGold()).baida(s.isBaida())
+                .bonus(s.isBonus()).only(s.isOnly()).scatter(s.isScatter()).quit(s.isQuit()).build();
     }
 
 }

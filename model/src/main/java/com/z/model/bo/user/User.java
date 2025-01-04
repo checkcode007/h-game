@@ -41,8 +41,7 @@ public class User {
      * 高级玩法次数
      */
     int highC;
-
-
+    int gmFreeC;
 
 
     public int addFree(int c) {
@@ -93,5 +92,11 @@ public class User {
     }
     public void addHighC(int c) {
         this.highC += c;
+    }
+    public void addGmFreeC(int c) {
+        this.gmFreeC += c;
+    }
+    public void resetGmFreeC() {
+        this.gmFreeC = 0;
     }
 }

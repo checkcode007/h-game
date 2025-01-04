@@ -1,7 +1,5 @@
-package com.z.model.bo.majiang;
+package com.z.model.bo.slot;
 
-import com.z.model.bo.slot.SlotModel;
-import com.z.model.proto.CommonGame;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -11,7 +9,7 @@ import java.util.StringJoiner;
 @Data
 public class Goal {
 
-    CommonGame.MJ mj;
+    int  k;
     /**
      * 连接列个数
      */
@@ -25,14 +23,14 @@ public class Goal {
      */
     int free;
     List<SlotModel> points;
-    public Goal(CommonGame.MJ mj, int c, int rate) {
-        this.mj = mj;
+    public Goal(int k, int c, int rate) {
+        this.k = k;
         this.c = c;
         this.rate = rate;
         this.points = new ArrayList<>();
     }
-    public Goal(CommonGame.MJ mj, int c, int rate,int free) {
-        this.mj = mj;
+    public Goal(int k, int c, int rate,int free) {
+        this.k = k;
         this.c = c;
         this.rate = rate;
         this.points = new ArrayList<>();

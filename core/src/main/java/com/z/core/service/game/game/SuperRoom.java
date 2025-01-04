@@ -1,17 +1,26 @@
 package com.z.core.service.game.game;
 
+import com.google.common.collect.HashBasedTable;
+import com.z.core.service.cfg.CCfgBizService;
+import com.z.core.service.game.slot.CPaylineService;
+import com.z.core.service.game.slot.CSlotService;
 import com.z.core.service.user.UserService;
+import com.z.core.service.wallet.WalletBizService;
 import com.z.core.service.wallet.WalletService;
+import com.z.core.util.SpringContext;
+import com.z.model.bo.slot.Slot;
 import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CRoom;
+import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonGame;
+import com.z.model.type.PosType;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -19,6 +28,10 @@ import java.util.concurrent.atomic.AtomicLong;
 public abstract class SuperRoom implements IRoom{
 
     protected Logger log = LoggerFactory.getLogger(getClass());
+    protected CSlotService service;
+    protected CPaylineService paylineService;
+    protected WalletBizService walletBizService;
+    protected CCfgBizService cfgBizService;
     /**
      * 房间id
      */
@@ -57,6 +70,12 @@ public abstract class SuperRoom implements IRoom{
      */
     protected IRound curRound;
     /**
+     * 选择的所有符号
+     */
+    protected Map<Integer, Slot> slots;
+
+    protected List<Slot> allSlots;
+    /**
      * 奖池倍率
      */
     protected Map<Integer,Integer> radioMap = new HashMap<>();
@@ -67,11 +86,23 @@ public abstract class SuperRoom implements IRoom{
     static AtomicLong  atomicLong = new AtomicLong(0);
     protected long uid;
 
+    //col 第几列 row 第几排
+    protected int COL_SIZE=5,ROW_SIZE=3;
+
+
+
     public SuperRoom(CRoom cRoom,long uid) {
         this.gameType = CommonGame.GameType.forNumber(cRoom.getGameType());
         this.roomType = CommonGame.RoomType.forNumber(cRoom.getType());
         this.id = atomicLong.incrementAndGet();
         this.uid = uid;
+        slots = new HashMap<>();
+        allSlots = new ArrayList<>();
+
+        service = SpringContext.getBean(CSlotService.class);
+        paylineService = SpringContext.getBean(CPaylineService.class);
+        walletBizService = SpringContext.getBean(WalletBizService.class);
+        cfgBizService = SpringContext.getBean(CCfgBizService.class);
     }
 
 
@@ -81,6 +112,26 @@ public abstract class SuperRoom implements IRoom{
         this.maxC =cRoom.getMaxPlayers();
         this.minBet =cRoom.getMinBet();
         this.minBalance = cRoom.getMinBalance();
+        Map<Integer, List<CSlot>> map = service.getMap(gameType);
+        for (List<CSlot> list : map.values()) {
+            for (CSlot slot : list) {
+                int k = slot.getSymbol();
+                Slot st = slots.getOrDefault(k, new Slot(slot.getW1()));
+                slots.putIfAbsent(k, st);
+                BeanUtils.copyProperties(slot, st);
+                st.setK(slot.getSymbol());
+                st.setPosType(PosType.getType(slot.getPosType()));
+                st.setBaida(slot.isBaida());
+                st.setOnly(slot.isOnly());
+                if(StringUtils.isNotEmpty(slot.getPos())){
+                    String[] ss = slot.getPos().split(",");
+                    for (String s : ss) {
+                        st.addPos(Integer.parseInt(s));
+                    }
+                }
+            }
+        }
+        allSlots.addAll(slots.values());
     }
 
 
@@ -151,6 +202,34 @@ public abstract class SuperRoom implements IRoom{
     public MsgResult settle(){
         return new MsgResult(true);
     }
+
+    /**
+     * 判断是否相同的符号
+     * 百搭不能替换scatter ，bonus
+     *
+     * @param i
+     * @param k1
+     * @param k2
+     * @return
+     */
+
+    public boolean isSame(int i, int k1, int k2) {
+        if(k1 ==k2){
+            return true;
+        }
+        CSlot slot1 = service.get(gameType,k1).get(0);
+        CSlot slot2 = service.get(gameType,k2).get(0);
+        boolean b1 = slot1.isBonus()|| slot1.isScatter();
+        boolean b2 = slot2.isBonus()|| slot2.isScatter();
+        if(slot1.isBaida() && !b2){
+            return true;
+        }
+        if(slot2.isBaida() && !b1){
+            return true;
+        }
+        return false;
+    }
+
 
     public void update(long now){
 

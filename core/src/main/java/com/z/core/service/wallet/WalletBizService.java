@@ -5,6 +5,7 @@ import com.google.protobuf.ByteString;
 import com.z.core.net.channel.UserChannelManager;
 import com.z.core.service.email.MailBizService;
 import com.z.core.service.transfer.TransferBizService;
+import com.z.core.service.user.UserService;
 import com.z.model.bo.WalletBo;
 import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgId;
@@ -52,7 +53,9 @@ public class WalletBizService {
     public boolean changeGold(CommonUser.GoldType goldType, AddType addType, long uid, long gold) {
         return changeGold(goldType,addType,uid,gold);
     }
-    public boolean changeGold(CommonUser.GoldType goldType, AddType addType, long uid, long gold, CommonGame.GameType gameType, CommonGame.RoomType roomType) {
+    public boolean changeGold(CommonUser.GoldType goldType, AddType addType,
+                              long uid, long gold, CommonGame.GameType gameType,
+                              CommonGame.RoomType roomType) {
         StringJoiner sj = new StringJoiner(",");
         sj.add("add:" + addType).add("uid:" + uid).add("gold:" + gold);
         log.info(sj.toString());

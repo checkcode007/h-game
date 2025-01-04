@@ -24,7 +24,6 @@ import java.util.List;
 @Service
 public class GMAddGold implements IHandler<User.C_10321> {
     protected org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
-//    private static final Logger log = LogManager.getLogger(BankDeposit.class);
     @Autowired
     WalletBizService service;
 
@@ -42,10 +41,13 @@ public class GMAddGold implements IHandler<User.C_10321> {
     @Override
     public AbstractMessageLite handleDo(ChannelHandlerContext ctx, User.C_10321 req) {
         long uid = ctx.channel().attr(ChannelAttributes.USER_ID).get();
-        service.changeGold(CommonUser.GoldType.GT_GM, AddType.ADD,uid,req.getGold(),null,null);
+        service.changeGold(CommonUser.GoldType.GT_GM, AddType.ADD,uid,req.getGold(), null,null);
         log.info("uid:"+ uid +" highC:"+req.getHighC()+" gold:"+req.getGold());
         if(req.getHighC()>0){
             UserService.ins.get(uid).setHighC(req.getHighC());
+        }
+        if(req.getFreeC()>0){
+            UserService.ins.get(uid).addGmFreeC(req.getFreeC());
         }
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_GM_ADDGOLD).setOk(true);
         return res.build();

@@ -1,4 +1,4 @@
-package com.z.core.service.game.mali;
+package com.z.core.service.game.wm;
 
 
 import com.z.core.service.game.slot.SlotCommon;
@@ -12,7 +12,6 @@ import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CRoom;
 import com.z.model.mysql.cfg.CSlot;
-import com.z.model.proto.CommonGame;
 import com.z.model.proto.CommonUser;
 import com.z.model.proto.Game;
 import com.z.model.type.AddType;
@@ -24,21 +23,27 @@ import java.util.*;
 /**
  * 高级玩法房间
  */
-public class MaliHigherRoom extends SlotRoom {
+public class WMHigherRoom extends SlotRoom {
     protected Logger log = LoggerFactory.getLogger(getClass());
 
     int winC= 0;
     int totalC= 0;
-    public MaliHigherRoom(CRoom cRoom, long uid) {
+
+    public WMHigherRoom(CRoom cRoom, long uid) {
         super(cRoom, uid);
     }
 
+    @Override
+    public void init(CRoom cRoom) {
+        super.init(cRoom);
+    }
 
     void printslot(){
         for (Slot s : allSlots) {
             log.info(s.getK()+"------>"+s.getW1());
         }
     }
+
     /**
      * 下注
      *
@@ -46,7 +51,7 @@ public class MaliHigherRoom extends SlotRoom {
      */
     //todo 金额本地保存
     //todo限制无限循环
-    public MsgResult<Game.MaliHighMsg> bet(long uid, long gold) {
+    public MsgResult<Game.WMHighMsg> bet(long uid, long gold) {
         printslot();
         nextRound();
         var round = createRound(uid, gold);
@@ -94,12 +99,12 @@ public class MaliHigherRoom extends SlotRoom {
         }
         long rewardGold = betGold * rate;
 
-        Game.MaliHighMsg.Builder b = Game.MaliHighMsg.newBuilder().setGold(rewardGold).setType(CommonGame.MaliHigher.forNumber(sameType)).setGold(rate).setLeaveC(user.getHighC());
+        Game.WMHighMsg.Builder b = Game.WMHighMsg.newBuilder().setGold(rewardGold).setType(sameType).setGold(rate).setLeaveC(user.getHighC());
         for (int i = 1; i < 5; i++) {
             SlotModel m = board.get(i, 0);
-            b.addPools(CommonGame.MaliHigher.forNumber(m.getType()));
+            b.addPools(m.getType());
         }
-        var ret = new MsgResult<Game.MaliHighMsg>(true);
+        var ret = new MsgResult<Game.WMHighMsg>(true);
         if (rewardGold > 0) {
             winC++;
             walletBizService.changeGold(CommonUser.GoldType.GT_GAME, AddType.ADD, uid, rewardGold, gameType, roomType);
@@ -112,6 +117,20 @@ public class MaliHigherRoom extends SlotRoom {
         return ret;
     }
 
+    /**
+     * 生成符号
+     */
+    @Override
+    public void generate() {
+        board.clear();
+        for (int i = 0; i < COL_SIZE; i++) {
+            for (int j = 0; j < ROW_SIZE; j++) {
+                Slot slot = random(slots, i);
+                SlotModel model =  SlotCommon.ins.toModel(slot,i,j);
+                board.put(model.getX(), model.getY(), model);
+            }
+        }
+    }
     @Override
     public Slot random(Map<Integer, Slot> slots, int i) {
         Set<Integer> goals = new HashSet<>();
@@ -122,6 +141,7 @@ public class MaliHigherRoom extends SlotRoom {
     }
 
     public List<Integer>  allSymbol(){
+
         List<Integer> highers = new ArrayList<>();
         if(board.isEmpty())return highers;
         for (int i = 0; i < 5; i++) {

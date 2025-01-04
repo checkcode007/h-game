@@ -139,7 +139,21 @@ public class MsgId {
 
 
     //九线拉王-推送宝箱奖池数据
-    public static final int S_LINE9_BOX_POOL=20204;
+    public static final int S_LINE9_BOX_POOL=20304;
+
+
+    //水浒传-比倍
+    public static final int C_WM_DICE=20311;
+    public static final int S_WM_DICE=20312;
+
+
+    //僵尸新娘-抓鬼游戏-开始
+    public static final int C_CORPSE_START=20321;
+    public static final int S_CORPSE_START=20322;
+
+    //僵尸新娘-抓鬼游戏-猜灯笼
+    public static final int C_CORPSE_CATCH=20323;
+    public static final int S_CORPSE_CATCH=20324;
 
 
 }

@@ -1,13 +1,14 @@
 package com.z.core.service.game.mali;
 
 
+import cn.hutool.core.util.RandomUtil;
 import com.z.core.service.game.slot.SlotRoom;
 import com.z.core.service.wallet.WalletService;
-import com.z.model.bo.slot.Slot;
-import com.z.model.bo.slot.SlotModel;
+import com.z.model.bo.slot.*;
 import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CRoom;
+import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonGame;
 import com.z.model.proto.Game;
 import org.slf4j.Logger;
@@ -78,9 +79,22 @@ public class MaliRoom extends SlotRoom {
         }
     }
 
+
     @Override
-    public boolean isSpecialType(int type) {
-        return type == CommonGame.Mali.WILD_VALUE;
+    public Rewardline checkHigher(Payline line) {
+        Rewardline payline = null;
+        for (Point p : line.getPoints()) {
+            int x = p.getX();
+            SlotModel m = board.get(x,p.getY());
+            int type = m.getChangeType()>0 ?m.getChangeType():m.getType();
+            if(!m.isBaida()) continue;
+            if(payline==null){
+                payline =new Rewardline(type,line.getLineId());
+            }
+            payline.addSpecicalC();
+            payline.addPoint(p);
+        }
+        return payline;
     }
 
     @Override
@@ -93,16 +107,4 @@ public class MaliRoom extends SlotRoom {
         return type == CommonGame.Mali.GOLD_WILD_VALUE;
     }
 
-    @Override
-    public boolean isSame(int i, int k1, int k2) {
-        if (super.isSame(i, k1, k2)) {
-            return true;
-        }
-        if (i != 0) {
-            if (k2 == CommonGame.Mali.WILD_VALUE || k2 == CommonGame.Mali.GOLD_WILD_VALUE) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

@@ -47,6 +47,9 @@ public class MailBizService {
         email.setState(CommonUser.YesNo.YN_N.getNumber());     // 设置 state
         email.setCreateTime(d);                                // 设置 createTime
         email.setUpdateTime(d);                                // 设置 updateTime
+        email.setTitle("");
+        String content = "您已经成功领取到了一笔"+gold+"金币,来自ID:"+fromId+",请银行查收";
+        email.setContent(content);
         return dao.save(email);
     }
     /**
@@ -57,7 +60,7 @@ public class MailBizService {
         log.info(sj.toString());
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_EMAIL_LIST).setOk(true);
         List<GEmail> list = null;
-        if(type == 1){//全部
+        if(type == 0){//全部
             list = dao.findByUid(uid);
         }else{//未领取
             list = dao.find(uid, CommonUser.YesNo.YN_N);
@@ -68,7 +71,13 @@ public class MailBizService {
             size = list.size();
             for (GEmail gEmail : list) {
                 User.Email.Builder builder = User.Email.newBuilder();
-                builder.setId(gEmail.getId()).setFromId(gEmail.getFromId()).setTransferId(gEmail.getTransferId()).setTitle(gEmail.getTitle()).setContent(gEmail.getContent()).setGold(gEmail.getGold());
+                builder.setId(gEmail.getId()).setFromId(gEmail.getFromId()).setTransferId(gEmail.getTransferId()).setGold(gEmail.getGold());
+                if(gEmail.getTitle() != null){
+                    builder.setTitle(gEmail.getTitle());
+                }
+                if(gEmail.getContent() != null){
+                    builder.setContent(gEmail.getContent());
+                }
                 builder.setState(gEmail.getState()).setCreateTime(gEmail.getCreateTime().getTime()).setUpdateTime(gEmail.getUpdateTime().getTime());
                 b.addEmails(builder.build());
             }
@@ -81,7 +90,7 @@ public class MailBizService {
         return dao.findById(id);
     }
     public void update(GEmail record){
-        dao.save(record);
+        dao.update(record);
     }
     public List<GEmail> get(long uid){
         return dao.findByUid(uid);

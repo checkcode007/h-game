@@ -80,7 +80,7 @@ public class TransferBizService {
         record.setMailId(mailId);
         record.setTax(tax);
         record.setRealGold(realGold);
-        dao.save(record);
+        dao.update(record);
         log.error(sj.add("sucess").toString());
         return true;
     }
@@ -98,7 +98,7 @@ public class TransferBizService {
             return false;
         }
         record.setState(true);
-        dao.save(record);
+        dao.update(record);
         log.error(sj.add("sucess").toString());
         return true;
     }

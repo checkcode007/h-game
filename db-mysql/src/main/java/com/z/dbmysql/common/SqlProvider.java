@@ -212,6 +212,9 @@ public class SqlProvider {
                 return null;
             }
             field.setAccessible(true);
+            if(field.get(model) == null ){
+                return null;
+            }
             return  Long.valueOf(field.get(model).toString());
         } catch (NoSuchFieldException e) {
             System.err.println("NoSuchFieldException={},auto id"+e.getMessage());

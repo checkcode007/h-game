@@ -29,12 +29,21 @@ public abstract class SuperRound implements IRound {
      */
     protected Table<Long, Integer, Long> table = HashBasedTable.create();
 
+    protected int  ROW_SIZE = 4;
+    protected int  COL_SIZE = 5;
+
+    protected long uid;
+
     public SuperRound(long id, CommonGame.GameType gameType, CommonGame.RoomType roomType) {
         this.id = id;
         this.gameType = gameType;
         this.roomType = roomType;
     }
-
+    public void init(long uid,int rowSize, int colSize) {
+        this.ROW_SIZE = rowSize;
+        this.COL_SIZE = colSize;
+        this.uid = uid;
+    }
 
     @Override
     public MsgResult bet(long uid, int type, long gold, boolean free) {

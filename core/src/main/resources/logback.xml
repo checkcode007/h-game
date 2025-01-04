@@ -3,6 +3,7 @@
     <!-- 设置通用配置 -->
     <property name="LOG_PATH" value="logs"/>
     <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36}[%M][%L]- %msg%n"/>
+<!--    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger[%M][%L]- %msg%n"/>-->
     <property name="MAX_FILE_SIZE" value="100MB"/>
     <property name="MAX_HISTORY" value="30"/>
     <property name="TOTAL_SIZE_CAP" value="1GB"/>
@@ -179,7 +180,10 @@
     <logger name="com.z" level="INFO" additivity="false">
         <appender-ref ref="INFO_FILE"/>
     </logger>
-
+    <!-- 定义异常日志记录器 -->
+    <logger name="com.z" level="ERROR" additivity="true">
+        <appender-ref ref="ERROR_FILE"/>
+    </logger>
     <!-- 根日志设置，控制台输出 -->
     <root level="INFO">
         <appender-ref ref="STDOUT"/>

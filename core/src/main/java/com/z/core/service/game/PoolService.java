@@ -39,11 +39,19 @@ public enum PoolService {
     }
 
     public void add(CommonGame.GameType gameType, long gold) {
-        pools.get(gameType).addGold(gold/10);
+        Pool pool =  pools.get(gameType);
+        if(pool == null) {
+            return;
+        }
+        pool .addGold(gold/10);
     }
 
     public long get(CommonGame.GameType gameType) {
-        return  pools.get(gameType).getGold();
+        Pool pool =  pools.get(gameType);
+        if(pool == null) {
+            return 0;
+        }
+        return  pool.getGold();
     }
     public void exe() {
         long now = System.currentTimeMillis();

@@ -32,4 +32,9 @@ public class CSlot {
     int posType;//位置类型
     String pos;//位置
     boolean baida;
+    boolean full;//是否全屏幕显示
+    boolean only;//每轴只能有一个
+    boolean bonus;
+    boolean scatter;
+    boolean quit;//是否是退出图标
 }

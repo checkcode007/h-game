@@ -14,6 +14,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class GBankTransfer extends Model {
+    private Long id;
     /**
      * @see  com.z.model.proto.CommonUser.TransferLogType
      */

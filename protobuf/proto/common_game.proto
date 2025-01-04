@@ -36,6 +36,8 @@ enum GameType {
   JINZHUSONGFU = 12;       // 金猪送福
 
   BAIBIAN_XIAOMALI_HIGHER = 102;    // 百变小码丽-高级玩法
+
+  SHUIHUZHUAN_HIGHER = 106;    // 水浒传->小码丽-高级玩法
 }
 
 enum GameState{
@@ -200,6 +202,7 @@ enum FOOTBALL {
   FT_MONK5 = 10;               // 和尚5-绿色
 
   FT_BAIDA = 100;            // 百搭
+  FT_SCATTER = 200;            //夺宝符号
 }
 
 
@@ -221,3 +224,101 @@ enum Aladdin {
   A_BAIDA = 60;            // 百搭
 }
 
+//冰球突破
+enum Puck {
+  P_UNSPECIFIED = 0;  // 默认值，未指定的符号
+  P_CAR = 1;              // 汽车
+  P_SHOE = 2;                //鞋
+  P_STICK = 3;                //棍子
+  P_PUCK = 4;                //球
+  P_TWO = 5;              // 两个人
+  P_G_FAT =6;              // 绿色胖子
+  P_B_FAT = 7;              //蓝色胖子
+  P_G_THIN = 8;              // 绿色瘦子
+  P_R_THIN = 9;          //红色瘦子
+
+  P_FREE = 50;            // SCATTER
+  P_BAIDA = 60;            // 百搭
+}
+
+//水浒传-----------------start
+//水浒传
+enum WaterMargin {
+  WM_UNSPECIFIED = 0;  // 默认值，未指定的符号
+  WM_AXE = 1;              // 斧子
+  WM_SPEAR = 2;                //长枪
+  WM_CUT = 3;                //刀
+  WM_LU = 4;                //鲁智深
+  WM_LIN = 5;              // 林冲
+  WM_SONG =6;              // 宋江
+  WM_DAO =7;              // 替天行道
+  WM_TANG =8;              // 忠义堂
+
+  WM_HIGHER = 50;            // 水浒传-触发高级玩法小玛丽的图标
+}
+
+//水浒传-小玛丽高级场符号
+enum WMHigher {
+  WH_UNSPECIFIED = 0;  // 默认值，未指定的符号
+
+  WH_AXE = 1;              // 斧子
+  WH_SPEAR = 2;                //长枪
+  WH_CUT = 3;                //刀
+  WH_LU = 4;                //鲁智深
+  WH_LIN = 5;              // 林冲
+  WH_SONG =6;              // 宋江
+  WH_DAO =7;              // 替天行道
+  WH_TANG =8;              // 忠义堂
+
+  WH_EXIT =100;              // 退出
+}
+//水浒传-比倍
+enum WMDice {
+  WD_UNSPECIFIED = 0;  // 默认值，未指定的符号
+
+  WD_SMALL = 1;  // 小
+  WD_TIE= 2;  // 和
+  WD_BIG = 3;  // 大
+}
+
+//水浒传-----------------end
+//金猪送福
+enum Pig {
+  PG_UNSPECIFIED = 0;  // 默认值，未指定的符号
+
+  PG_9 = 9;              // 九
+  PG_10 = 10;                //十
+  PG_11 = 11;                //11
+  PG_12= 12;                //12
+  PG_13 = 13;              // 13
+  PG_TAI =14;              // 太
+  PG_COPPER =15;              // 铜钱
+  PG_LOTUS =16;              // 荷花
+  PG_GLIM =17;              // 灯笼
+  PG_FU =18;              // 福
+  PG_FISH =19;              // 鱼
+
+  PG_FREE =50;              // 免费次数-福
+  PG_WILD =60;              // 百搭
+}
+
+//僵尸新娘
+enum Corpse {
+  C_UNSPECIFIED = 0;  // 默认值，未指定的符号
+
+  C_10 = 10;                //十
+  C_11 = 11;                //11
+  C_12= 12;                //12
+  C_13 = 13;              // 13
+  C_A =14;              // A
+  C_Skull =15;              //骷髅
+  C_BOY =16;              // 小孩
+  C_MAN =17;              // 男僵尸
+  C_BRIDE=18;              // 新娘
+
+  C_FREE =50;              // 免费次数
+  C_WILD =60;              // 百搭
+
+  C_BONUS =100;              //进入小游戏图标
+
+}

@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class RewardPayline {
+public class Rewardline {
     /**
      * 符号
      * @see com.z.model.proto.CommonGame.Mali
@@ -33,7 +33,7 @@ public class RewardPayline {
      */
     int specialC=0;
 
-    public RewardPayline(int k, int lineId) {
+    public Rewardline(int k, int lineId) {
         this.k = k;
         this.lineId = lineId;
         this.points = new ArrayList<>();
@@ -48,6 +48,9 @@ public class RewardPayline {
     }
     public void addSpecicalC() {
         this.specialC++;
+    }
+    public void addSpecicalC(int specialC) {
+        this.specialC+=specialC;
     }
     @Override
     public String toString() {

@@ -11,6 +11,7 @@ import java.util.Date;
 @ExcludeCreateTime
 @ExcludeUpdateTime
 public class GBankLog extends Model{
+    private Long id;
     private int type;
     private long uid;
     private long targetId;

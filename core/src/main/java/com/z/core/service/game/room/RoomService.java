@@ -5,6 +5,7 @@ import com.google.common.collect.Table;
 import com.google.protobuf.AbstractMessageLite;
 import com.google.protobuf.ByteString;
 import com.z.core.service.game.aladdin.AladdinRoom;
+import com.z.core.service.game.corpse.CorpseRoom;
 import com.z.core.service.game.fish.FishRoom;
 import com.z.core.service.game.football.BallRoom;
 import com.z.core.service.game.line9.Line9Room;
@@ -12,7 +13,10 @@ import com.z.core.service.game.majiang.MaJiangRoom;
 import com.z.core.service.game.mali.MaliHigherRoom;
 import com.z.core.service.game.mali.MaliRoom;
 import com.z.core.service.game.game.SuperRoom;
+import com.z.core.service.game.pig.PigRoom;
+import com.z.core.service.game.puck.PuckRoom;
 import com.z.core.service.game.slot.SlotRoom;
+import com.z.core.service.game.wm.WMRoom;
 import com.z.core.util.SpringContext;
 import com.z.dbmysql.dao.room.CRoomDao;
 import com.z.model.common.MsgId;
@@ -108,6 +112,26 @@ public enum RoomService {
             return room;
         }else if (gameType == CommonGame.GameType.ALADING) {
             AladdinRoom room = new AladdinRoom(cRoom,uid);
+            map.put(room.getId(), room);
+            room.init(cRoom);
+            return room;
+        }else if (gameType == CommonGame.GameType.BINGQIUTUPO) {
+            PuckRoom room = new PuckRoom(cRoom,uid);
+            map.put(room.getId(), room);
+            room.init(cRoom);
+            return room;
+        }else if (gameType == CommonGame.GameType.SHUIHUZHUAN) {
+            WMRoom room = new WMRoom(cRoom,uid);
+            map.put(room.getId(), room);
+            room.init(cRoom);
+            return room;
+        }else if (gameType == CommonGame.GameType.JINZHUSONGFU) {
+            PigRoom room = new PigRoom(cRoom,uid);
+            map.put(room.getId(), room);
+            room.init(cRoom);
+            return room;
+        }else if (gameType == CommonGame.GameType.JIANGSHIXINNIANG) {
+            CorpseRoom room = new CorpseRoom(cRoom,uid);
             map.put(room.getId(), room);
             room.init(cRoom);
             return room;

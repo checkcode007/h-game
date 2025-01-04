@@ -6,6 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class GEmail extends Model {
+    private Long id;
     private long uid;
     private String title;
     private String content;

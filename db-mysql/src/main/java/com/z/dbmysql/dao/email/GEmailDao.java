@@ -66,6 +66,12 @@ public class GEmailDao extends AbstractMapperService<GEmail, Long> {
         return super.save(e);
     }
 
+    @CacheEvict(cacheNames = "commonCache", key = "getTarget().cacheNamespace() + ':'  + #e.id")
+    @Override
+    public GEmail update(GEmail e) {
+        return super.update(e);
+    }
+
     public List<GEmail> findByUid(long uid) {
         Map<String, Object> wheres = new HashMap<>();
         wheres.put("uid", uid);

@@ -1,7 +1,6 @@
 package com.z.model.mysql;
 
 import lombok.*;
-import org.checkerframework.checker.units.qual.A;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;

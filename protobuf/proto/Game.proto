@@ -109,9 +109,15 @@ message S_20104 {
   MaliBetMsg mali = 1;//玛丽下注返回
   MaliHighMsg   hightMali = 2;//小玛丽高级玩法返回
   MjBetMsg   mj = 3;//麻将下注返回
-  Line9BetMsg line9=4;//九线拉王下注返回
-  FootBallMsg  footBall=5;//少林足球
-  AladdinMsg   aladdin=6;//阿拉丁
+  Line9BetMsg line9 = 4;//九线拉王下注返回
+  FootBallMsg  footBall = 5;//少林足球
+  AladdinMsg   aladdin = 6;//阿拉丁
+  ClearGameMsg   puck = 7;//冰球突破
+  PigMsg  pig = 8;//金猪送福
+  WMBetMsg    waterMargin = 9;//水浒传
+  WMHighMsg    wmHigher = 10;//水浒传-小玛丽
+  WMHighMsg    wmSpecial = 11;//水浒传-特殊玩法
+  CorpseMsg    Corpse = 12;//僵尸新娘
 }
 
 //退出房间->返回20106
@@ -150,14 +156,15 @@ message PayLine{
   int32  rate = 2;//倍率
   int64  gold = 3;//中奖金额
   repeated Spot spots = 4;//支付线上的点
-  int32 highC=5;//每条线上的高级玩法次数
+  int32 highC = 5;//每条线上的高级玩法次数
 }
 //显示的每个点
 message  Spot{
   int32 symbol = 1;//符号
   int32 x = 2; //列 （第几列）
   int32 y = 3;//行。 （列中的第几行）
-  int32 changeType=4;//要变成的符号（金色珍珠周围变成普通珍珠，少林足球要变的类型）
+  int32 changeType = 4;//要变成的符号（金色珍珠周围变成普通珍珠，少林足球要变的类型）
+  bool gold = 5;//是否是金色牌
 }
 message Point{
   int32 x = 1; //列 （第几列）
@@ -261,11 +268,11 @@ message S_20302 {
 }
 //幸运玩家
 message Line9Luck{
-  int64  uid=1;//玩家id
-  int32 icon =2;//头像
-  string name=3;//名字
-  int64 gold=4;//中奖金额
-  int64 time=5;//中奖时间
+  int64  uid = 1;//玩家id
+  int32 icon = 2;//头像
+  string name = 3;//名字
+  int64 gold = 4;//中奖金额
+  int64 time = 5;//中奖时间
 
 }
 //刷新宝箱奖池金额
@@ -285,6 +292,8 @@ message FootBallMsg {
   int32 rate = 4;//中奖的倍率
   repeated Spot spots = 5;//显示水果
   repeated PayLine lines = 6;// 中奖的支付线
+  int32 addFreeC = 7;//增加的免费次数
+  int32 totalFreeC = 8;//总免费次数
 }
 //---------少林足球------------end
 
@@ -297,7 +306,127 @@ message AladdinMsg {
   int32 rate = 4;//中奖的倍率
   repeated Spot spots = 5;//显示水果
   repeated PayLine lines = 6;// 中奖的支付线
+  int32 addFreeC = 7;//增加的免费次数
+  int32 totalFreeC = 8;//总免费次数
 }
 //---------少林足球------------end
 
+//---------冰球------------start
+//消除游戏下注结果
+message ClearGameMsg {
+  int64 roundId = 1;//轮数id
+  int64 leaveGold = 2;//剩余金额
+  int64 gold = 3;//中奖的金额
+  repeated Round rounds = 4;//每次消除
+  repeated Spot  lastView = 5;//最后显示
+  bool free = 6;//是否免费
+  int32 addFreeC = 7;//增加的免费次数
+  int32 totalFreeC = 8;//总免费次数
+  int32 wildIndex = 9;// 运动员点中的线（大于0有效）
+}
 
+//每轮显示
+message  Round{
+  repeated Spot spots = 1;//显示（消除前的）
+  repeated Spot delSpots = 2;//消除的点
+  int64  gold = 3;//获取的金币
+  int32 rowRadio = 4;//连续倍率
+}
+
+//---------冰球------------end
+
+
+//-----------水浒传-------start
+//高级玩法下注结果
+message WMHighMsg {
+  int32 type = 1;//外层圈子中奖的符号
+  repeated int32 pools = 2;//池子里的符号
+  int64 leaveGold = 3;//剩余金额
+  int64 gold = 4;//中奖的金额
+  int32 rate = 5;//中奖的倍率
+  int32 leaveC = 6;//小玛丽剩余次数
+}
+
+//下注结果
+message WMBetMsg {
+  int64 roundId = 1;//轮数id
+  int64 leaveGold = 2;//剩余金额
+  int64 gold = 3;//中奖的金额
+  int32 rate = 4;//中奖的倍率
+  repeated Spot spots = 5;//显示水果
+  repeated PayLine lines = 6;// 中奖的支付线
+  int32 addFreeC = 7;//增加的免费次数
+  int32 totalFreeC = 8;//总免费次数
+  int32 highC = 9;//高级玩法次数
+  int32 fullType = 10;//全屏幕符号（大于0有效）
+  int32 fullRate = 11;//全屏幕符号倍率
+}
+//比倍请求
+message C_20311{
+  WMDice type = 1;//选择的类型（小，和，大）
+  int64  gold = 2;//下注的金额
+}
+//比倍返回
+message S_20312{
+  WinState state = 1;//结果类型（输赢）
+  int64  gold = 2;//金额
+  int64  leaveGold = 3;//钱包剩余金额
+}
+//-----------水浒传-------end
+
+
+//-----------金猪送福-------start
+
+
+//下注结果
+message PigMsg {
+  int64 roundId = 1;//轮数id
+  int64 leaveGold = 2;//剩余金额
+  int64 gold = 3;//中奖的金额
+  int32 rate = 4;//中奖的倍率
+  repeated Spot spots = 5;//显示水果
+  repeated PayLine lines = 6;// 中奖的支付线
+  int32 addFreeC = 7;//增加的免费次数
+  int32 totalFreeC = 8;//总免费次数
+  int32 highC = 9;//高级玩法次数
+}
+
+//-----------金猪送福-------end
+
+
+//-----------僵尸新娘------start
+
+//下注结果
+message CorpseMsg {
+  int64 roundId = 1;//轮数id
+  int64 leaveGold = 2;//剩余金额
+  int64 gold = 3;//中奖的金额
+  int32 rate = 4;//中奖的倍率
+  repeated Spot spots = 5;//显示水果
+  repeated PayLine lines = 6;// 中奖的支付线
+  int32 addFreeC = 7;//增加的免费次数
+  int32 totalFreeC = 8;//总免费次数
+  bool  catchGame=9;//是否开启抓鬼游戏
+}
+
+//开始抓鬼游戏 ->返回20322
+message C_20321{
+}
+
+//猜灯笼
+message C_20323{
+}
+//猜灯笼返回
+message S_20314{
+  int32 type = 1;//灯笼类型（1 太极，2 骷髅头）
+  int32  rate = 2;//灯笼的倍率
+  bool over = 3;//是否结束（true 结束）
+  int32 totalRate = 4;//总倍率
+  int32  betGold = 5;//下注金额
+  int32  c1 = 7;//太极灯笼的个数
+  int32  c2 = 8;//骷髅头灯笼的个数
+  int64 gold = 9;//赢得的总金额
+  int64 leaveGold = 10;//钱包剩余金额
+
+}
+//-----------僵尸新娘-------end

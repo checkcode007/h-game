@@ -20,6 +20,10 @@ public class Slot {
     PosType posType;
     Set<Integer> pos = new HashSet<>();
     boolean baida;
+    boolean only;//每轴只能有一个
+    boolean bonus;
+    boolean scatter;
+    boolean quit;//是否是退出图标
 
 
     public Slot(int w) {
