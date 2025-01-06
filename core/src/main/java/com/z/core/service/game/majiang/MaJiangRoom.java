@@ -51,12 +51,12 @@ public class MaJiangRoom extends SuperRoom {
      * @param uid
      * @param gold
      */
-    public MsgResult<Game.MjBetMsg> bet(long uid, long gold,boolean free) {
+    public MsgResult<Game.ClearGameMsg> bet(long uid, long gold,boolean free) {
         User user = UserService.ins.get(uid);
         MaJiangRound round =(MaJiangRound) createRound(uid);
         user.setRoundId(round.getId());
         log.info("uid:"+uid+" roundId:"+user.getRoundId()+"================>start");
-        MsgResult<Game.MjBetMsg> ret = round.bet(uid, 0, gold, free);
+        MsgResult<Game.ClearGameMsg> ret = round.bet(uid, 0, gold, free);
         log.info("uid:"+uid+" roundId:"+user.getRoundId()+"==>ret:"+ PbUtils.pbToJson(ret.getT()));
         return ret;
     }

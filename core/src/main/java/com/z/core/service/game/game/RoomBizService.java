@@ -171,7 +171,7 @@ public class RoomBizService {
         } else if (gameType == CommonGame.GameType.MAJIANG_2) {
             msgResult = majiangBet((MaJiangRoom) room, uid, gold,free);
             if(msgResult.isOk()) {
-                b.setMj((Game.MjBetMsg) msgResult.getT());
+                b.setMj((Game.ClearGameMsg) msgResult.getT());
             }
         } else if (gameType == CommonGame.GameType.JIUXIANLAWANG) {
             msgResult = line9Bet((Line9Room) room, uid, gold,free);
@@ -249,9 +249,9 @@ public class RoomBizService {
         return msgRet;
     }
 
-    public MsgResult<Game.MjBetMsg> majiangBet(MaJiangRoom room, long uid, long gold,boolean free) {
+    public MsgResult<Game.ClearGameMsg> majiangBet(MaJiangRoom room, long uid, long gold,boolean free) {
         StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("gold:" + gold).add("free:" + free);
-        MsgResult<Game.MjBetMsg> msgRet = room.bet(uid, gold,free);
+        MsgResult<Game.ClearGameMsg> msgRet = room.bet(uid, gold,free);
         if (!msgRet.isOk()) {
             log.error(sj.add("bet fail").toString());
             return msgRet;
@@ -455,13 +455,13 @@ public class RoomBizService {
             return res.build();
         }
         CorpseRoom corpseRoom =(CorpseRoom)room;
-        MsgResult<Game.S_20314.Builder> msgResult = corpseRoom.catchGame();
+        MsgResult<Game.S_20324.Builder> msgResult = corpseRoom.catchGame();
         if (!msgResult.isOk()) {
             log.error(sj.add("data error").toString());
             res.setOk(false).setFailMsg(msgResult.getMessage());
             return res.build();
         }
-        Game.S_20314.Builder b = msgResult.getT();
+        Game.S_20324.Builder b = msgResult.getT();
         log.info(sj.add("ret:" + PbUtils.pbToJson(b)).add("success").toString());
         return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
     }

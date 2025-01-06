@@ -1,75 +1,24 @@
 package com.z.core.service.game.majiang;
 
-import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.z.core.service.game.game.SuperRound;
-import com.z.core.service.game.slot.CSlotService;
+import com.z.core.service.game.clear.ClearRound;
 import com.z.core.service.game.slot.SlotCommon;
-import com.z.core.service.user.UserService;
-import com.z.core.service.wallet.WalletBizService;
-import com.z.core.service.wallet.WalletService;
-import com.z.core.util.SpringContext;
-import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.Goal;
+import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
-import com.z.model.bo.user.User;
-import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonGame;
-import com.z.model.proto.CommonUser;
-import com.z.model.proto.Game;
-import com.z.model.type.AddType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class MaJiangRound extends SuperRound {
+public class MaJiangRound extends ClearRound {
     protected Logger log = LoggerFactory.getLogger(getClass());
-    CSlotService service;
-    WalletBizService walletService;
-    /**
-     * 选择的所有符号
-     */
-    Map<Integer, Slot> slots;
-    /**
-     * 下注基数比值
-     */
-    public static final int BASE = 20;
-    /**
-     * 池子里所有的符号
-     */
-    private Table<Integer, Integer, SlotModel> board;
-    /**
-     * 是否免费轮
-     */
-    boolean free;
-
-    Map<Integer, Goal> delMap;
-
-    List<Integer> rowRadio = Arrays.asList(1, 2, 3, 5);
-    /**
-     * 赢的总次数
-     */
-    int winC = 0;
-    /**
-     * 连续赢的次数
-     */
-    int lianxuC = 0;
-
 
     public MaJiangRound(long id, CommonGame.GameType gameType, CommonGame.RoomType roomType) {
         super(id, gameType, roomType);
-        service = SpringContext.getBean(CSlotService.class);
-        walletService = SpringContext.getBean(WalletBizService.class);
-        board = HashBasedTable.create();
-        delMap = new HashMap<>();
     }
-
-    public void init(Map<Integer, Slot> slots) {
-        this.slots = new HashMap<>(slots);
-    }
-
     /**
      * 生成符号
      */
@@ -81,119 +30,15 @@ public class MaJiangRound extends SuperRound {
             if (i == 0 || i == 4) {
                 size = 4;
             }
-            boolean hu = false;
             for (int j = 0; j < size; j++) {
-                Slot slot = random(slots, i, hu);
+                Slot slot = random(slots, i);
                 SlotModel model = SlotCommon.ins.toModel(slot, i, j);
-                if (slot.getK() == CommonGame.MJ.HU.getNumber()) {
-                    hu = true;
-                }
                 board.put(model.getX(), model.getY(), model);
             }
 
         }
     }
 
-    @Override
-    public MsgResult<Game.MjBetMsg> bet(long uid, int type, long gold, boolean free) {
-        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("type:" + type)
-                .add("gold:" + gold).add("id:" + id).add("free:" + free);
-        log.info(sj.toString());
-        this.free = free;
-        User user = UserService.ins.get(uid);
-        if (free) {
-            gold = user.getFreeBetGold();
-            sj.add("freeBet:" + user.getFreeBetGold());
-        }
-        //下注
-        MsgResult ret = super.bet(uid, type, gold, free);
-        if (!ret.isOk()) {
-            log.error(sj.add("bet fail").toString());
-            return ret;
-        }
-        //生成第一次符号==========
-        generate();
-        log.info("bet下注前:" + id);
-        print(board);
-        Table<Integer, Integer, SlotModel> preBoard = HashBasedTable.create();
-        preBoard.putAll(board);
-
-        Game.MjBetMsg.Builder builder = Game.MjBetMsg.newBuilder().setRoundId(id);
-        //第一次检测============
-        //免费次数判断
-        int freeC = 0;
-        int index = 0;
-        long rewardGold = 0L;
-        //消除情况下，多次判断
-        check();
-        while (!delMap.isEmpty()) {
-            Game.MjOne.Builder b = Game.MjOne.newBuilder();
-            //倍率
-            int rate = 0;
-            int freeCout = 0;
-            for (Goal g : delMap.values()) {
-                for (SlotModel p : g.getPoints()) {
-                    b.addGoals(Game.MjModel.newBuilder().setType(CommonGame.MJ.forNumber(p.getType())).setX(p.getX()).setY(p.getY()).setGold(p.isGold()).build());
-                }
-                rate += g.getRate();
-                freeCout += g.getFree();
-                log.info("k:" + g.getK() + " c:" + g.getC() + " rate:" + g.getRate() + " free:" + free);
-            }
-
-            freeC += freeCout;
-            int rowRate = rowRadio.get(index > rowRadio.size() - 1 ? rowRadio.size() - 1 : index);
-            rowRate = free ? rowRate : rowRate * 2;
-            long addGold = (gold / BASE) * rate * rowRate;
-            StringJoiner sj1 = new StringJoiner(",");
-            sj1.add("r:" + rate).add("rowR:" + rowRate).add("index:" + index).add("baseG:" + (gold / BASE)).add("addG:" + addGold);
-            log.info(sj1.toString());
-            b.setGold(addGold);
-            b.setRowRadio(rowRate);
-            rewardGold += b.getGold();
-            b.addAllMjs(allToModel(preBoard));
-            builder.addMjOnes(b.build());
-            winC++;
-            if (freeCout > 0) {
-                break;
-            }
-            move();
-            log.info("消除后的牌面：");
-            preBoard.clear();
-            preBoard.putAll(board);
-            print(board);
-            reset();
-            //下一轮检测
-            check();
-            index++;
-            lianxuC++;
-        }
-
-        sj.add("index:" + index).add("gold1:" + rewardGold);
-
-        if (rewardGold > 0) {
-            walletService.changeGold(CommonUser.GoldType.GT_GAME, AddType.ADD, uid, rewardGold, gameType, roomType);
-        } else {
-            lianxuC = 0;
-        }
-        if (free) {
-            user.subFree();
-        } else {
-            user.addFree(freeC);
-            if (freeC > 0) {
-                user.setFreeBetGold((int) gold);
-            } else if (user.getFreeBetGold() > 0) {
-                user.setFreeBetGold(0);
-            }
-        }
-
-        builder.setFree(freeC > 0);
-        builder.setAddFreeC(freeC);
-        builder.setTotalFreeC(user.getFree());
-        builder.setGold(rewardGold).addAllMjs(allToModel(board));
-        builder.setLeaveGold(WalletService.ins.get(uid).getGold());
-        log.info(sj.add("success").toString());
-        return new MsgResult(builder.build());
-    }
 
     public void reset() {
         delMap.clear();
@@ -201,16 +46,19 @@ public class MaJiangRound extends SuperRound {
 
     /**
      * 检测
+     *
      * @return
      */
     public void check() {
         checkCommon();
         checkBonus();
     }
+
     /**
      * 检测普通符号
      */
     public void checkCommon() {
+        log.info("checkCommon---------->start");
         // 1. 遍历行列位置和对应的值
         Map<Integer, List<SlotModel>> firstMap = new HashMap<>();
         Collection<SlotModel> row_1 = board.row(0).values();
@@ -223,6 +71,7 @@ public class MaJiangRound extends SuperRound {
         }
         for (int k : firstMap.keySet()) {
             List<SlotModel> lianjie = new ArrayList<>(firstMap.get(k));
+
             int c = 1;
             for (int i = 1; i < 5; i++) {
                 //每列加1
@@ -235,47 +84,47 @@ public class MaJiangRound extends SuperRound {
                         lianjie.add(e);
                         b_col_had = true;
                         log.info(" col:" + i + " type:" + k + "->" + e);
+                    } else {
                         break;
                     }
                 }
                 if (!b_col_had) break;
             }
-            if (c > 1) { //移除匹配的
-                CSlot slot = service.get(gameType,k, c);
-                if (slot != null) {
-                    List<SlotModel> toRemove = new ArrayList<>();
-                    for (var m : lianjie) {
-                        int x = m.getX();
-                        for (SlotModel e : board.row(x).values()) {
-                            if (e.getType() == k || e.isBaida()) {
-                                toRemove.add(e);
-                            }
+//            log.info("k------->:" + k+" c--->"+c);
+            if (c < 2) continue;
+            //移除匹配的
+            CSlot slot = service.get(gameType, k, c);
+            if (slot != null) {
+                List<SlotModel> toRemove = new ArrayList<>();
+                for (var m : lianjie) {
+                    int x = m.getX();
+                    for (SlotModel e : board.row(x).values()) {
+                        if (e.getType() == k || e.isBaida()) {
+                            toRemove.add(e);
                         }
-                        log.info("del--->" + x + "--->" + k + "-->del-->" + m);
                     }
-                    // 进行删除操作
-
-                    Map<Integer, Integer> rateMap = new HashMap();
-                    for (var e : toRemove) {
-                        board.remove(e.getX(), e.getY());
-//                        de1lList.add(e);
-                        if (!e.isBaida()&& e.isGold()) {
-                            CSlot wildSlot = service.getWild(gameType);
-                            Slot s = slots.get(wildSlot.getType());
-                            SlotModel baida = SlotCommon.ins.toModel(s, e.getX(), e.getY());
-                            board.put(baida.getX(), baida.getY(), baida);
-                        }
-                        rateMap.put(e.getX(), rateMap.getOrDefault(e.getX(), 0) + 1);
-                    }
-                    int rate = 1;
-                    for (Integer v : rateMap.values()) {
-                        rate = rate * v;
-                    }
-                    rate = rate * slot.getRate();
-                    Goal goal = new Goal(k, c, rate, slot.getFree());
-                    goal.addPoint(lianjie);
-                    delMap.put(k, goal);
+                    log.info("del--->" + x + "--->" + k + "-->del-->" + m);
                 }
+                // 进行删除操作
+                Map<Integer, Integer> rateMap = new HashMap();
+                for (var e : toRemove) {
+                    board.remove(e.getX(), e.getY());
+                    if (!e.isBaida() && e.isGold()) {
+                        CSlot wildSlot = service.getWild(gameType);
+                        Slot s = slots.get(wildSlot.getSymbol());
+                        SlotModel baida = SlotCommon.ins.toModel(s, e.getX(), e.getY());
+                        board.put(baida.getX(), baida.getY(), baida);
+                    }
+                    rateMap.put(e.getX(), rateMap.getOrDefault(e.getX(), 0) + 1);
+                }
+                int rate = 1;
+                for (Integer v : rateMap.values()) {
+                    rate = rate * v;
+                }
+                rate = rate * slot.getRate();
+                Goal goal = new Goal(k, c, rate, slot.getFree());
+                goal.addPoint(lianjie);
+                delMap.put(k, goal);
             }
         }
     }
@@ -285,7 +134,7 @@ public class MaJiangRound extends SuperRound {
      */
     public void checkBonus() {
         CSlot slot = service.getBonus(gameType);
-        int type = slot.getType();
+        int type = slot.getSymbol();
         int c = 0;
         Map<Integer, Integer> map = new HashMap<>();
         for (Table.Cell<Integer, Integer, SlotModel> cell : board.cellSet()) {
@@ -313,11 +162,9 @@ public class MaJiangRound extends SuperRound {
     }
 
     // 消除符号并让下方的符号前移‘
-    //todo 金色牌变成百搭
-    private boolean move() {
+    @Override
+    public void move() {
         moveForward();
-        boolean b = false;
-
         Map<Integer, Integer> huMap = new HashMap<>();
         for (int x = 0; x < 5; x++) {
             int size = x == 0 || x == 4 ? 4 : 5;
@@ -330,66 +177,25 @@ public class MaJiangRound extends SuperRound {
         }
         for (int x = 0; x < 5; x++) {
             int size = x == 0 || x == 4 ? 4 : 5;
-            boolean hu = huMap.containsKey(x);
             for (int y = 0; y < size; y++) {
                 SlotModel m = board.get(x, y);
                 if (m == null) {
                     Slot slot;
                     if (x == 1) {
-                        slot = random(slots, x, hu);
+                        slot = random(slots, x);
                     } else {
-                        slot = random(slots, x, hu);
+                        slot = random(slots, x);
                     }
                     SlotModel model = SlotCommon.ins.toModel(slot, x, y);
                     log.info("x:-->" + x + "----->" + model);
                     board.put(x, y, model);
-                    if (slot.isBonus()) {
-                        hu = true;
-                    }
                 }
             }
-
         }
         //免费次数第三列都是金色牌处理
         col3Gold();
-
-        return b;
     }
 
-    public void moveForward() {
-        for (int i = 0; i < 5; i++) {
-            moveForward(i);
-        }
-        for (Table.Cell<Integer, Integer, SlotModel> cell : board.cellSet()) {
-            int x = cell.getRowKey();
-            int y = cell.getColumnKey();
-            SlotModel m = cell.getValue();
-            if (m == null) continue;
-            if (m.getY() != y) m.setY(y);
-        }
-    }
-
-    // 移动指定列中的数据x
-    private void moveForward(int x) {
-        // 获取该列的所有SlotModel
-        List<SlotModel> list = new ArrayList<>();
-        int size = x == 0 || x == 4 ? 4 : 5;
-        for (int i = 0; i < size; i++) {
-            SlotModel m = board.get(x, i);
-            list.add(m);
-        }
-        // 去除 null 值
-        list.removeIf(item -> item == null);
-        // 将非 null 的元素填充到原位置
-        for (int i = 0; i < size; i++) {
-            if (i < list.size()) {
-                board.put(x, i, list.get(i));
-            } else {
-                board.remove(x, i);
-            }
-        }
-
-    }
 
     /**
      * 第三列金色处理
@@ -403,18 +209,6 @@ public class MaJiangRound extends SuperRound {
         }
     }
 
-    public Slot random(Map<Integer, Slot> slots, int i, boolean hu) {
-        Set<Integer> goals = new HashSet<>(delMap.keySet());
-        return MJCommon.ins.random(board, slots, goals, i, hu, free, winC, lianxuC);
-    }
-
-    public void print(Table<Integer, Integer, SlotModel> board) {
-        MJCommon.ins.printTable(board);
-    }
-
-    public List<Game.MjModel> allToModel(Table<Integer, Integer, SlotModel> board) {
-        return MJCommon.ins.allToModelTable(board);
-    }
 
     @Override
     public String toString() {

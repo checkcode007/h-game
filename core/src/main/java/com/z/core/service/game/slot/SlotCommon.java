@@ -50,8 +50,6 @@ public enum SlotCommon {
     public Slot random(CommonGame.GameType gameType, Table<Integer,Integer,SlotModel> board, Map<Integer, Slot> slots, Set<Integer> goals,
                        int x,boolean free, User user) {
         List<Slot> list = new ArrayList<>(slots.values());
-
-
         list = checkGame(gameType,board,list,free);
         checkCount(board,list,x);
         checkPos(list,x);
@@ -61,7 +59,7 @@ public enum SlotCommon {
             boolean isGoal = goals != null && goals.contains(s.getK());
             // 动态调整权重变化：目标符号增加的幅度比非目标符号小
             int adjustFactor = isGoal ? diffW1 : (int) (diffW1 * 0.2); // 目标符号调整幅度小于非目标符号
-            if (s.getK() == CommonGame.MJ.BAIDA.getNumber() || s.getK() == CommonGame.MJ.HU.getNumber()) {
+            if (s.isBaida()|| s.isBonus()) {
                 adjustFactor = isGoal ? diffW1 * 5 : diffW1 / 5;
             }
             if (isGoal) {
@@ -91,7 +89,6 @@ public enum SlotCommon {
                 target = slots.get(k);
                 break;
             }
-
         }
         if (target == null) {
             int randomIndex = RandomUtil.randomInt(0, list.size());

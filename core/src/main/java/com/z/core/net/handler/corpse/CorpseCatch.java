@@ -25,7 +25,7 @@ public class CorpseCatch implements IHandler<Game.C_20323> {
 
     @Override
     public int getMsgId() {
-        return MsgId.C_CORPSE_START;
+        return MsgId.C_CORPSE_CATCH;
     }
 
     @Override

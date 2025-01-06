@@ -95,7 +95,6 @@ message C_20101 {
 }
 //消息返回
 message S_20102 {
-  repeated MjModel mjs = 1;//麻将显示
 }
 
 //下注
@@ -108,7 +107,7 @@ message C_20103 {
 message S_20104 {
   MaliBetMsg mali = 1;//玛丽下注返回
   MaliHighMsg   hightMali = 2;//小玛丽高级玩法返回
-  MjBetMsg   mj = 3;//麻将下注返回
+  ClearGameMsg   mj = 3;//麻将下注返回
   Line9BetMsg line9 = 4;//九线拉王下注返回
   FootBallMsg  footBall = 5;//少林足球
   AladdinMsg   aladdin = 6;//阿拉丁
@@ -172,33 +171,7 @@ message Point{
 }
 //-----------百变小玛丽--------end
 
-//-----------麻将--------start
-//下注结果
-message MjBetMsg {
-  int64 roundId = 1;//轮数id
-  int64 leaveGold = 2;//剩余金额
-  int64 gold = 3;//中奖的金额
-  repeated MjOne mjOnes = 4;//麻将每次消除
-  repeated MjModel mjs = 5;//最后显示
-  bool free = 6;//是否免费
-  int32 addFreeC = 7;//增加的免费次数
-  int32 totalFreeC = 8;//总免费次数
-}
-//麻将的每次显示（包括消除后）
-message  MjOne{
-  repeated MjModel mjs = 1;//麻将显示（消除后的显示）
-  repeated MjModel goals = 2;//中奖的麻将
-  int64  gold = 3;//获取的金币
-  int32 rowRadio = 4;//连续倍率
-}
 
-message MjModel{
-  MJ type = 1; //麻将符号
-  int32 x = 2; // 第几列
-  int32 y = 3; //列的第几个
-  bool gold = 4;//是否是金色牌
-}
-//-----------麻将--------end
 
 
 //---------捕鱼------------start
@@ -297,6 +270,8 @@ message FootBallMsg {
 }
 //---------少林足球------------end
 
+
+
 //---------阿拉丁------------start
 //下注结果
 message AladdinMsg {
@@ -311,7 +286,9 @@ message AladdinMsg {
 }
 //---------少林足球------------end
 
-//---------冰球------------start
+
+
+//---------冰球，麻将2------------start
 //消除游戏下注结果
 message ClearGameMsg {
   int64 roundId = 1;//轮数id
@@ -319,10 +296,9 @@ message ClearGameMsg {
   int64 gold = 3;//中奖的金额
   repeated Round rounds = 4;//每次消除
   repeated Spot  lastView = 5;//最后显示
-  bool free = 6;//是否免费
-  int32 addFreeC = 7;//增加的免费次数
-  int32 totalFreeC = 8;//总免费次数
-  int32 wildIndex = 9;// 运动员点中的线（大于0有效）
+  int32 addFreeC = 6;//增加的免费次数
+  int32 totalFreeC = 7;//总免费次数
+  int32 wildIndex = 8;// 运动员点中的线（大于0有效）
 }
 
 //每轮显示
@@ -417,7 +393,7 @@ message C_20321{
 message C_20323{
 }
 //猜灯笼返回
-message S_20314{
+message S_20324{
   int32 type = 1;//灯笼类型（1 太极，2 骷髅头）
   int32  rate = 2;//灯笼的倍率
   bool over = 3;//是否结束（true 结束）

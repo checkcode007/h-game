@@ -49,7 +49,7 @@ public class ClearRound extends SuperRound {
     /**
      * 连续中奖倍率
      */
-    protected List<Integer> rowRadio = Arrays.asList(1, 2, 3, 4,5,6,7,8,9,10);
+    protected List<Integer> rowRadio = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
     /**
      * 赢的总次数
      */
@@ -185,13 +185,13 @@ public class ClearRound extends SuperRound {
             }
         }
         user.addFree(freeC);
-        builder.setFree(freeC > 0).setAddFreeC(freeC).setTotalFreeC(user.getFree());
+        builder.setAddFreeC(freeC).setTotalFreeC(user.getFree());
         builder.setWildIndex(wildIndex).setGold(rewardGold);
         builder.setLeaveGold(WalletService.ins.get(uid).getGold());
 
-        if(wildIndex<1){ //不是冰球大wild 显示最后一轮
+        if (wildIndex < 1) { //不是冰球大wild 显示最后一轮
             builder.addAllLastView(allToModel(board));
-        }else if (index<1){//冰球大wild 没有消除 显示最后一轮展示
+        } else if (index < 1) {//冰球大wild 没有消除 显示最后一轮展示
             builder.addAllLastView(allToModel(board));
         }
         log.info(sj.add("success").toString());
@@ -244,47 +244,48 @@ public class ClearRound extends SuperRound {
                         b_col_had = true;
                         log.info(" col:" + i + " type:" + k + "->" + e);
                         break;
+                    }else {
+                        break;
                     }
                 }
                 if (!b_col_had) break;
             }
-            if (c > 1) { //移除匹配的
-                CSlot slot = service.get(gameType, k, c);
-                if (slot != null) {
-                    List<SlotModel> toRemove = new ArrayList<>();
-                    for (var m : lianjie) {
-                        int x = m.getX();
-                        for (SlotModel e : board.row(x).values()) {
-                            if (e.getType() == k) {
-                                toRemove.add(e);
-                            } else if (slots.get(e.getType()).isBaida()) {
-                                toRemove.add(e);
-                            }
+            if (c < 2) continue;
+            //移除匹配的
+            CSlot slot = service.get(gameType, k, c);
+            if (slot != null) {
+                List<SlotModel> toRemove = new ArrayList<>();
+                for (var m : lianjie) {
+                    int x = m.getX();
+                    for (SlotModel e : board.row(x).values()) {
+                        if (e.getType() == k) {
+                            toRemove.add(e);
+                        } else if (slots.get(e.getType()).isBaida()) {
+                            toRemove.add(e);
                         }
-                        log.info("del--->" + x + "--->" + k + "-->del-->" + m);
                     }
-                    // 进行删除操作
-
-                    Map<Integer, Integer> rateMap = new HashMap();
-                    for (var e : toRemove) {
-                        board.remove(e.getX(), e.getY());
-                        if (!e.isBaida() && e.isGold()) {
-                            CSlot wildSlot = service.getWild(gameType);
-                            Slot s = slots.get(wildSlot.getType());
-                            SlotModel baida = SlotCommon.ins.toModel(s, e.getX(), e.getY());
-                            board.put(baida.getX(), baida.getY(), baida);
-                        }
-                        rateMap.put(e.getX(), rateMap.getOrDefault(e.getX(), 0) + 1);
-                    }
-                    int rate = 1;
-                    for (Integer v : rateMap.values()) {
-                        rate = rate * v;
-                    }
-                    rate = rate * slot.getRate();
-                    Goal goal = new Goal(k, c, rate, slot.getFree());
-                    goal.addPoint(lianjie);
-                    delMap.put(k, goal);
+                    log.info("del--->" + x + "--->" + k + "-->del-->" + m);
                 }
+                // 进行删除操作
+                Map<Integer, Integer> rateMap = new HashMap();
+                for (var e : toRemove) {
+                    board.remove(e.getX(), e.getY());
+                    if (!e.isBaida() && e.isGold()) {
+                        CSlot wildSlot = service.getWild(gameType);
+                        Slot s = slots.get(wildSlot.getType());
+                        SlotModel baida = SlotCommon.ins.toModel(s, e.getX(), e.getY());
+                        board.put(baida.getX(), baida.getY(), baida);
+                    }
+                    rateMap.put(e.getX(), rateMap.getOrDefault(e.getX(), 0) + 1);
+                }
+                int rate = 1;
+                for (Integer v : rateMap.values()) {
+                    rate = rate * v;
+                }
+                rate = rate * slot.getRate();
+                Goal goal = new Goal(k, c, rate, slot.getFree());
+                goal.addPoint(lianjie);
+                delMap.put(k, goal);
             }
         }
     }
@@ -377,7 +378,7 @@ public class ClearRound extends SuperRound {
     }
 
     public Slot random(Map<Integer, Slot> slots, int i) {
-        return SlotCommon.ins.random(gameType, board, slots, delMap.keySet(), i,free, UserService.ins.get(uid));
+        return SlotCommon.ins.random(gameType, board, slots, delMap.keySet(), i, free,user);
     }
 
     public void print(Table<Integer, Integer, SlotModel> board) {

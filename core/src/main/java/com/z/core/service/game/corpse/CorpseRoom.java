@@ -8,11 +8,9 @@ import com.z.core.service.game.PoolService;
 import com.z.core.service.game.line9.Line9RankService;
 import com.z.core.service.game.slot.CSlotService;
 import com.z.core.service.game.slot.SlotRoom;
-import com.z.core.service.user.UserService;
 import com.z.core.service.wallet.WalletService;
 import com.z.core.util.SpringContext;
 import com.z.model.bo.slot.Rewardline;
-import com.z.model.bo.user.User;
 import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgId;
 import com.z.model.common.MsgResult;
@@ -166,7 +164,7 @@ public class CorpseRoom extends SlotRoom {
     /**
      * 抓鬼
      */
-    public MsgResult<Game.S_20314.Builder> catchGame(){
+    public MsgResult<Game.S_20324.Builder> catchGame(){
         int betGold = (int)getBetGold();
         StringJoiner sj = new StringJoiner(",").add("uid:"+uid).add("rid:"+id);
         log.info(sj.add("betGold:"+betGold).toString());
@@ -192,15 +190,15 @@ public class CorpseRoom extends SlotRoom {
         int rate =  getRate();
         catchRate += rate;
         if(over){
-            gold = betGold*catchRate;
+            gold = betGold*catchRate*Math.max(1,addIndex);
             walletBizService.changeGold(CommonUser.GoldType.GT_GAME, AddType.ADD, uid, gold, gameType, roomType);
         }
         Wallet wallet = WalletService.ins.get(uid);
-        Game.S_20314.Builder b = Game.S_20314.newBuilder().setOver(over);
+        Game.S_20324.Builder b = Game.S_20324.newBuilder().setOver(over).setTotalRate(catchRate);
         b.setType(type).setBetGold(betGold).setC1(addIndex).setC2(subIndex);
         b.setRate(rate).setGold(gold);
         b.setLeaveGold(wallet.getGold());
         log.info(b.toString());
-        return new MsgResult<Game.S_20314.Builder>(b);
+        return new MsgResult<Game.S_20324.Builder>(b);
     }
 }

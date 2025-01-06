@@ -38,6 +38,7 @@ public enum UserService {
             .expireAfterWrite(1, TimeUnit.HOURS).initialCapacity(1000).maximumSize(3000).build(new CacheLoader<Long, User>() {
         @Override
         public @Nullable User load(@NonNull Long id) throws Exception {
+            log.info("load user id:{}", id);
             GUser user = dao.findById(id);
             if(user == null) return null;
             User bo = new User();

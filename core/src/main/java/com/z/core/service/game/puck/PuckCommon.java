@@ -223,27 +223,7 @@ public enum PuckCommon {
         return list.get(list.size() - 1);
     }
 
-    public List<Game.MjModel> allToModel(List<List<SlotModel>> board) {
-        List<Game.MjModel> list = new ArrayList<>();
-        for (List<SlotModel> row : board) {
-            for (SlotModel e : row) {
-                list.add(Game.MjModel.newBuilder().setType(CommonGame.MJ.forNumber(e.getType())).setX(e.getX())
-                        .setY(e.getY()).setGold(e.isGold()).build());
-            }
-        }
-        return list;
-    }
 
-    public List<Game.MjModel> allToModelTable(Table<Integer, Integer, SlotModel> board) {
-        List<Game.MjModel> list = new ArrayList<>();
-        board.values().forEach(e -> {
-            if (e != null) {
-                list.add(Game.MjModel.newBuilder().setType(CommonGame.MJ.forNumber(e.getType())).setX(e.getX())
-                        .setY(e.getY()).setGold(e.isGold()).build());
-            }
-        });
-        return list;
-    }
 
     public void print(List<List<SlotModel>> board) {
         for (List<SlotModel> row : board) {

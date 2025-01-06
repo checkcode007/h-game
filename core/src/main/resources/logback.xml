@@ -2,7 +2,7 @@
 <configuration debug="true">
     <!-- 设置通用配置 -->
     <property name="LOG_PATH" value="logs"/>
-    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36}[%M][%L]- %msg%n"/>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36}[%M][%L]- %msg%n"/>
 <!--    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger[%M][%L]- %msg%n"/>-->
     <property name="MAX_FILE_SIZE" value="100MB"/>
     <property name="MAX_HISTORY" value="30"/>
@@ -172,7 +172,7 @@
     </logger>
 
     <!-- net 日志配置 -->
-    <logger name="com.z.core.net" level="DEBUG" additivity="false">
+    <logger name="com.z.core.net" level="DEBUG" additivity="true">
         <appender-ref ref="NET_FILE"/>
     </logger>
 
