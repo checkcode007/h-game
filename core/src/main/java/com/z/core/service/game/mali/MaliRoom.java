@@ -1,18 +1,16 @@
 package com.z.core.service.game.mali;
 
 
-import cn.hutool.core.util.RandomUtil;
 import com.z.core.service.game.slot.SlotRoom;
 import com.z.core.service.wallet.WalletService;
 import com.z.model.bo.slot.*;
 import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CRoom;
-import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonGame;
 import com.z.model.proto.Game;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +19,7 @@ import java.util.List;
  * 百变小玛丽房间
  */
 public class MaliRoom extends SlotRoom {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(MaliRoom.class);
 
     public MaliRoom(CRoom cRoom, long uid) {
         super(cRoom, uid);
@@ -52,7 +50,7 @@ public class MaliRoom extends SlotRoom {
         super.generate();
         List<SlotModel> origins = new ArrayList<>();
         for (SlotModel m : board.values()) {
-            if (isOrigin(m.getType())) {
+            if (isOrigin(m.getK())) {
                 origins.add(m);
             }
         }
@@ -86,7 +84,7 @@ public class MaliRoom extends SlotRoom {
         for (Point p : line.getPoints()) {
             int x = p.getX();
             SlotModel m = board.get(x,p.getY());
-            int type = m.getChangeType()>0 ?m.getChangeType():m.getType();
+            int type = m.getChangeType()>0 ?m.getChangeType():m.getK();
             if(!m.isBaida()) continue;
             if(payline==null){
                 payline =new Rewardline(type,line.getLineId());

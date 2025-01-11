@@ -1,12 +1,15 @@
 package com.z.core.net.channel;
 
 import com.google.protobuf.AbstractMessageLite;
+import com.z.core.net.WebSocketServer;
 import com.z.core.service.game.game.RoomBizService;
 import com.z.core.util.SpringContext;
 import com.z.model.proto.MyMessage;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,19 +22,20 @@ import java.util.concurrent.ConcurrentHashMap;
 // 全局管理类
 public class UserChannelManager {
     private static final Map<Long, Channel> channelMap = new ConcurrentHashMap<>();
-    private static final Logger log = LogManager.getLogger(UserChannelManager.class);
+//    private static final Logger log = LogManager.getLogger(UserChannelManager.class);
+    private static final Log logger = LogFactory.getLog(UserChannelManager.class);
 
     public static void bindUser(long userId, Channel channel) {
         channelMap.put(userId, channel);
     }
 
     public static Channel getChannel(long userId) {
-        System.err.println("addChannel------->"+userId);
+        logger.info("addChannel------->"+userId);
         return channelMap.get(userId);
     }
     //todo 离线后移除其他缓存
     public static void removeUser(long userId) {
-        System.err.println("delChannel------->"+userId);
+        logger.info("delChannel------->"+userId);
         channelMap.remove(userId);
         SpringContext.getBean(RoomBizService.class).out(userId);
     }
@@ -74,7 +78,7 @@ public class UserChannelManager {
         byte[] messageBytes = res.toByteArray();
         BinaryWebSocketFrame resFrame = new BinaryWebSocketFrame(Unpooled.wrappedBuffer(messageBytes));
         channel.writeAndFlush(resFrame);
-        log.info(sj.add("sucess").toString());
+        logger.info(sj.add("sucess").toString());
         return true;
 
     }

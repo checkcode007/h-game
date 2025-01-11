@@ -4,10 +4,13 @@ package com.z.core.service.user;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.z.core.net.handler.ProtocolDispatcher;
 import com.z.core.util.SpringContext;
 import com.z.dbmysql.dao.agent.GAgentDao;
 import com.z.model.bo.user.AgentBo;
 import com.z.model.mysql.GAgent;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
@@ -19,7 +22,8 @@ import java.util.concurrent.TimeUnit;
 //@Log4j2
 public enum AgentService {
     ins;
-    protected Logger log = LoggerFactory.getLogger(getClass());
+//    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(AgentService.class);
 
     GAgentDao dao;
     AgentService() {

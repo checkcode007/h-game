@@ -4,53 +4,101 @@ package com.z.core.service.user;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.z.core.service.wallet.WalletBizService;
+import com.z.common.util.DateTimeUtil;
+import com.z.core.service.cfg.CCfgBizService;
+import com.z.core.service.wallet.WalletService;
 import com.z.core.util.SpringContext;
 import com.z.dbmysql.dao.user.GUserDao;
 import com.z.model.bo.user.User;
+import com.z.model.bo.user.Wallet;
 import com.z.model.mysql.GUser;
 import com.z.model.proto.CommonGame;
 import com.z.model.proto.CommonUser;
+import com.z.model.type.BetState;
 import com.z.model.type.user.UserState;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 public enum UserService {
     ins;
-
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(UserService.class);
     GUserDao dao;
-    WalletBizService walletBizService;
     UserService() {
         dao = SpringContext.getBean(GUserDao.class);
-
     }
     LoadingCache<Long, User> cache = Caffeine.newBuilder().expireAfterAccess(1, TimeUnit.HOURS)
             .expireAfterWrite(1, TimeUnit.HOURS).initialCapacity(1000).maximumSize(3000).build(new CacheLoader<Long, User>() {
         @Override
         public @Nullable User load(@NonNull Long id) throws Exception {
-            log.info("load user id:{}", id);
+            log.info("load user id:"+ id);
             GUser user = dao.findById(id);
             if(user == null) return null;
             User bo = new User();
-            BeanUtils.copyProperties(user,bo);
-            bo.setId(user.getId());
-            bo.setType(CommonUser.UserType.valueOf(user.getType()));
-            bo.setState(UserState.getUserState(user.getState()));
-            bo.setUser(user);
+            initUser(bo, user);
             return bo;
         }
     });
 
+    public void initUser(User bo,GUser user) {
+        bo.init(user);
+        reloadBetState(bo);
+
+    }
+
+    /**
+     * 刷新切换用户下注状态
+     *  RTP = 玩家回报 / 玩家投入。例如设定 RTP = 95%
+     * @param bo
+     */
+    public void reloadBetState(User bo) {
+        StringJoiner sj = new StringJoiner(",").add("uid:"+bo.getId()).add("lock:"+bo.isLock());
+        if(bo.isLock()){
+            bo.setBetState(BetState.LOW_BET);
+            offer(bo.getId());
+            log.info(sj.add("low").toString());
+            return;
+        }
+        //新用户
+        long t = System.currentTimeMillis();
+        Wallet wallet = WalletService.ins.get(bo.getId());
+        if(wallet == null || t-wallet.getWallet().getCreateTime().getTime()<DateTimeUtil.DAY_MILLS ){
+            bo.setBetState(BetState.MEDIUM_BET);
+            offer(bo.getId());
+            log.info(sj.add("wallet less mid").toString());
+            return;
+        }
+        //老用户
+        long winGold = wallet.getWinGold();
+        long betGold = wallet.getBetGold();
+        if(winGold<1){
+            bo.setBetState(BetState.HIGH_BET);
+            offer(bo.getId());
+            log.info(sj.add("betGold less high").toString());
+            return;
+        }
+
+        float radio = winGold*100/betGold;
+
+        if(radio>CCfgBizService.ins.getUV1()){
+            bo.setBetState(BetState.LOW_BET);
+        } else  if(radio>CCfgBizService.ins.getUV2()){
+            bo.setBetState(BetState.MEDIUM_BET);
+        }else{
+            bo.setBetState(BetState.HIGH_BET);
+        }
+        offer(bo.getId());
+        log.info(sj.add("radio :"+radio).add("state:"+bo.getBetState()).toString());
+    }
     Queue<Long> queue = new ConcurrentLinkedQueue<>();
 
     public void offer(long uid){
@@ -85,7 +133,11 @@ public enum UserService {
         return dao.findByDeviceId(deviceId);
     }
     public GUser findByPhone(String deviceId){
-        return dao.findByPhone(deviceId);
+        GUser gUser  = dao.findByPhone(deviceId);
+        if(gUser!=null){
+            cache.get(gUser.getId());
+        }
+        return gUser;
     }
     public User get(long uid){
         return cache.get(uid);

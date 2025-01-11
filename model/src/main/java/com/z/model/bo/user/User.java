@@ -3,15 +3,16 @@ package com.z.model.bo.user;
 import com.z.model.mysql.GUser;
 import com.z.model.proto.CommonGame;
 import com.z.model.proto.CommonUser;
+import com.z.model.type.BetState;
 import com.z.model.type.user.UserState;
 import lombok.Data;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 @Data
 public class User {
-    protected Logger log = LoggerFactory.getLogger(getClass());
-
+//    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(User.class);
     long id;
     GUser user;
     /**
@@ -42,6 +43,30 @@ public class User {
      */
     int highC;
     int gmFreeC;
+    /**
+     * @see BetState
+     */
+    BetState betState= BetState.MEDIUM_BET;
+
+
+    public void init(GUser user) {
+        this.user = user;
+        id = user.getId();
+        type = CommonUser.UserType.valueOf(user.getType());
+        state = UserState.getUserState(user.getState());
+        betState= BetState.getBetState(user.getBetState());
+        roomId = user.getRoom();
+    }
+    public void setLock(boolean lock) {
+         user.setLockState(lock);
+    }
+    public void setBetState(BetState state) {
+        this.user.setBetState(state.getK());
+    }
+
+    public boolean isLock(){
+        return user.isLockState();
+    }
 
 
     public int addFree(int c) {

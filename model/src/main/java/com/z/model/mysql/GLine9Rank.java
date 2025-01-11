@@ -12,6 +12,7 @@ import java.util.Date;
 @ExcludeCreateTime
 @ExcludeUpdateTime
 public class GLine9Rank extends Model{
+    private Long id;
     private long gold;
     private Date lastTime;
 }

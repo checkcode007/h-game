@@ -16,6 +16,7 @@ import com.z.core.service.game.game.SuperRoom;
 import com.z.core.service.game.pig.PigRoom;
 import com.z.core.service.game.puck.PuckRoom;
 import com.z.core.service.game.slot.SlotRoom;
+import com.z.core.service.game.wm.WMHigherRoom;
 import com.z.core.service.game.wm.WMRoom;
 import com.z.core.util.SpringContext;
 import com.z.dbmysql.dao.room.CRoomDao;
@@ -24,6 +25,8 @@ import com.z.model.mysql.cfg.CRoom;
 import com.z.model.proto.CommonGame;
 import com.z.model.proto.Game;
 import com.z.model.proto.MyMessage;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +38,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public enum RoomService {
     ins;
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(RoomService.class);
+
+//    protected Logger log = LoggerFactory.getLogger(getClass());
 
     Map<Long, SuperRoom> map = new ConcurrentHashMap<>();
     Table<CommonGame.GameType, CommonGame.RoomType, CRoom> table = HashBasedTable.create();
@@ -125,6 +130,11 @@ public enum RoomService {
             map.put(room.getId(), room);
             room.init(cRoom);
             return room;
+        }else if (gameType == CommonGame.GameType.SHUIHUZHUAN_HIGHER) {
+            WMHigherRoom room = new WMHigherRoom(cRoom,uid);
+            map.put(room.getId(), room);
+            room.init(cRoom);
+            return room;
         }else if (gameType == CommonGame.GameType.JINZHUSONGFU) {
             PigRoom room = new PigRoom(cRoom,uid);
             map.put(room.getId(), room);
@@ -150,7 +160,7 @@ public enum RoomService {
         if(map!=null){
             map.forEach((k,v)->{
                 Game.Room.Builder room = Game.Room.newBuilder();
-                room.setId(v.getId()).setType(k).setMinBalance(v.getMinBalance()).setMinBet(v.getMinBet());
+                room.setId(v.getId()).setType(k).setMinBalance(v.getMinBalance()).setMinBet(v.getBetMin());
                 b.addRooms(room.build());
             });
         }

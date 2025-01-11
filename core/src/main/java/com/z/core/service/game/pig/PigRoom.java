@@ -1,30 +1,40 @@
 package com.z.core.service.game.pig;
 
 
+import cn.hutool.core.util.RandomUtil;
 import com.google.protobuf.ByteString;
 import com.z.core.net.channel.UserChannelManager;
 import com.z.core.service.game.PoolService;
 import com.z.core.service.game.line9.Line9RankService;
+import com.z.core.service.game.puck.PuckRound;
 import com.z.core.service.game.slot.CSlotService;
 import com.z.core.service.game.slot.SlotRoom;
 import com.z.core.service.wallet.WalletService;
 import com.z.core.util.SpringContext;
+import com.z.model.bo.slot.Payline;
 import com.z.model.bo.slot.Rewardline;
 import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgId;
 import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CRoom;
+import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonGame;
 import com.z.model.proto.Game;
 import com.z.model.proto.MyMessage;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 房间
  */
 public class PigRoom extends SlotRoom {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+//    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(PigRoom.class);
 
     Line9RankService line9Service;
     CSlotService service;
@@ -35,6 +45,7 @@ public class PigRoom extends SlotRoom {
         line9Service = SpringContext.getBean(Line9RankService.class);
         service = SpringContext.getBean(CSlotService.class);
     }
+
 
     /**
      * 下注
@@ -55,11 +66,36 @@ public class PigRoom extends SlotRoom {
         ret.ok(b.build());
         return ret;
     }
-
-
+    /**
+     * 所有支付线
+     */
     @Override
-    public long getBetGold() {
-        return betGold / cfgBizService.getBB_XML_bet_base();
+    public void checklines() {
+        List<Rewardline> rewardlines = new ArrayList<>();
+        for (Payline payline : lines.values()) {
+            Rewardline line = checkLine(payline);
+            if (line == null) continue;
+            rewardlines.add(line);
+        }
+        long base = getBetGold();
+        for (Rewardline line : rewardlines) {
+            CSlot cSlot = service.get(gameType, line.getK(), line.getPoints().size());
+            if (cSlot == null) continue;
+            int rate = cSlot.getRate();
+            if(line.isHadBaida()){
+                rate += rate * RandomUtil.randomInt(1,7);
+            }
+            line.setRate(rate);
+            if (isPool(line.getK())) {
+                poolLine(line);
+            }else {
+                line.setGold(base * rate);
+            }
+            line.setSpecialC(cSlot.getC1());
+            this.rewardlines.add(line);
+            highC +=cSlot.getC1();
+            log.info(line.toString());
+        }
     }
 
     @Override
@@ -74,19 +110,6 @@ public class PigRoom extends SlotRoom {
         long poolGold = PoolService.ins.get(gameType);
         line.setGold(poolGold * line.getRate() / 10000);
         log.info("poolGold:" + poolGold +":"+ line.getGold());
-    }
-
-    @Override
-    public boolean isSame(int i, int k1, int k2) {
-        if (super.isSame(i, k1, k2)) {
-            return true;
-        }
-        if (i != 0) {
-            if (k2 == CommonGame.LINE9.L9_BAR_VALUE) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public void addRecord(long uid) {

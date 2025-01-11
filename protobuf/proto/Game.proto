@@ -32,6 +32,9 @@ message S_20004 {
   int64 roomId = 1;//房间id
   GameState state = 2;//游戏状态（牛牛使用）
   int32 leaveTime = 3;//剩余时间 （牛牛使用）
+  int32 betMin =4;//最小下注金额
+  int32 betMax =5;//最大下注金额
+  int32 betBase =6;//下注金额的比值
 }
 
 //游戏状态切换（20006）
@@ -347,6 +350,9 @@ message S_20312{
   WinState state = 1;//结果类型（输赢）
   int64  gold = 2;//金额
   int64  leaveGold = 3;//钱包剩余金额
+  int32 dice1=4;//第一个骰子的点数
+  int32 dice2=5;//第二个骰子的点数
+
 }
 //-----------水浒传-------end
 

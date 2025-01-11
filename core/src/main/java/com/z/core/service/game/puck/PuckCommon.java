@@ -5,7 +5,6 @@ import com.google.common.collect.Table;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
 import com.z.model.proto.CommonGame;
-import com.z.model.proto.Game;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,14 +118,14 @@ public enum PuckCommon {
         if(winC%7 < 2 ){
             if(x == 1){
                 for (SlotModel m : board.row(0).values()) {
-                    if(m.getType() != CommonGame.MJ.HU.getNumber()){
-                        map.put(m.getType(),slots.get(m.getType()).getW1()/10);
+                    if(m.getK() != CommonGame.MJ.HU.getNumber()){
+                        map.put(m.getK(),slots.get(m.getK()).getW1()/10);
                     }
                 }
             } else if (x == 2) {
                 for (SlotModel m : board.row(1).values()) {
-                    if(m.getType() != CommonGame.MJ.HU.getNumber()){
-                        map.put(m.getType(),slots.get(m.getType()).getW1()/10);
+                    if(m.getK() != CommonGame.MJ.HU.getNumber()){
+                        map.put(m.getK(),slots.get(m.getK()).getW1()/10);
                     }
                 }
             }
@@ -134,28 +133,28 @@ public enum PuckCommon {
         if(lianxuC>8){
             if(x == 1){
                 for (SlotModel m : board.row(0).values()) {
-                    if(m.getType() != CommonGame.MJ.HU.getNumber()){
-                        map.put(m.getType(),0);
+                    if(m.getK() != CommonGame.MJ.HU.getNumber()){
+                        map.put(m.getK(),0);
                     }
                 }
             } else if (x == 2) {
                 for (SlotModel m : board.row(1).values()) {
-                    if(m.getType() != CommonGame.MJ.HU.getNumber()){
-                        map.put(m.getType(),10);
+                    if(m.getK() != CommonGame.MJ.HU.getNumber()){
+                        map.put(m.getK(),10);
                     }
                 }
             }
         }else if(lianxuC%3==0){
             if(x == 1){
                 for (SlotModel m : board.row(0).values()) {
-                    if(m.getType() != CommonGame.MJ.HU.getNumber()){
-                        map.put(m.getType(),100);
+                    if(m.getK() != CommonGame.MJ.HU.getNumber()){
+                        map.put(m.getK(),100);
                     }
                 }
             } else if (x == 2) {
                 for (SlotModel m : board.row(1).values()) {
-                    if(m.getType() != CommonGame.MJ.HU.getNumber()){
-                        map.put(m.getType(),300);
+                    if(m.getK() != CommonGame.MJ.HU.getNumber()){
+                        map.put(m.getK(),300);
                     }
                 }
             }
@@ -229,7 +228,7 @@ public enum PuckCommon {
         for (List<SlotModel> row : board) {
             StringJoiner sj = new StringJoiner(" ");
             for (SlotModel tile : row) {
-                sj.add(tile.getType() + "x" + tile.getX() + "y" + tile.getY());
+                sj.add(tile.getK() + "x" + tile.getX() + "y" + tile.getY());
             }
             log.info(sj.toString());
         }
@@ -245,7 +244,7 @@ public enum PuckCommon {
                 if (m == null) {
                     sj.add("nullx" + x + "y" + y);
                 } else {
-                    sj.add(m.getType() + "x" + x + "y" + y + "g:" + (m.isGold() ? "t" : "f"));
+                    sj.add(m.getK() + "x" + x + "y" + y + "g:" + (m.isGold() ? "t" : "f"));
                 }
             }
             log.info(sj.toString());

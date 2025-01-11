@@ -26,6 +26,8 @@ import com.z.model.proto.MyMessage;
 import com.z.model.type.AddType;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +40,11 @@ import java.util.StringJoiner;
 //@Log4j2
 @Service
 public class UserBizService {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(UserBizService.class);
+
+//    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     EsUserLogBizService esUserLogBizService;
-    @Autowired
-    CCfgBizService cfgBizService;
     @Autowired
     WalletBizService walletBizService;
 
@@ -62,7 +64,7 @@ public class UserBizService {
         log.info(sj.toString());
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_REG).setOk(true);
         List<GUser> list = UserService.ins.findByDeviceId(deviceId);
-        if (list != null && list.size() > cfgBizService.getRegNum()) {
+        if (list != null && list.size() > CCfgBizService.ins.getRegNum()) {
             log.error(sj.add("已达手机注册上限").toString());
             res.setOk(false).setFailMsg("已达手机注册上限");
             return res.build();
@@ -95,6 +97,8 @@ public class UserBizService {
         user.setUpdateTime(date);
         user.setDeviceId(deviceId);
         user.setName(NameUtils.generateRandomString(8));
+        user.setCreateTime(new Date());
+        user.setUpdateTime(new Date());
         user = UserService.ins.add(user);
         addChannel(ctx, user.getId());
         com.z.model.proto.User.S_10002.Builder b = com.z.model.proto.User.S_10002.newBuilder();
@@ -356,7 +360,7 @@ public class UserBizService {
             res.setOk(false).setFailMsg("没有该用户");
             return res.build();
         }
-        b.setLock(target.getUser().isLockState());
+        b.setLock(target.isLock());
         Wallet wallet = WalletService.ins.get(targetId);
         if(wallet!=null){
             b.setGold(wallet.getGold()).setBankGold(wallet.getBankGold());
@@ -379,21 +383,21 @@ public class UserBizService {
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_CODE_QUERY_LOCK).setOk(true);
         User user = UserService.ins.get(targetId);
         if(state){
-            if(user.getUser().isLockState()){
+            if(user.isLock()){
                 log.error(sj.add("had").toString());
                 res.setOk(false);
                 res.setFailMsg("该用户已经锁了");
                 return res.build();
             }
         }else{
-            if(!user.getUser().isLockState()){
+            if(!user.isLock()){
                 log.error(sj.add("had").toString());
                 res.setOk(false);
                 res.setFailMsg("该用户已经解锁");
                 return res.build();
             }
         }
-        user.getUser().setLockState(state);
+        user.setLock(state);
         UserService.ins.offer(user.getId());
         log.info(sj.add("success").toString());
         return res.build();

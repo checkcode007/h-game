@@ -96,7 +96,7 @@ public enum WMCommon {
         board.rowKeySet().forEach(x -> {
             StringJoiner sj = new StringJoiner(" ");
             board.row(x).forEach((y, m) -> {
-                sj.add(m.getType() + "x" + x + "y" + y);
+                sj.add(m.getK() + "x" + x + "y" + y);
             });
             log.info(sj.toString());
         });

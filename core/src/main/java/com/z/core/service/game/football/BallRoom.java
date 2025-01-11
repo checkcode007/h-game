@@ -16,14 +16,16 @@ import com.z.model.mysql.cfg.CRoom;
 import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonGame;
 import com.z.model.proto.Game;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * 房间
  */
 public class BallRoom extends SlotRoom {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(BallRoom.class);
+
+//    protected Logger log = LoggerFactory.getLogger(getClass());
 
     Line9RankService line9Service;
     CSlotService service;
@@ -54,8 +56,8 @@ public class BallRoom extends SlotRoom {
         int type =0;
         for (SlotModel m : board.row(2).values()) {
             if(type == 0){
-                type = m.getType();
-            } else if (type != m.getType()) {
+                type = m.getK();
+            } else if (type != m.getK()) {
                 b_all_3 = false;
                 break;
             }
@@ -63,10 +65,10 @@ public class BallRoom extends SlotRoom {
         if(b_all_3){
             for (SlotModel m : board.values()) {
                 if(m.getX() == 2) continue;
-                if(m.getType()< CommonGame.FOOTBALL.FT_MONK1_VALUE){
+                if(m.getK()< CommonGame.FOOTBALL.FT_MONK1_VALUE){
                     continue;
                 }
-                if(m.getType() == type) continue;
+                if(m.getK() == type) continue;
                 m.setChangeType(type);
             }
         }
@@ -77,7 +79,7 @@ public class BallRoom extends SlotRoom {
     public void checkBounus() {
         int c = 0;
         for (SlotModel m : board.values()) {
-            Slot slot = slots.get(m.getType());
+            Slot slot = slots.get(m.getK());
             if (!slot.isBonus()) continue;
             c++;
         }

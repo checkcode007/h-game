@@ -6,6 +6,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.z.core.net.channel.ChannelAttributes;
 import com.z.core.net.channel.UserChannelManager;
+import com.z.core.schedule.ScheduledManager;
 import com.z.core.util.SpringContext;
 import com.z.model.proto.MyMessage;
 import com.z.model.proto.User;
@@ -15,6 +16,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +28,9 @@ import java.util.StringJoiner;
 
 //@Log4j2
 public class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocketFrame> {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+//    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(WebSocketFrameHandler.class);
+
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame){

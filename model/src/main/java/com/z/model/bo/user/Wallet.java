@@ -33,16 +33,17 @@ public class Wallet {
         wallet.setBankGold(last);
     }
     public void addBetGold(long gold){
-        wallet.setBetGold(wallet.getBetGold() + gold);
+        long max = Math.min(Long.MAX_VALUE, wallet.getBetGold()+gold);
+        wallet.setBetGold(max);
     }
     public void addWinGold(long gold){
-        wallet.setWinGold(wallet.getWinGold() + gold);
+        long max = Math.min(Long.MAX_VALUE, wallet.getWinGold()+gold);
+        wallet.setWinGold(max);
     }
-    public void addLosses(long lossses){
-        wallet.setLosses(wallet.getLosses() + lossses);
-    }
-    public void addWins(long wins){
-        wallet.setWins(wallet.getWins() + wins);
+
+    public void addWins(){
+        long max = Math.min(Long.MAX_VALUE, wallet.getWins()+1);
+        wallet.setWins(max);
     }
     public void setWallet(GWallet wallet) {
         this.wallet = wallet;
@@ -71,9 +72,12 @@ public class Wallet {
     public long getWins(){
         return wallet.getWins();
     }
-    public long getLosses(){
-        return wallet.getLosses();
+    public long getBetC(){
+        return wallet.getBetC();
     }
-
+    public void addBetC(){
+        long max = Math.min(Long.MAX_VALUE, wallet.getBetC()+1);
+        wallet.setBetC(max);
+    }
 
 }

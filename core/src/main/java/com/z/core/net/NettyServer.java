@@ -8,14 +8,16 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 
 import java.util.logging.Logger;
 
+@Log4j2
 //@Component
 public class NettyServer implements ApplicationListener<ApplicationReadyEvent> {
-    Logger logger = Logger.getLogger(NettyServer.class.getName());
+//    Logger logger = java.util.logging.Logger.getLogger(NettyServer.class.getName());
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event)  {
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -31,11 +33,11 @@ public class NettyServer implements ApplicationListener<ApplicationReadyEvent> {
                         }
                     });
 
-            logger.info("netty start=====>1");
+            log.info("netty start=====>1");
             ChannelFuture f = b.bind(8080).sync();
-            logger.info("netty start=====>2");
+            log.info("netty start=====>2");
             f.channel().closeFuture().sync();
-            logger.info("netty start=====>3");
+            log.info("netty start=====>3");
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {

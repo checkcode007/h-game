@@ -3,45 +3,45 @@ package com.z.core.service.game.majiang;
 import com.google.common.collect.Table;
 import com.z.core.service.game.clear.ClearRound;
 import com.z.core.service.game.slot.SlotCommon;
+import com.z.core.service.wallet.WalletService;
 import com.z.model.bo.slot.Goal;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
+import com.z.model.bo.user.Wallet;
 import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonGame;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
 
 public class MaJiangRound extends ClearRound {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(MaJiangRound.class);
 
-    public MaJiangRound(long id, CommonGame.GameType gameType, CommonGame.RoomType roomType) {
-        super(id, gameType, roomType);
+    public MaJiangRound(long id, CommonGame.GameType gameType, CommonGame.RoomType roomType, int base) {
+        super(id, gameType, roomType, base);
     }
+
     /**
      * 生成符号
      */
     //todo 金色符号不出现在第一列
+    @Override
     public void generate() {
         board.clear();
+        initParam();
         for (int i = 0; i < 5; i++) {
             int size = 5;
             if (i == 0 || i == 4) {
                 size = 4;
             }
             for (int j = 0; j < size; j++) {
-                Slot slot = random(slots, i);
+                param.setX(i);
+                Slot slot = random(slots);
                 SlotModel model = SlotCommon.ins.toModel(slot, i, j);
                 board.put(model.getX(), model.getY(), model);
             }
-
         }
-    }
-
-
-    public void reset() {
-        delMap.clear();
     }
 
     /**
@@ -49,6 +49,7 @@ public class MaJiangRound extends ClearRound {
      *
      * @return
      */
+    @Override
     public void check() {
         checkCommon();
         checkBonus();
@@ -57,6 +58,7 @@ public class MaJiangRound extends ClearRound {
     /**
      * 检测普通符号
      */
+    @Override
     public void checkCommon() {
         log.info("checkCommon---------->start");
         // 1. 遍历行列位置和对应的值
@@ -65,32 +67,33 @@ public class MaJiangRound extends ClearRound {
         for (SlotModel m : row_1) {
             if (m == null) continue;
             if (m.isBonus()) continue;
-            List<SlotModel> list = firstMap.getOrDefault(m.getType(), new ArrayList<>());
-            firstMap.putIfAbsent(m.getType(), list);
+            List<SlotModel> list = firstMap.getOrDefault(m.getK(), new ArrayList<>());
+            firstMap.putIfAbsent(m.getK(), list);
             list.add(m);
         }
         for (int k : firstMap.keySet()) {
             List<SlotModel> lianjie = new ArrayList<>(firstMap.get(k));
-
+            //连接各数，
             int c = 1;
-            for (int i = 1; i < 5; i++) {
+            for (int i = 1; i < COL_SIZE; i++) {
                 //每列加1
                 Collection<SlotModel> list = board.row(i).values();
                 //每列相同的汇总
                 boolean b_col_had = false;
                 for (SlotModel e : list) {
-                    if (e.getType() == k || e.isBaida()) {//百搭处理
-                        c++;
+                    if (e.getK() == k || e.isBaida()) {//百搭处理
                         lianjie.add(e);
                         b_col_had = true;
-                        log.info(" col:" + i + " type:" + k + "->" + e);
-                    } else {
-                        break;
+//                        log.info(" col:" + i + " type:" + k + "->" + e);
                     }
                 }
-                if (!b_col_had) break;
+                if (b_col_had) {
+                    c++;
+                } else {
+                    break;
+                }
             }
-//            log.info("k------->:" + k+" c--->"+c);
+            log.info("k------->:" + k + " c--->" + c);
             if (c < 2) continue;
             //移除匹配的
             CSlot slot = service.get(gameType, k, c);
@@ -99,14 +102,14 @@ public class MaJiangRound extends ClearRound {
                 for (var m : lianjie) {
                     int x = m.getX();
                     for (SlotModel e : board.row(x).values()) {
-                        if (e.getType() == k || e.isBaida()) {
+                        if (e.getK() == k || e.isBaida()) {
                             toRemove.add(e);
                         }
                     }
                     log.info("del--->" + x + "--->" + k + "-->del-->" + m);
                 }
                 // 进行删除操作
-                Map<Integer, Integer> rateMap = new HashMap();
+                Map<Integer, Integer> colCMap = new HashMap();//每排个数
                 for (var e : toRemove) {
                     board.remove(e.getX(), e.getY());
                     if (!e.isBaida() && e.isGold()) {
@@ -115,10 +118,10 @@ public class MaJiangRound extends ClearRound {
                         SlotModel baida = SlotCommon.ins.toModel(s, e.getX(), e.getY());
                         board.put(baida.getX(), baida.getY(), baida);
                     }
-                    rateMap.put(e.getX(), rateMap.getOrDefault(e.getX(), 0) + 1);
+                    colCMap.put(e.getX(), colCMap.getOrDefault(e.getX(), 0) + 1);
                 }
                 int rate = 1;
-                for (Integer v : rateMap.values()) {
+                for (Integer v : colCMap.values()) {
                     rate = rate * v;
                 }
                 rate = rate * slot.getRate();
@@ -132,6 +135,7 @@ public class MaJiangRound extends ClearRound {
     /**
      * 检测特殊符号-胡
      */
+    @Override
     public void checkBonus() {
         CSlot slot = service.getBonus(gameType);
         int type = slot.getSymbol();
@@ -142,7 +146,7 @@ public class MaJiangRound extends ClearRound {
             int y = cell.getColumnKey();
             SlotModel m = cell.getValue();
             if (m == null) continue;
-            if (m.getType() != type) continue;
+            if (m.getK() != type) continue;
             c++;
             map.put(x, y);
         }
@@ -164,6 +168,7 @@ public class MaJiangRound extends ClearRound {
     // 消除符号并让下方的符号前移‘
     @Override
     public void move() {
+        Wallet wallet = WalletService.ins.get(uid);
         moveForward();
         Map<Integer, Integer> huMap = new HashMap<>();
         for (int x = 0; x < 5; x++) {
@@ -181,11 +186,8 @@ public class MaJiangRound extends ClearRound {
                 SlotModel m = board.get(x, y);
                 if (m == null) {
                     Slot slot;
-                    if (x == 1) {
-                        slot = random(slots, x);
-                    } else {
-                        slot = random(slots, x);
-                    }
+                    param.setX(x);
+                    slot = random(slots);
                     SlotModel model = SlotCommon.ins.toModel(slot, x, y);
                     log.info("x:-->" + x + "----->" + model);
                     board.put(x, y, model);
@@ -196,6 +198,34 @@ public class MaJiangRound extends ClearRound {
         col3Gold();
     }
 
+    @Override
+    public void moveForward() {
+        super.moveForward();
+    }
+
+    @Override
+    public void moveForward(int x) {
+        int rowSize = ROW_SIZE;
+        if (x == 0 || x == 4) {
+            rowSize = 4;
+        }
+        // 获取该列的所有SlotModel
+        List<SlotModel> list = new ArrayList<>();
+        for (int i = 0; i < rowSize; i++) {
+            SlotModel m = board.get(x, i);
+            list.add(m);
+        }
+        // 去除 null 值
+        list.removeIf(item -> item == null);
+        // 将非 null 的元素填充到原位置
+        for (int i = 0; i < rowSize; i++) {
+            if (i < list.size()) {
+                board.put(x, i, list.get(i));
+            } else {
+                board.remove(x, i);
+            }
+        }
+    }
 
     /**
      * 第三列金色处理

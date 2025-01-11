@@ -3,6 +3,8 @@ package com.z.core.net.handler;
 import com.google.protobuf.AbstractMessageLite;
 import com.z.model.proto.MyMessage;
 import io.netty.channel.ChannelHandlerContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,9 @@ import java.util.StringJoiner;
 
 @Service
 public class ProtocolDispatcher {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(ProtocolDispatcher.class);
+
+//    protected Logger log = LoggerFactory.getLogger(getClass());
     private final List<IHandler<?>> handlers; // 自动注入所有 ProtocolHandler
     private final Map<Integer, IHandler<?>> handlerMap = new HashMap<>();
 

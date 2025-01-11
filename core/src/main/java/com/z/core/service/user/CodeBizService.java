@@ -17,6 +17,8 @@ import com.z.model.proto.CommonUser;
 import com.z.model.proto.MyMessage;
 import com.z.model.type.AddType;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,15 +34,15 @@ import java.util.StringJoiner;
  */
 @Service
 public class CodeBizService {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(CodeBizService.class);
+
+//    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     GCodeDao dao;
     @Autowired
     GCodeSendLogDao logDao;
     @Autowired
     UserBizService userBizService;
-    @Autowired
-    CCfgBizService cfgBizService;
     @Autowired
     MailBizService mailBizService;
     @Autowired
@@ -188,7 +190,7 @@ public class CodeBizService {
         record.setCreateTime(d);
         record.setUpdateTime(d);
         record.setState(CommonUser.CodeState.CS_NOUSE.getNumber());
-        int timeout = cfgBizService.getCodeTime();
+        int timeout = CCfgBizService.ins.getCodeTime();
         record.setLastTime(now.plusSeconds(timeout).toDate());
         return record;
     }

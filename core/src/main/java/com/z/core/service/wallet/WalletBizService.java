@@ -17,9 +17,9 @@ import com.z.model.proto.CommonUser;
 import com.z.model.proto.MyMessage;
 import com.z.model.proto.User;
 import com.z.model.type.AddType;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,8 @@ import java.util.StringJoiner;
 
 @Service
 public class WalletBizService {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(WalletBizService.class);
+//    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     BankLogBizService bankLogBizService;
     @Autowired
@@ -76,19 +77,33 @@ public class WalletBizService {
         sj.add("create:" + create);
         if (addType == AddType.ADD) {
             wallet.addGold(gold);
+            if(goldType == CommonUser.GoldType.GT_GAME){
+                wallet.addWinGold(gold);
+                wallet.addWins();
+            }
         } else {
             if (wallet.getGold() < gold) {
                 log.error(sj.add("not full").toString());
                 return false;
             }
             wallet.subGold(gold);
+            if(goldType == CommonUser.GoldType.GT_GAME){
+                wallet.addBetGold(gold);
+                wallet.addBetC();
+            }
         }
+
         if (create) {
             WalletService.ins.add(wallet.getWallet());
         } else {
             WalletService.ins.offer(wallet.getId());
         }
+        com.z.model.bo.user.User user = UserService.ins.get(uid);
+        UserService.ins.reloadBetState(user);
+
         //todo 添加入库金额变动记录
+
+        //todo 出场入场的金额纪录
 
         sendWalletInfo(uid);
         log.info(sj.add("success").toString());
@@ -181,35 +196,6 @@ public class WalletBizService {
         return wallet;
     }
 
-    public boolean addCout(WalletBo bo) {
-        long uid = bo.getId();
-        StringJoiner sj = new StringJoiner(",");
-        sj.add("uid:" + uid).add("bo:" + bo);
-        log.info(sj.toString());
-        boolean create = false;
-        DateTime now = DateTime.now();
-        Date d = now.toDate();
-        Wallet wallet = WalletService.ins.get(uid);
-        if (wallet == null) {
-            create = true;
-            GWallet w = create(uid, d);
-            wallet = new Wallet();
-            wallet.setWallet(w);
-        }
-        sj.add("create:" + create);
-
-        wallet.addBetGold(bo.getBankGold());
-        wallet.addWinGold(bo.getWinGold());
-        wallet.addLosses(bo.getLosses());
-        wallet.addWins(bo.getWins());
-        if (create) {
-            WalletService.ins.add(wallet.getWallet());
-        } else {
-            WalletService.ins.offer(wallet.getId());
-        }
-        log.info(sj.add("success").toString());
-        return true;
-    }
     /**
      * 领取邮件
      */

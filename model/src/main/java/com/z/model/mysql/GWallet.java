@@ -15,9 +15,9 @@ public class GWallet {
      */
     private long wins;
     /**
-     * 总失败次数
+     * 押注次数
      */
-    private long losses;
+    private long betC;
     /**
      * '累计下注金额'
      */

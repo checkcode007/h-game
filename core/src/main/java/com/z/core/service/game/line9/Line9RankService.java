@@ -7,6 +7,8 @@ import com.z.model.common.MsgId;
 import com.z.model.mysql.GLine9Rank;
 import com.z.model.proto.Game;
 import com.z.model.proto.MyMessage;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,9 @@ import java.util.StringJoiner;
 
 @Service
 public class Line9RankService {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+//    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(Line9RankService.class);
+
     @Autowired
     GLine9RankDao dao;
 

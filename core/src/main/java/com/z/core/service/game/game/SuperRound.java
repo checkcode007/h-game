@@ -6,6 +6,8 @@ import com.z.core.service.user.UserService;
 import com.z.model.bo.user.User;
 import com.z.model.common.MsgResult;
 import com.z.model.proto.CommonGame;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +16,9 @@ import java.util.Map;
 
 
 public abstract class SuperRound implements IRound {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+//    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(SuperRound.class);
+
     /**
      * 第几轮
      */
@@ -38,6 +42,8 @@ public abstract class SuperRound implements IRound {
     protected long uid;
 
     protected User user;
+
+    protected long betGold;
 
     public SuperRound(long id, CommonGame.GameType gameType, CommonGame.RoomType roomType) {
         this.id = id;

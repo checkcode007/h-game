@@ -1,5 +1,6 @@
 package com.z.model.mysql;
 
+import com.z.model.type.BetState;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,6 +44,7 @@ public class GUser extends Model {
      * 点卡生成次数
      */
     private int codeCout;
+
     /**
      * @see com.z.model.type.user.UserState
      */
@@ -53,7 +55,7 @@ public class GUser extends Model {
     private boolean lockState;
     int game;
     int room;
-
+    int betState;
     @Override
     public String toString() {
         return "GUser{" +getId()+
@@ -68,7 +70,7 @@ public class GUser extends Model {
                 ", icon=" + icon +
                 ", codeCout=" + codeCout +
                 ", state=" + state +
-                ", lockState=" + lockState +
+                ", lock=" + lockState +
                 ", game=" + game +
                 ", room=" + room +
                 '}';

@@ -3,6 +3,7 @@ package com.z.core.service.game.game;
 import com.google.protobuf.AbstractMessageLite;
 import com.google.protobuf.ByteString;
 import com.z.common.util.PbUtils;
+import com.z.core.net.WebSocketServer;
 import com.z.core.service.game.aladdin.AladdinRoom;
 import com.z.core.service.game.corpse.CorpseRoom;
 import com.z.core.service.game.football.BallRoom;
@@ -25,8 +26,8 @@ import com.z.model.proto.CommonUser;
 import com.z.model.proto.Game;
 import com.z.model.proto.MyMessage;
 import com.z.model.type.AddType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +38,9 @@ import java.util.StringJoiner;
  */
 @Service
 public class RoomBizService {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+//    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(RoomBizService.class);
+
     @Autowired
     WalletBizService walletBizService;
 
@@ -51,16 +54,16 @@ public class RoomBizService {
             res.setOk(false).setFailMsg("房间数据错误");
             return res.build();
         }
-
         MsgResult enterRet = room.enter(uid);
         if (!enterRet.isOk()) {
             log.error(sj.add("enter fail:" + enterRet.getMessage()).toString());
             res.setOk(false).setFailMsg(enterRet.getMessage());
             return res.build();
         }
-        log.info(sj.add("success").toString());
+//        log.info(sj.add("success").toString());
         Game.S_20004.Builder b = Game.S_20004.newBuilder();
-        b.setRoomId(room.getId());
+        b.setRoomId(room.getId()).setBetMin(room.getBetMin()).setBetMax(room.getBetMax()).setBetBase(room.base);
+        log.info(sj.add("ret:" + PbUtils.pbToJson(b)).add("success").toString());
         return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
     }
 
@@ -132,7 +135,6 @@ public class RoomBizService {
         if (room == null) {
             log.error(sj.add("room data fail").toString());
             res.setOk(false).setFailMsg("房间数据错误");
-            res.setFailMsg("房间数据错误");
             return res.build();
         }
         CommonGame.GameType gameType = user.getGameType();
@@ -140,7 +142,6 @@ public class RoomBizService {
             if(user.getHighC()<1){
                 log.error(sj.add("higher fail").toString());
                 res.setOk(false).setFailMsg("没有免费次数了");
-                res.setFailMsg("没有免费次数了");
                 return res.build();
             }
         }else{
@@ -148,19 +149,21 @@ public class RoomBizService {
                 if(user.getFree()<1){
                     log.error(sj.add("free fail").toString());
                     res.setOk(false).setFailMsg("没有免费次数了");
-                    res.setFailMsg("没有免费次数了");
                     return res.build();
                 }
             }else{
                 if (!walletBizService.changeGold(CommonUser.GoldType.GT_GAME, AddType.SUB, uid, gold,gameType,user.getRoomType())) {
                     log.error(sj.add("sub gold fail").toString());
                     res.setOk(false).setFailMsg("扣除金币失败");
-                    res.setFailMsg("扣除金币失败");
                     return res.build();
                 }
             }
         }
-
+        if(!room.betCheck(uid,gold)){
+            log.error(sj.add("bet gold fail").add("min:"+room.getBetMin()).add("max:"+room.getBetMax()).toString());
+            res.setOk(false).setFailMsg("扣除金币失败");
+            return res.build();
+        }
         MsgResult msgResult = null;
         Game.S_20104.Builder b = Game.S_20104.newBuilder();
         if (gameType == CommonGame.GameType.BAIBIAN_XIAOMALI || gameType == CommonGame.GameType.JINGDIAN_XIAOMALI ) {

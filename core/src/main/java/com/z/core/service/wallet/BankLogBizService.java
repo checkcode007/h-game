@@ -1,13 +1,12 @@
 package com.z.core.service.wallet;
 
 
-import com.z.core.service.cfg.CCfgBizService;
 import com.z.dbmysql.dao.walletlog.GBankLogDao;
 import com.z.model.mysql.GBankLog;
 import com.z.model.proto.CommonUser;
 import com.z.model.proto.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +16,11 @@ import java.util.List;
 
 @Service
 public class BankLogBizService {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(BankLogBizService.class);
+
+//    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     GBankLogDao dao;
-    @Autowired
-    CCfgBizService cfgBizService;
 
     public List<User.BankLog> getList(long uid){
         List<GBankLog> list1 = dao.findByUid(uid);

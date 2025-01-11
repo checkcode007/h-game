@@ -16,9 +16,8 @@ import com.z.model.proto.CommonGame;
 import com.z.model.proto.CommonUser;
 import com.z.model.proto.Game;
 import com.z.model.type.AddType;
-import com.z.model.type.DiceType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,9 @@ import java.util.StringJoiner;
  * 水浒传
  */
 public class WMRoom extends SlotRoom {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+//    protected Logger log = LoggerFactory.getLogger(getClass());
+
+    private static final Log log = LogFactory.getLog(WMRoom.class);
 
     public WMRoom(CRoom cRoom, long uid) {
         super(cRoom, uid);
@@ -60,8 +61,8 @@ public class WMRoom extends SlotRoom {
         int fullType=0;
         for (SlotModel m : board.values()) {
             if(fullType == 0){
-                fullType = m.getType();
-            } else if ( fullType != m.getType()) {
+                fullType = m.getK();
+            } else if ( fullType != m.getK()) {
                 fullType= 0;
                 break;
             }
@@ -107,7 +108,7 @@ public class WMRoom extends SlotRoom {
         for (Point p : line.getPoints()) {
             int x = p.getX();
             SlotModel m = board.get(x,p.getY());
-            int type = m.getType();
+            int type = m.getK();
             if(leftType<1){
                 leftType = type;
                 leftList.add(p);
@@ -124,7 +125,7 @@ public class WMRoom extends SlotRoom {
             Point p =line.getPoints().get(i);
             int x = p.getX();
             SlotModel m = board.get(x,p.getY());
-            int type = m.getType();
+            int type = m.getK();
             if(rightType<1){
                 rightType = type;
                 rightList.add(p);
@@ -192,8 +193,8 @@ public class WMRoom extends SlotRoom {
         int type = 0;
         if(payline==null){
             CSlot slot = service.getScatter(gameType);
-            payline =new Rewardline(slot.getType(),line.getLineId());
-            type = slot.getType();
+            payline =new Rewardline(slot.getSymbol(),line.getLineId());
+            type = slot.getSymbol();
         }
         if(leftC>=rightC){
             payline.addSpecicalC(leftList.size());
@@ -213,6 +214,9 @@ public class WMRoom extends SlotRoom {
         super.generate();
     }
 
+
+
+
     /**
      * 骰子比大小（比倍）
      *
@@ -220,18 +224,44 @@ public class WMRoom extends SlotRoom {
     public Game.S_20312.Builder compareDice(CommonGame.WMDice type, long gold){
         StringJoiner sj = new StringJoiner(",").add("uid:"+uid).add("rid:"+id).add("type:"+type).add("gold:"+gold);
         log.info(sj.toString());
-        int random = RandomUtil.randomInt(1,4);
-        CommonGame.WinState winState = CommonGame.WinState.WIN;
-        if(type.getNumber() == random){
-            gold = DiceType.getType(type).getRate() * gold;
+        int dice1 = RandomUtil.randomInt(1,7);
+        int dice2 = RandomUtil.randomInt(1,7);
+        int number = dice1 + dice2;
+        int diceRate = 0;
+        CommonGame.WinState winState = CommonGame.WinState.FAIL;
+        if(number<7){
+            if(type == CommonGame.WMDice.WD_SMALL){
+                winState = CommonGame.WinState.WIN;
+                if(dice1 == dice2){
+                    diceRate = 2;
+                }else{
+                    diceRate = 4;
+                }
+            }
+        }else if(number==7){
+            if(type == CommonGame.WMDice.WD_TIE){
+                winState = CommonGame.WinState.WIN;
+                diceRate = 6;
+            }
+        }else{
+            if(type == CommonGame.WMDice.WD_BIG){
+                winState = CommonGame.WinState.WIN;
+                if(dice1 == dice2){
+                    diceRate = 2;
+                }else{
+                    diceRate = 4;
+                }
+            }
+        }
+        if(winState == CommonGame.WinState.WIN){
+            gold = diceRate * gold;
             walletBizService.changeGold(CommonUser.GoldType.GT_GAME, AddType.ADD, uid, gold, gameType, roomType);
         }else{
-            winState = CommonGame.WinState.FAIL;
             walletBizService.changeGold(CommonUser.GoldType.GT_GAME, AddType.SUB, uid, gold, gameType, roomType);
         }
         Wallet wallet =WalletService.ins.get(uid);
         Game.S_20312.Builder b = Game.S_20312.newBuilder();
-        b.setGold(gold).setLeaveGold(wallet.getGold()).setState(winState);
+        b.setGold(gold).setLeaveGold(wallet.getGold()).setState(winState).setDice1(dice1).setDice2(dice2);
         return b;
     }
 }

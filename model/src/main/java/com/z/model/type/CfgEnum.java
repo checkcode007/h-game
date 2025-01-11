@@ -6,11 +6,14 @@ public enum CfgEnum {
     REGNUN("regNum",Integer.class,"手机注册上限"),
     NIUNIU_TIME("niuniu_time",Integer.class,"百变牛牛-时间-准备"),
 
-    BAIBIAN_XIAOMALI_BET_MIN("baibian_xiaomali_bet_min",Integer.class,"百变小玛丽-下注-最小金额"),
-    BAIBIAN_XIAOMALI_BET_MAX("baibian_xiaomali_bet_max",Integer.class,"百变小玛丽-下注-最大金额"),
-    BAIBIAN_XIAOMALI_BET_BASE("baibian_xiaomali_bet_base",Integer.class,"百变小玛丽-下注-除以的基数"),
+
     CODE_GOLD("code_gold",Integer.class,"兑换码对应的金币"),
     CODE_TIME("code_time",Integer.class,"点卡过期时间（秒）"),
+
+
+    U_V1("u_v1",Integer.class,"控制用户状态的值1"),
+    U_V2("u_v2",Integer.class,"控制用户状态的值2"),
+    U_V3("u_v3",Integer.class,"控制用户状态的值3"),
     ;
     public String name;
     public Class clazz;

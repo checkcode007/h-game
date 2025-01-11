@@ -4,8 +4,11 @@ import com.z.common.util.DateTimeUtil;
 import com.z.common.util.SnowflakeId;
 import com.z.core.service.game.card.CardGame;
 import com.z.core.service.game.card.CardPlayer;
+import com.z.core.service.game.line9.Line9RankService;
 import com.z.dbes.service.EsGameService;
 import com.z.model.es.EsGame;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +23,9 @@ import java.util.StringJoiner;
  */
 @Service
 public class EsGameBizService {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(EsGameBizService.class);
+
+//    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     EsGameService esGameService;
     public EsGame add(CardGame cardGame) {

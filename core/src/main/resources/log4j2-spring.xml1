@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Properties>
+        <!-- 全局配置日志路径 -->
+        <Property name="LOG_PATH">logs</Property>
+        <!-- 定义统一的日志输出模式 -->
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss} [%t] %-5level %class{1}.%method:%line - %msg%n%throwable</Property>
+    </Properties>
+
+    <Appenders>
+
+        <!-- INFO级别的日志输出 -->
+        <RollingFile name="InfoFile" fileName="${sys:LOG_PATH}/info.log" filePattern="${sys:LOG_PATH}/info-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="30MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="90"/>
+        </RollingFile>
+
+        <!-- DEBUG级别的日志输出 -->
+        <RollingFile name="DebugFile" fileName="${sys:LOG_PATH}/debug.log" filePattern="${sys:LOG_PATH}/debug-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Filters>
+                <!-- 只允许DEBUG级别及以上 -->
+                <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="30MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="90"/>
+        </RollingFile>
+
+        <!-- ERROR级别的日志输出 -->
+        <RollingFile name="ErrorFile" fileName="${sys:LOG_PATH}/error.log" filePattern="${sys:LOG_PATH}/error-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Filters>
+                <!-- 只允许ERROR级别的日志 -->
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="30MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="90"/>
+        </RollingFile>
+        <!-- 控制台输出 -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+    </Appenders>
+
+    <Loggers>
+        <!-- INFO级别的日志配置，输出到InfoFile -->
+        <Logger name="com.z" level="info" additivity="false">
+            <AppenderRef ref="InfoFile"/>
+        </Logger>
+
+        <!-- DEBUG级别的日志配置，输出到DebugFile -->
+        <Logger name="com.z" level="debug" additivity="false">
+            <AppenderRef ref="DebugFile"/>
+        </Logger>
+
+        <!-- ERROR级别的日志配置，输出到ErrorFile -->
+        <Logger name="com.z" level="error" additivity="false">
+            <AppenderRef ref="ErrorFile"/>
+        </Logger>
+
+        <!-- 根日志配置 -->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="InfoFile"/>
+            <AppenderRef ref="ErrorFile"/>
+            <AppenderRef ref="DebugFile"/>
+        </Root>
+    </Loggers>
+</Configuration>

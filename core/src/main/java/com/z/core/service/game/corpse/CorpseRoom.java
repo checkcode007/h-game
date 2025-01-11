@@ -20,8 +20,8 @@ import com.z.model.proto.CommonUser;
 import com.z.model.proto.Game;
 import com.z.model.proto.MyMessage;
 import com.z.model.type.AddType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,8 +32,7 @@ import java.util.StringJoiner;
  * 僵尸新娘房间
  */
 public class CorpseRoom extends SlotRoom {
-    protected Logger log = LoggerFactory.getLogger(getClass());
-
+    private static final Log log = LogFactory.getLog(CorpseRoom.class);
     Line9RankService line9Service;
     CSlotService service;
 
@@ -64,12 +63,6 @@ public class CorpseRoom extends SlotRoom {
         return ret;
     }
 
-
-    @Override
-    public long getBetGold() {
-        return betGold / cfgBizService.getBB_XML_bet_base();
-    }
-
     @Override
     public boolean isPool(int type) {
         return type == CommonGame.LINE9.L9_BOX_VALUE;
@@ -82,19 +75,6 @@ public class CorpseRoom extends SlotRoom {
         long poolGold = PoolService.ins.get(gameType);
         line.setGold(poolGold * line.getRate() / 10000);
         log.info("poolGold:" + poolGold +":"+ line.getGold());
-    }
-
-    @Override
-    public boolean isSame(int i, int k1, int k2) {
-        if (super.isSame(i, k1, k2)) {
-            return true;
-        }
-        if (i != 0) {
-            if (k2 == CommonGame.LINE9.L9_BAR_VALUE) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public void addRecord(long uid) {

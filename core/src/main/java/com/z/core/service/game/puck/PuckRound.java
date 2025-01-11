@@ -3,14 +3,14 @@ package com.z.core.service.game.puck;
 import com.z.core.service.game.clear.ClearRound;
 import com.z.model.bo.slot.SlotModel;
 import com.z.model.proto.CommonGame;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class PuckRound extends ClearRound {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(PuckRound.class);
 
-    public PuckRound(long id, CommonGame.GameType gameType, CommonGame.RoomType roomType) {
-        super(id, gameType, roomType);
+    public PuckRound(long id, CommonGame.GameType gameType, CommonGame.RoomType roomType,int base) {
+        super(id, gameType, roomType, base);
     }
 
     @Override

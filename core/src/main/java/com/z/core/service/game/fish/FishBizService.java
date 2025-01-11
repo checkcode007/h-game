@@ -3,6 +3,7 @@ package com.z.core.service.game.fish;
 import com.google.protobuf.AbstractMessageLite;
 import com.google.protobuf.ByteString;
 import com.z.common.game.FishCommon;
+import com.z.core.service.game.football.BallRoom;
 import com.z.core.service.game.game.SuperRoom;
 import com.z.core.service.game.room.RoomService;
 import com.z.core.service.user.UserBizService;
@@ -20,6 +21,8 @@ import com.z.model.proto.CommonUser;
 import com.z.model.proto.Game;
 import com.z.model.proto.MyMessage;
 import com.z.model.type.AddType;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +36,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Service
 public class FishBizService {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(FishBizService.class);
+
+//    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     CFishService cFishService;
     @Autowired

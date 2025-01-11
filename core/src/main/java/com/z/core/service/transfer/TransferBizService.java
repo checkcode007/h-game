@@ -32,8 +32,6 @@ public class TransferBizService {
     @Autowired
     GWalletDao walletDao;
     @Autowired
-    CCfgBizService cfgBizService;
-    @Autowired
     EsBankLogService bankLogService;
 
     public List<User.TransforLog> getList(int type ,long uid){

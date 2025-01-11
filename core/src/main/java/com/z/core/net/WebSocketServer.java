@@ -16,21 +16,24 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import io.netty.handler.timeout.IdleStateHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
+//@Slf4j
 @Component
 public class WebSocketServer implements ApplicationListener<ApplicationReadyEvent> {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+private static final Log logger = LogFactory.getLog(WebSocketServer.class);
+
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event)  {
         try {
-            log.info("-----webstart-----");
+            logger.info("-----webstart-----");
             start(8081);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -63,11 +66,11 @@ public class WebSocketServer implements ApplicationListener<ApplicationReadyEven
                                 protected void channelRead0(ChannelHandlerContext ctx, BinaryWebSocketFrame msg) throws Exception {
                                     // 在这里处理 Socket 消息
                                     MyMessage.MyMsgReq message =MyMessage.MyMsgReq.parseFrom(msg.content().nioBuffer());
-                                    log.error("fail msg:"+message);
+                                    logger.error("fail msg:"+message);
                                 }
                                 @Override
                                 public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-                                    log.error("发生异常", cause);
+                                    logger.error("发生异常", cause);
                                     ctx.close();
                                 }
                             });
@@ -75,18 +78,18 @@ public class WebSocketServer implements ApplicationListener<ApplicationReadyEven
                     });
             // 添加 Shutdown Hook
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                log.info("正在关闭 WebSocket 服务器...");
+                logger.info("正在关闭 WebSocket 服务器...");
                 bossGroup.shutdownGracefully();
                 workerGroup.shutdownGracefully();
-                log.info("WebSocket 服务器已关闭");
+                logger.info("WebSocket 服务器已关闭");
             }));
 //             b.bind(port).sync();
             Channel ch = b.bind(port).sync().channel();
-            log.info("WebSocket服务器在端口=======> " + port + " 启动");
+            logger.info("WebSocket服务器在端口=======> " + port + " 启动");
 
             // 使用addListener()来处理通道关闭事件
             ch.closeFuture().addListener((ChannelFuture future) -> {
-                log.info("WebSocket服务器在端口=======> 结束 " + port);
+                logger.info("WebSocket服务器在端口=======> 结束 " + port);
                 // 在这里可以添加其他关闭后的逻辑
                 bossGroup.shutdownGracefully();
                 workerGroup.shutdownGracefully();
@@ -96,7 +99,7 @@ public class WebSocketServer implements ApplicationListener<ApplicationReadyEven
             // 比如：等待某个条件后再关闭服务器
             ch.closeFuture().sync();//阻塞
         } catch (Error e) {
-            log.error(" websocket---->",e);
+            logger.error(" websocket---->",e);
             throw new RuntimeException(e);
         } finally {
             bossGroup.shutdownGracefully();

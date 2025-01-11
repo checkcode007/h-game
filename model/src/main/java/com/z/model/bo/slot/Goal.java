@@ -52,7 +52,7 @@ public class Goal {
     public String toString() {
         StringJoiner sj = new StringJoiner(" ");
         for (SlotModel p : points) {
-            sj.add(p.getType()+"x"+p.getX()+"y"+p.getY());
+            sj.add(p.getK()+"x"+p.getX()+"y"+p.getY());
         }
         return "goal{" + "c=" + c + ", r=" + rate + ", p=" + sj+ '}';
     }

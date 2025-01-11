@@ -10,6 +10,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,7 @@ public class GUserDao extends AbstractMapperService<GUser,Long> {
 //    })
     @Override
     public GUser update(GUser gUser) {
+        gUser.setUpdateTime(new Date());
         return super.update(gUser);
     }
     public List<GUser> findRobot(int num){

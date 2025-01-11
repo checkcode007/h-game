@@ -4,6 +4,7 @@ package com.z.core.service.email;
 import com.google.protobuf.ByteString;
 import com.z.core.service.cfg.CCfgBizService;
 import com.z.core.util.IdUtil;
+import com.z.core.util.SpringContext;
 import com.z.dbmysql.dao.email.GEmailDao;
 import com.z.model.common.MsgId;
 import com.z.model.mysql.GEmail;
@@ -25,13 +26,11 @@ public class MailBizService {
     protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     GEmailDao dao;
-    @Autowired
-    CCfgBizService cfgBizService;
 
     public GEmail add(CommonUser.EmailType type,long transferId, long fromId,
                       long targerId,long gold){
         //扣除税率
-        long tax = (long)(gold*cfgBizService.getTaxes());
+        long tax = (long)(gold*CCfgBizService.ins.getTaxes());
         long gold2 = gold - tax;
         DateTime now = DateTime.now();
         Date d =now.toDate();

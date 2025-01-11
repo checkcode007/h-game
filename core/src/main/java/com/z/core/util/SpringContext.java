@@ -1,5 +1,8 @@
 package com.z.core.util;
 
+import com.z.core.service.wallet.BankLogBizService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -9,14 +12,15 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SpringContext implements ApplicationContextAware {
-    private static final Logger log = LoggerFactory.getLogger(SpringContext.class);
+//    private static final Logger log = LoggerFactory.getLogger(SpringContext.class);
+    private static final Log log = LogFactory.getLog(SpringContext.class);
 
     private static ApplicationContext applicationContext;
 
     @Override
     public void setApplicationContext(ApplicationContext context) throws BeansException {
         applicationContext = context;
-        log.info("ApplicationContext has been set: {}", applicationContext);
+        log.info("ApplicationContext has been set: " +applicationContext);
         System.err.println("ApplicationContext has been set: " + applicationContext);
     }
 
@@ -34,7 +38,7 @@ public class SpringContext implements ApplicationContextAware {
         try {
             return applicationContext.getBean(clazz);
         } catch (BeansException e) {
-            log.error("Error getting bean of type {}: {}", clazz.getName(), e.getMessage());
+            log.error("Error getting bean of type:"+clazz.getName(), e);
             throw e; // rethrow to ensure caller can handle it properly
         }
     }
@@ -53,7 +57,7 @@ public class SpringContext implements ApplicationContextAware {
         try {
             return (T) applicationContext.getBean(name);
         } catch (BeansException e) {
-            log.error("Error getting bean with name {}: {}", name, e.getMessage());
+            log.error("Error getting bean with name :"+ name, e);
             throw e; // rethrow to ensure caller can handle it properly
         }
     }

@@ -9,45 +9,31 @@ import com.z.core.service.game.game.IRound;
 import com.z.core.service.game.game.Round;
 import com.z.core.service.game.game.SuperRoom;
 import com.z.core.service.user.UserService;
+import com.z.core.service.wallet.WalletService;
+import com.z.model.BetParam;
 import com.z.model.bo.slot.*;
 import com.z.model.bo.user.User;
+import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CRoom;
 import com.z.model.mysql.cfg.CSlot;
-import com.z.model.proto.CommonGame;
 import com.z.model.proto.CommonUser;
 import com.z.model.proto.Game;
 import com.z.model.type.AddType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
 /**
  * 房间
  */
 public class SlotRoom extends SuperRoom {
-    protected Logger log = LoggerFactory.getLogger(getClass());
-
-
-
-    /**
-     * 支付线
-     */
-    protected Map<Integer,Payline> lines;
+    private static final Log log = LogFactory.getLog(SlotRoom.class);
 
     /**
      * 中奖的集合
      */
     protected List<Rewardline> rewardlines = new ArrayList<>();
-
-
-    protected long betGold;
-
-    /**
-     * 池子里所有的符号
-     */
-    protected Table<Integer,Integer,SlotModel> board;
-
 
     /**
      * 是否免费轮
@@ -100,35 +86,34 @@ public class SlotRoom extends SuperRoom {
      */
     protected int quitType =0;
 
+    protected BetParam param;
+
 
     public SlotRoom(CRoom cRoom,long uid) {
         super(cRoom,uid);
-        slots = new HashMap<>();
-        allSlots = new ArrayList<>();
-        lines = new HashMap<>();
-        board = HashBasedTable.create();
 
     }
     //todo 抽取到super
     @Override
     public void init(CRoom cRoom) {
         super.init(cRoom);
-        lines =  paylineService.getMap(gameType);
         CSlot slot = service.getQuit(gameType);
         if(slot!=null){
-            quitType = slot.getType();
+            quitType = slot.getSymbol();
         }
-
-
+        param = new BetParam();
+        param.setUid(uid);
     }
     /**
      * 生成符号
      */
     public void generate() {
         board.clear();
+        initParam();
         for (int i = 0; i < COL_SIZE; i++) {
             for (int j = 0; j < ROW_SIZE; j++) {
-                Slot slot = random(slots, i);
+                param.setX(i);
+                Slot slot = random(slots);
                 SlotModel model =  SlotCommon.ins.toModel(slot,i,j);
                 board.put(model.getX(), model.getY(), model);
             }
@@ -168,6 +153,15 @@ public class SlotRoom extends SuperRoom {
         roundMap.put(uid, round);
         return round;
     }
+    public void initParam(){
+        Wallet wallet = WalletService.ins.get(uid);
+        param.setGameType(gameType);
+        param.setUid(uid);
+        param.setState(user.getBetState().getK());
+        param.setFree(free);
+        param.setWinC(wallet.getWins());
+        param.setTotalC(wallet.getBetC());
+    }
     /**
      * 下注
      *
@@ -179,22 +173,22 @@ public class SlotRoom extends SuperRoom {
         nextRound();
         var round = createRound(uid, gold);
         StringJoiner sj = new StringJoiner(",").add("gameType:"+gameType).add("roomType:"+roomType).add("uid:"+uid).add("rid:" + id).add("roundId:" + round.getId()).add("uid:" + uid).add("gold:" + gold);
-        log.info(sj.toString());
+        log.info(sj.add("betState:"+user.getBetState()).toString());
         var roundCheck = round.bet(uid, 0, gold, free);
         if (!roundCheck.isOk()) {
             log.error("roundCheck fail");
             return roundCheck;
         }
-        User user = UserService.ins.get(uid);
         if (free) {
             gold = user.getFreeBetGold();
             sj.add("freeBet:" + user.getFreeBetGold());
         }
         this.free = free;
-        betGold = gold / SlotCommon.BASE;
-        sj.add("betGold:" + betGold);
+        betGold = gold;
+        long realGold = getBetGold();
+        sj.add("lastG:" + betGold).add("realG:" + realGold);
         //生成符号
-        log.info("生成------>:" + round.getId());
+        log.info("用户状态:"+user.getBetState()+"生成------>:" + round.getId());
         generate();
         print();
         spots = toSpots();
@@ -252,7 +246,7 @@ public class SlotRoom extends SuperRoom {
             if (line == null) continue;
             rewardlines.add(line);
         }
-        long base = getBetGold();
+        long realGold = getBetGold();
         for (Rewardline line : rewardlines) {
             CSlot cSlot = service.get(gameType, line.getK(), line.getPoints().size());
             if (cSlot == null) continue;
@@ -260,7 +254,7 @@ public class SlotRoom extends SuperRoom {
             if (isPool(line.getK())) {
                 poolLine(line);
             }else {
-                line.setGold(base * line.getRate());
+                line.setGold(realGold * line.getRate());
             }
             line.setSpecialC(cSlot.getC1());
             this.rewardlines.add(line);
@@ -272,10 +266,10 @@ public class SlotRoom extends SuperRoom {
         int c = 0;
         int symbol = 0;
         for (SlotModel m : board.values()) {
-            Slot slot = slots.get(m.getType());
+            Slot slot = slots.get(m.getK());
             if (!slot.isBonus()) continue;
             c++;
-            symbol = m.getType();
+            symbol = m.getK();
         }
         if(c<1) return;
         CSlot cSlot = service.get(gameType, symbol, c);
@@ -308,14 +302,18 @@ public class SlotRoom extends SuperRoom {
         //从左到右
         int leftType = 0;
         List<Point> leftList = new ArrayList<>();
+        boolean had_baida = false;
         for (Point p : line.getPoints()) {
             int x = p.getX();
             SlotModel m = board.get(x,p.getY());
-            int type = m.getType();
+            int type = m.getK();
+            if(m.isBaida()){
+               had_baida = true;
+            }
             if(leftType<1){
                 leftType = type;
                 leftList.add(p);
-            }else if(type==leftType){
+            }else if(isSame(x,leftType,type)){
                 leftList.add(p);
             }else{
                 break;
@@ -325,6 +323,7 @@ public class SlotRoom extends SuperRoom {
             payline = new Rewardline(leftType,line.getLineId());
         }
         payline.addPoints(leftList);
+        payline.setHadBaida(had_baida);
         return payline;
     }
 
@@ -339,7 +338,7 @@ public class SlotRoom extends SuperRoom {
         for (Point p : line.getPoints()) {
             int x = p.getX();
             SlotModel m = board.get(x,p.getY());
-            type = m.getType();
+            type = m.getK();
             if(!m.isScatter()) continue;
             if(payline==null){
                 payline =new Rewardline(type,line.getLineId());
@@ -355,24 +354,24 @@ public class SlotRoom extends SuperRoom {
         return payline;
     }
 
-    /**
-     * 获取下注金额 比例减少后的
-     * @return
-     */
-    public long getBetGold() {
-        return betGold / cfgBizService.getBB_XML_bet_base();
-    }
-
     public boolean isPool(int type) {
         return false;
     }
 
-    public Slot random (Map < Integer, Slot > slots, int i){
+    public Slot random (Map < Integer, Slot > slots) {
         Set<Integer> rewardSymbols = new HashSet<>();
         for (Rewardline line : rewardlines) {
             rewardSymbols.add(line.getK());
         }
-        return SlotCommon.ins.random(gameType,board,slots, rewardSymbols, i,free,UserService.ins.get(uid));
+        Slot slot =  SlotCommon.ins.random(gameType,board,slots, rewardSymbols, param);
+        if(slot.isScatter()){
+            param.addScatter();
+        } else if (slot.isBonus()) {
+            param.addBonus();
+        } else if (slot.isBaida()) {
+            param.addBaida();
+        }
+        return slot;
     }
     public void print () {
         SlotCommon.ins.print(board,gameType,roomType,id,uid);
@@ -381,7 +380,7 @@ public class SlotRoom extends SuperRoom {
         List<Game.Spot> list = new ArrayList<>(30);
         for (SlotModel m : board.values()) {
             Game.Spot.Builder b = Game.Spot.newBuilder();
-            b.setSymbol(m.getType()).setX(m.getX()).setY(m.getY()).setChangeType(m.getChangeType());
+            b.setSymbol(m.getK()).setX(m.getX()).setY(m.getY()).setChangeType(m.getChangeType());
             list.add(b.build());
         }
         return list;

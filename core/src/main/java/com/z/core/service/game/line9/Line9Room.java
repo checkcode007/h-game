@@ -4,6 +4,7 @@ package com.z.core.service.game.line9;
 import com.google.protobuf.ByteString;
 import com.z.core.net.channel.UserChannelManager;
 import com.z.core.service.game.PoolService;
+import com.z.core.service.game.majiang.MaJiangRound;
 import com.z.core.service.game.slot.CSlotService;
 import com.z.core.service.game.slot.SlotRoom;
 import com.z.core.service.wallet.WalletService;
@@ -16,6 +17,8 @@ import com.z.model.mysql.cfg.CRoom;
 import com.z.model.proto.CommonGame;
 import com.z.model.proto.Game;
 import com.z.model.proto.MyMessage;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +26,8 @@ import org.slf4j.LoggerFactory;
  * 房间
  */
 public class Line9Room extends SlotRoom {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+//    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(Line9Room.class);
 
     Line9RankService line9Service;
     CSlotService service;
@@ -50,9 +54,9 @@ public class Line9Room extends SlotRoom {
      */
     public MsgResult<Game.Line9BetMsg> bet(long uid, int type, long gold, boolean free) {
         super.bet(uid, type, gold, free);
+        Wallet wallet = WalletService.ins.get(uid);
         var b = Game.Line9BetMsg.newBuilder().setRoundId(id).addAllLines(payLines).addAllSpots(spots);
         b.setFree(freeC > 0).setAddFreeC(freeC).setTotalFreeC(totalFreeC);
-        Wallet wallet = WalletService.ins.get(uid);
         b.setRate(rate).setGold(rewardGold).setLeaveGold(wallet.getGold());
         addRecord(uid);
         PoolService.ins.add(gameType, gold);
@@ -61,11 +65,6 @@ public class Line9Room extends SlotRoom {
         return ret;
     }
 
-
-    @Override
-    public long getBetGold() {
-        return betGold / cfgBizService.getBB_XML_bet_base();
-    }
 
     /**
      * 是否是宝箱连线
@@ -107,7 +106,11 @@ public class Line9Room extends SlotRoom {
             }
         }
         if (gold > 0) {
-            line9Service.add(uid, gold);
+            try {
+                line9Service.add(uid, gold);
+            } catch (Exception e) {
+                log.error("uid:"+uid+" id:"+id,e);
+            }
         }
     }
 

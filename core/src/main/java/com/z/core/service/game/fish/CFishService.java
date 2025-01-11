@@ -7,6 +7,8 @@ import com.z.dbmysql.dao.fish.CFishFireDao;
 import com.z.model.mysql.cfg.CFish;
 import com.z.model.mysql.cfg.CFishFire;
 import com.z.model.proto.CommonGame;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -25,7 +27,9 @@ import java.util.Map;
  */
 @Service
 public class CFishService implements InitializingBean {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+//    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(CFishService.class);
+
     @Autowired
     CFishDao dao;
     @Autowired

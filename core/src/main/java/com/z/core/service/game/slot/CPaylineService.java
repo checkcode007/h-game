@@ -2,6 +2,7 @@ package com.z.core.service.game.slot;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import com.z.core.service.game.wm.WMRoom;
 import com.z.dbmysql.dao.slot.CPaylineDao;
 import com.z.model.bo.slot.Payline;
 import com.z.model.bo.slot.Point;
@@ -11,6 +12,8 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +31,9 @@ import java.util.Map;
  */
 @Service
 public class CPaylineService {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(CPaylineService.class);
+
+//    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     CPaylineDao dao;
 

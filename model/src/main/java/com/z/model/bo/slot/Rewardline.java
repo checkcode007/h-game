@@ -33,6 +33,9 @@ public class Rewardline {
      */
     int specialC=0;
 
+    boolean hadBaida = false;
+
+
     public Rewardline(int k, int lineId) {
         this.k = k;
         this.lineId = lineId;

@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SlotModel{
-    int type; //符号
+    int k; //符号
     int x; // 第几列
     int y; //列的第几个
     boolean gold;//是否是金色牌
@@ -37,7 +37,7 @@ public class SlotModel{
     @Override
     public String toString() {
         return "m{" +
-                "type=" + type +
+                "k=" + k +
                 ", x=" + x +
                 ", y=" + y +
                 ", g=" + (gold?1:0) +

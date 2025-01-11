@@ -1,20 +1,22 @@
 package com.z.core.service.cfg;
 
+import com.z.core.util.SpringContext;
 import com.z.model.proto.CommonGame;
 import com.z.model.type.CfgEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
-public class CCfgBizService {
+public enum CCfgBizService {
+    ins;
     protected Logger log = LoggerFactory.getLogger(getClass());
-    @Autowired
     CCfgDataBizService service;
+
+    CCfgBizService() {
+        this.service = SpringContext.getBean(CCfgDataBizService.class);
+    }
 
     /**
      * 税率
@@ -42,27 +44,6 @@ public class CCfgBizService {
     }
 
     /**
-     * 百变小玛丽-下注-最小金额
-     * @return
-     */
-    public int getBB_XML_bet_min(){
-        return service.get(CfgEnum.BAIBIAN_XIAOMALI_BET_MIN.name,CfgEnum.BAIBIAN_XIAOMALI_BET_MIN.clazz);
-    }
-    /**
-     * 百变小玛丽-下注-最大金额
-     * @return
-     */
-    public int getBB_XML_bet_max(){
-        return service.get(CfgEnum.BAIBIAN_XIAOMALI_BET_MAX.name,CfgEnum.BAIBIAN_XIAOMALI_BET_MAX.clazz);
-    }
-    /**
-     * 百变小玛丽-下注-除以的基数
-     * @return
-     */
-    public int getBB_XML_bet_base(){
-        return service.get(CfgEnum.BAIBIAN_XIAOMALI_BET_BASE.name,CfgEnum.BAIBIAN_XIAOMALI_BET_BASE.clazz);
-    }
-    /**
      * 点卡对应的金币
      * @return
      */
@@ -78,6 +59,30 @@ public class CCfgBizService {
         return service.get(CfgEnum.CODE_TIME.name,CfgEnum.CODE_TIME.clazz);
     }
 
+    /**
+     * 用户切换状态值1
+     * @return
+     */
+    public int getUV1(){
+        return service.get(CfgEnum.U_V1.name,CfgEnum.U_V1.clazz);
+    }
+
+
+    /**
+     * 用户切换状态值2
+     * @return
+     */
+    public int getUV2(){
+        return service.get(CfgEnum.U_V2.name,CfgEnum.U_V2.clazz);
+    }
+
+    /**
+     * 用户切换状态值3
+     * @return
+     */
+    public int getUV3(){
+        return service.get(CfgEnum.U_V3.name,CfgEnum.U_V3.clazz);
+    }
 
     public  Map<CommonGame.GameState,Integer> getNiuniuTime(){
         Map<CommonGame.GameState,Integer> map = new HashMap<>();

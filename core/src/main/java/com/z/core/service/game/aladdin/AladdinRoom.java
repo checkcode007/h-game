@@ -18,8 +18,8 @@ import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CRoom;
 import com.z.model.proto.CommonGame;
 import com.z.model.proto.Game;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +30,7 @@ import java.util.Map;
  * 阿拉丁房间
  */
 public class AladdinRoom extends SlotRoom {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(AladdinRoom.class);
 
     /**
      * 池子里所有的符号(上一轮)
@@ -65,7 +65,7 @@ public class AladdinRoom extends SlotRoom {
         for (int j = 0; j < ROW_SIZE; j++) {
             for (int i = 0; i < COL_SIZE; i++) {
                 SlotModel m = board.get(i, j);
-                Slot slot = slots.get(m.getType());
+                Slot slot = slots.get(m.getK());
                 if (!slot.isBaida()) continue;
                 if (j == 0) {
                     list.add(m);
@@ -90,15 +90,16 @@ public class AladdinRoom extends SlotRoom {
         }
     }
 
-
     @Override
     public void generate() {
         board.clear();
+        initParam();
         for (int i = 0; i < COL_SIZE; i++) {
             for (int j = 0; j < ROW_SIZE; j++) {
                 SlotModel model = preBaida.get(i, j);
                 if (model == null) {
-                    Slot slot = random(slots, i);
+                    param.setX(i);
+                    Slot slot = random(slots);
                     model = SlotCommon.ins.toModel(slot,i,j);
                 }
                 board.put(model.getX(), model.getY(), model);
@@ -107,21 +108,21 @@ public class AladdinRoom extends SlotRoom {
     }
 
     @Override
-    public Slot random(Map<Integer, Slot> slots, int i) {
-        if (i != 4 && free) {//免费押注非最后一排不生成百搭
+    public Slot random(Map<Integer, Slot> slots) {
+        if (param.getX() != 4 && free) {//免费押注非最后一排不生成百搭
             Map<Integer, Slot> slots1 = new HashMap<>();
             for (Slot s : slots.values()) {
                 if (s.isBaida()) continue;
                 slots1.put(s.getK(), s);
             }
-            return super.random(slots1, i);
+            return super.random(slots1);
         } else {
             if (free) { //免费选择第五排最少有一个百搭
-                Slot slot = super.random(slots, i);
+                Slot slot = super.random(slots);
                 if (slot.isBaida()) return slot;
                 boolean hadBaida = false;
                 for (SlotModel s : board.row(4).values()) {
-                    if (slots.get(s.getType()).isBaida()) {
+                    if (slots.get(s.getK()).isBaida()) {
                         hadBaida = true;
                         break;
                     }
@@ -131,7 +132,7 @@ public class AladdinRoom extends SlotRoom {
                 }
                 return slot;
             } else {
-                return super.random(slots, i);
+                return super.random(slots);
             }
         }
     }

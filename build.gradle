@@ -53,20 +53,28 @@ subprojects {
 //        implementation 'org.springframework.boot:spring-boot-starter'
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
-//        testImplementation 'org.slf4j:slf4j-jdk14:2.1.0-alpha1'
-        testImplementation 'ch.qos.logback:logback-classic:1.5.12'
 
         testImplementation ('org.springframework.boot:spring-boot-starter-test')
+        // 排除默认的日志框架
         implementation('org.springframework.boot:spring-boot-starter') {
-//            exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
-//            exclude group: 'org.apache.logging.log4j', module: 'log4j-api' // 排除 Log4j2 API
-//            exclude group: 'org.apache.logging.log4j', module: 'log4j-core' // 排除 Log4j2 核心
+            exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
         }
-//                implementation 'org.slf4j:slf4j-api:2.1.0-alpha1'
-        testImplementation 'org.apache.logging.log4j:log4j-slf4j-impl:3.0.0-beta2'
+        // 添加 Log4j2 相关依赖
+        implementation 'org.springframework.boot:spring-boot-starter-log4j2'
 
-//        implementation 'org.apache.logging.log4j:log4j-core:3.0.0-beta3'
-//        implementation 'org.apache.logging.log4j:log4j-api:3.0.0-beta2'
+        // 排除 log4j-to-slf4j
+        implementation('org.apache.logging.log4j:log4j-slf4j2-impl') {
+            exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+        }
+        // 排除 log4j-slf4j2-impl
+        implementation('org.apache.logging.log4j:log4j-to-slf4j') {
+            exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
+        }
+
+        implementation 'org.apache.logging.log4j:log4j-core:3.0.0-beta2'
+        implementation 'org.apache.logging.log4j:log4j-api:3.0.0-beta2'
+        testImplementation 'org.apache.logging.log4j:log4j-slf4j2-impl:3.0.0-beta2'
+
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
         implementation("org.apache.commons:commons-lang3:$commonlanVer")
@@ -98,6 +106,13 @@ subprojects {
 
 
 
+    }
+    configurations.all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j2-impl'
     }
     dependencyManagement {
         imports {

@@ -6,6 +6,8 @@ import com.z.core.service.game.card.CardService;
 import com.z.core.service.game.room.RoomService;
 import com.z.core.service.user.UserService;
 import com.z.core.service.wallet.WalletService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class ScheduledManager implements ApplicationListener<ApplicationReadyEvent> {
     public List<MySchedule> scheduleList = new ArrayList<>();
-    protected Logger log = LoggerFactory.getLogger(getClass());
+//    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(ScheduledManager.class);
+
     @Autowired
     CardService cardService;
 
@@ -40,17 +44,17 @@ public class ScheduledManager implements ApplicationListener<ApplicationReadyEve
         scheduleList.add(schedule);
         schedule = new MySchedule(1,"card",this::exe1,25,5, TimeUnit.SECONDS);
         scheduleList.add(schedule);
-        schedule = new MySchedule(1,"mali",this::exe2,25,1, TimeUnit.SECONDS);
+        schedule = new MySchedule(1,"user",this::exe2,25,1, TimeUnit.SECONDS);
         scheduleList.add(schedule);
 
         schedule = new MySchedule(1,"cfg",this::exeCfg,10,10, TimeUnit.MINUTES);
         scheduleList.add(schedule);
 
-        schedule = new MySchedule(1,"update",this::exe5,10,5, TimeUnit.SECONDS);
+        schedule = new MySchedule(1,"room",this::exe5,10,5, TimeUnit.SECONDS);
         scheduleList.add(schedule);
 
 
-        schedule = new MySchedule(1,"goldPool",this::exe6,10,5, TimeUnit.MINUTES);
+        schedule = new MySchedule(1,"rwdpool",this::exe6,10,5, TimeUnit.MINUTES);
         scheduleList.add(schedule);
     }
     public void exe(){

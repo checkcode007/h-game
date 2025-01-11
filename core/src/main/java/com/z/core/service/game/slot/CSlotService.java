@@ -2,9 +2,12 @@ package com.z.core.service.game.slot;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import com.z.core.service.game.wm.WMHigherRoom;
 import com.z.dbmysql.dao.slot.CSlotDao;
 import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonGame;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,9 @@ import java.util.Map;
  */
 @Service
 public class CSlotService {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(CSlotService.class);
+
+//    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     CSlotDao dao;
 

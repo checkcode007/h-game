@@ -15,8 +15,8 @@ import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonUser;
 import com.z.model.proto.Game;
 import com.z.model.type.AddType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
 
@@ -24,34 +24,31 @@ import java.util.*;
  * 高级玩法房间
  */
 public class WMHigherRoom extends SlotRoom {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(WMHigherRoom.class);
 
-    int winC= 0;
-    int totalC= 0;
+    int winC = 0;
+    int totalC = 0;
 
     public WMHigherRoom(CRoom cRoom, long uid) {
         super(cRoom, uid);
+        COL_SIZE = 5;
+        ROW_SIZE = 1;
     }
 
     @Override
     public void init(CRoom cRoom) {
         super.init(cRoom);
+
     }
 
-    void printslot(){
+    void printslot() {
         for (Slot s : allSlots) {
-            log.info(s.getK()+"------>"+s.getW1());
+            log.info(s.getK() + "------>" + s.getW1());
         }
     }
 
-    /**
-     * 下注
-     *
-     * @param uid
-     */
-    //todo 金额本地保存
-    //todo限制无限循环
-    public MsgResult<Game.WMHighMsg> bet(long uid, long gold) {
+    @Override
+    public MsgResult bet(long uid, int type, long gold, boolean free) {
         printslot();
         nextRound();
         var round = createRound(uid, gold);
@@ -64,7 +61,6 @@ public class WMHigherRoom extends SlotRoom {
             return roundCheck;
         }
         betGold = gold;
-
         //生成符号
         generate();
         print();
@@ -76,20 +72,20 @@ public class WMHigherRoom extends SlotRoom {
         for (Integer higher : allList) {
             if (sameType == 0) {
                 sameType = higher;
-                sameC++;
+//                sameC++;
             } else if (sameType == higher) {
                 sameC++;
             } else {
                 break;
             }
-            if (higher ==quitType) {
+            if (higher == quitType) {
                 isDel = true;
                 break;
             }
         }
-        sj.add("del:"+isDel);
+        sj.add("del:" + isDel).add("sameC:" + sameC).add("sameType:" + sameType);
 
-        if(isDel){
+        if (isDel) {
             user.subHigherC();
         }
         int rate = 0;
@@ -100,9 +96,9 @@ public class WMHigherRoom extends SlotRoom {
         long rewardGold = betGold * rate;
 
         Game.WMHighMsg.Builder b = Game.WMHighMsg.newBuilder().setGold(rewardGold).setType(sameType).setGold(rate).setLeaveC(user.getHighC());
-        for (int i = 1; i < 5; i++) {
+        for (int i = 1; i < COL_SIZE; i++) {
             SlotModel m = board.get(i, 0);
-            b.addPools(m.getType());
+            b.addPools(m.getK());
         }
         var ret = new MsgResult<Game.WMHighMsg>(true);
         if (rewardGold > 0) {
@@ -117,37 +113,33 @@ public class WMHigherRoom extends SlotRoom {
         return ret;
     }
 
+
     /**
      * 生成符号
      */
+
     @Override
-    public void generate() {
-        board.clear();
-        for (int i = 0; i < COL_SIZE; i++) {
-            for (int j = 0; j < ROW_SIZE; j++) {
-                Slot slot = random(slots, i);
-                SlotModel model =  SlotCommon.ins.toModel(slot,i,j);
-                board.put(model.getX(), model.getY(), model);
-            }
-        }
-    }
-    @Override
-    public Slot random(Map<Integer, Slot> slots, int i) {
+    public Slot random(Map<Integer, Slot> slots) {
         Set<Integer> goals = new HashSet<>();
         for (SlotModel m : board.values()) {
-            goals.add(m.getType());
+            goals.add(m.getK());
         }
-        return SlotCommon.ins.randomHigher(gameType, slots,goals, i,winC,totalC);
+        return SlotCommon.ins.randomHigher(gameType, slots, goals, param);
     }
 
-    public List<Integer>  allSymbol(){
-
+    public List<Integer> allSymbol() {
         List<Integer> highers = new ArrayList<>();
-        if(board.isEmpty())return highers;
-        for (int i = 0; i < 5; i++) {
-            int type = board.get(i,0).getType();
+        if (board.isEmpty()) return highers;
+        for (int i = 0; i < COL_SIZE; i++) {
+            int type = board.get(i, 0).getK();
             highers.add(type);
         }
         return highers;
+    }
+
+    public static void main(String[] args) {
+        for (int i = 0; i < 4; i++) {
+            System.err.println(i);
+        }
     }
 }

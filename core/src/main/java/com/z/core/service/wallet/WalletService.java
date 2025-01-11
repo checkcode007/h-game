@@ -8,10 +8,10 @@ import com.z.core.util.SpringContext;
 import com.z.dbmysql.dao.wallet.GWalletDao;
 import com.z.model.bo.user.Wallet;
 import com.z.model.mysql.GWallet;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Queue;
@@ -20,7 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 public enum WalletService {
     ins;
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(BankLogBizService.class);
+
 
     GWalletDao dao;
 
@@ -59,6 +60,7 @@ public enum WalletService {
         Map<Long, Wallet> map = cache.asMap();
         for (Wallet bo : map.values()) {
             if(bo.isChange()){
+                log.info(bo.toString());
                 dao.update(bo.getWallet());
                 bo.setChange(false);
             }

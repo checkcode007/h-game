@@ -2,17 +2,13 @@ package com.z.core.service.user;
 
 
 import com.z.core.service.cfg.CCfgBizService;
-import com.z.core.service.game.card.SuperGame;
 import com.z.core.service.game.game.RoomBizService;
 import com.z.core.service.game.room.RoomService;
 import com.z.core.service.wallet.WalletBizService;
 import com.z.dbmysql.dao.user.GUserDao;
-import com.z.model.mysql.GRoom;
-import com.z.model.proto.CommonGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,8 +16,6 @@ public class TestBizService {
     protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
     GUserDao dao;
-    @Autowired
-    CCfgBizService cfgBizService;
     @Autowired
     WalletBizService walletBizService;
 

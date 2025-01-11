@@ -1,6 +1,7 @@
 package com.z.core.service.game.game;
 
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.z.core.service.cfg.CCfgBizService;
 import com.z.core.service.game.slot.CPaylineService;
 import com.z.core.service.game.slot.CSlotService;
@@ -8,7 +9,10 @@ import com.z.core.service.user.UserService;
 import com.z.core.service.wallet.WalletBizService;
 import com.z.core.service.wallet.WalletService;
 import com.z.core.util.SpringContext;
+import com.z.model.bo.slot.Payline;
 import com.z.model.bo.slot.Slot;
+import com.z.model.bo.slot.SlotModel;
+import com.z.model.bo.user.User;
 import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CRoom;
@@ -16,8 +20,8 @@ import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonGame;
 import com.z.model.type.PosType;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeanUtils;
 
 import java.util.*;
@@ -26,12 +30,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class SuperRoom implements IRoom{
-
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(SuperRoom.class);
     protected CSlotService service;
     protected CPaylineService paylineService;
     protected WalletBizService walletBizService;
-    protected CCfgBizService cfgBizService;
     /**
      * 房间id
      */
@@ -49,6 +51,14 @@ public abstract class SuperRoom implements IRoom{
      */
     protected CommonGame.RoomType roomType;
     /**
+     * 支付线
+     */
+    protected Map<Integer, Payline> lines;
+    /**
+     * 池子里所有的符号
+     */
+    protected Table<Integer,Integer, SlotModel> board;
+    /**
      * 当前人数
      */
     protected int curC;
@@ -60,10 +70,6 @@ public abstract class SuperRoom implements IRoom{
      *  门槛-最低入场资金
      */
     protected long minBalance;
-    /**
-     * 底分
-     */
-    protected long minBet;
 
     /**
      * 当前轮
@@ -88,7 +94,16 @@ public abstract class SuperRoom implements IRoom{
 
     //col 第几列 row 第几排
     protected int COL_SIZE=5,ROW_SIZE=3;
+    /**
+     * 下注比值
+     */
+    protected int base=10;
 
+    protected long betGold;
+
+    protected int betMin;
+    protected int betMax;
+    protected User user;
 
 
     public SuperRoom(CRoom cRoom,long uid) {
@@ -96,22 +111,24 @@ public abstract class SuperRoom implements IRoom{
         this.roomType = CommonGame.RoomType.forNumber(cRoom.getType());
         this.id = atomicLong.incrementAndGet();
         this.uid = uid;
+        this.cfgId= cRoom.getId();
+        this.maxC =cRoom.getMaxPlayers();
+        this.minBalance = cRoom.getMinBalance();
+        base = cRoom.getBase();
+        betMin = cRoom.getBetMin();
+        betMax = cRoom.getBetMax();
         slots = new HashMap<>();
         allSlots = new ArrayList<>();
-
+        lines = new HashMap<>();
+        board = HashBasedTable.create();
         service = SpringContext.getBean(CSlotService.class);
         paylineService = SpringContext.getBean(CPaylineService.class);
         walletBizService = SpringContext.getBean(WalletBizService.class);
-        cfgBizService = SpringContext.getBean(CCfgBizService.class);
     }
 
 
     @Override
     public void init(CRoom cRoom) {
-        this.cfgId= cRoom.getId();
-        this.maxC =cRoom.getMaxPlayers();
-        this.minBet =cRoom.getMinBet();
-        this.minBalance = cRoom.getMinBalance();
         Map<Integer, List<CSlot>> map = service.getMap(gameType);
         for (List<CSlot> list : map.values()) {
             for (CSlot slot : list) {
@@ -123,6 +140,12 @@ public abstract class SuperRoom implements IRoom{
                 st.setPosType(PosType.getType(slot.getPosType()));
                 st.setBaida(slot.isBaida());
                 st.setOnly(slot.isOnly());
+                if(st.getRate1()<1 || slot.getRate()<st.getRate1()){
+                    st.setRate1(slot.getRate());
+                }
+                if(st.getRate2()<1 || slot.getRate()>st.getRate2()){
+                    st.setRate2(slot.getRate());
+                }
                 if(StringUtils.isNotEmpty(slot.getPos())){
                     String[] ss = slot.getPos().split(",");
                     for (String s : ss) {
@@ -132,6 +155,8 @@ public abstract class SuperRoom implements IRoom{
             }
         }
         allSlots.addAll(slots.values());
+        lines =  paylineService.getMap(gameType);
+
     }
 
 
@@ -146,6 +171,12 @@ public abstract class SuperRoom implements IRoom{
         return new MsgResult(true);
     }
 
+    public boolean betCheck(long uid,long gold) {
+        if(gold<betMin || gold>betMax){
+            return false;
+        }
+        return true;
+    }
     @Override
     public MsgResult enter(long uid) {
         StringJoiner sj = new StringJoiner(",").add("uid:"+uid);
@@ -170,6 +201,7 @@ public abstract class SuperRoom implements IRoom{
             log.error(sj.add("after fail:"+afterRet.getMessage()).toString());
             return ret;
         }
+        user = UserService.ins.get(uid);
         return new MsgResult(true);
     }
 
@@ -184,6 +216,7 @@ public abstract class SuperRoom implements IRoom{
         if(curRound!=null){
             curRound.out(uid);
         }
+        user = null;
         UserService.ins.out(uid);
         return new MsgResult(true);
     }
@@ -230,9 +263,17 @@ public abstract class SuperRoom implements IRoom{
         return false;
     }
 
-
     public void update(long now){
 
+    }
+
+
+    /**
+     * 获取下注金额 比例减少后的
+     * @return
+     */
+    public long getBetGold() {
+        return betGold / base;
     }
 
     @Override
@@ -261,10 +302,6 @@ public abstract class SuperRoom implements IRoom{
         return minBalance;
     }
 
-    public long getMinBet() {
-        return minBet;
-    }
-
     @Override
     public long getId() {
         return id;
@@ -284,5 +321,17 @@ public abstract class SuperRoom implements IRoom{
 
     public long getUid() {
         return uid;
+    }
+
+    public int getBase() {
+        return base;
+    }
+
+    public int getBetMin() {
+        return betMin;
+    }
+
+    public int getBetMax() {
+        return betMax;
     }
 }

@@ -9,33 +9,32 @@ import com.z.core.service.user.UserService;
 import com.z.core.service.wallet.WalletBizService;
 import com.z.core.service.wallet.WalletService;
 import com.z.core.util.SpringContext;
+import com.z.model.BetParam;
 import com.z.model.bo.slot.Goal;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
 import com.z.model.bo.user.User;
+import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonGame;
 import com.z.model.proto.CommonUser;
 import com.z.model.proto.Game;
 import com.z.model.type.AddType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
 
 public class ClearRound extends SuperRound {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(ClearRound.class);
+
     protected CSlotService service;
     WalletBizService walletService;
     /**
      * 选择的所有符号
      */
     protected Map<Integer, Slot> slots;
-    /**
-     * 下注基数比值
-     */
-    public static final int BASE = 20;
     /**
      * 池子里所有的符号
      */
@@ -57,16 +56,21 @@ public class ClearRound extends SuperRound {
     /**
      * 连续赢的次数
      */
-    protected int lianxuC = 0;
+    protected int continueC = 0;
 
     protected int wildIndex = 0;
+    protected int base = 10;
 
-    public ClearRound(long id, CommonGame.GameType gameType, CommonGame.RoomType roomType) {
+    protected BetParam param;
+
+    public ClearRound(long id, CommonGame.GameType gameType, CommonGame.RoomType roomType, int base) {
         super(id, gameType, roomType);
         service = SpringContext.getBean(CSlotService.class);
         walletService = SpringContext.getBean(WalletBizService.class);
         board = HashBasedTable.create();
         delMap = new HashMap<>();
+        this.base = base;
+
     }
 
     @Override
@@ -81,6 +85,8 @@ public class ClearRound extends SuperRound {
 
     public void init(Map<Integer, Slot> slots) {
         this.slots = new HashMap<>(slots);
+        this.param = new BetParam();
+        this.param.setUid(uid);
     }
 
     /**
@@ -88,26 +94,41 @@ public class ClearRound extends SuperRound {
      */
     public void generate() {
         board.clear();
+        initParam();
         for (int i = 0; i < COL_SIZE; i++) {
             for (int j = 0; j < ROW_SIZE; j++) {
-                Slot slot = random(slots, i);
+                param.setX(i);
+                Slot slot = random(slots);
                 SlotModel model = SlotCommon.ins.toModel(slot, i, j);
                 board.put(model.getX(), model.getY(), model);
             }
         }
     }
 
+    public void initParam() {
+        Wallet wallet = WalletService.ins.get(uid);
+        param.setGameType(gameType);
+        param.setFree(free);
+        param.setUid(uid);
+        param.setState(user.getBetState().getK());
+        param.setFree(free);
+        param.setWinC(wallet.getWins());
+        param.setTotalC(wallet.getBetC());
+    }
+
     @Override
     public MsgResult<Game.ClearGameMsg> bet(long uid, int type, long gold, boolean free) {
-        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("type:" + type)
-                .add("gold:" + gold).add("id:" + id).add("free:" + free);
-        log.info(sj.toString());
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("type:" + type).add("gold:" + gold).add("id:" + id).add("free:" + free);
         this.free = free;
+        this.continueC = 0;
         User user = UserService.ins.get(uid);
         if (free) {
             gold = user.getFreeBetGold();
             sj.add("freeBet:" + user.getFreeBetGold());
         }
+        this.betGold = gold;
+        long realGold = getBetGold();
+        log.info(sj.add("lastG:" + gold).add("realG:" + realGold).toString());
         //下注
         MsgResult ret = super.bet(uid, type, gold, free);
         if (!ret.isOk()) {
@@ -136,7 +157,7 @@ public class ClearRound extends SuperRound {
             Game.Round.Builder b = Game.Round.newBuilder();
             for (Goal g : delMap.values()) {
                 for (SlotModel p : g.getPoints()) {
-                    b.addDelSpots(Game.Spot.newBuilder().setSymbol(p.getType()).setX(p.getX()).setY(p.getY())
+                    b.addDelSpots(Game.Spot.newBuilder().setSymbol(p.getK()).setX(p.getX()).setY(p.getY())
                             .setGold(p.isGold()).build());
                 }
                 rate += g.getRate();
@@ -146,19 +167,20 @@ public class ClearRound extends SuperRound {
             freeC += freeCout;
             int rowRate = rowRadio.get(index > rowRadio.size() - 1 ? rowRadio.size() - 1 : index);
             rowRate = free ? rowRate : rowRate * 2;
-            long addGold = (gold / BASE) * rate * rowRate;
+            long addGold = realGold * rate * rowRate;
             StringJoiner sj1 = new StringJoiner(",");
-            sj1.add("r:" + rate).add("rowR:" + rowRate).add("index:" + index).add("baseG:" + (gold / BASE)).add("addG:" + addGold).add("freeC:" + freeCout);
+            sj1.add("r:" + rate).add("rowR:" + rowRate).add("index:" + index).add("realG:" + realGold).add("addG:" + addGold).add("freeC:" + freeCout);
             log.info(sj1.toString());
-            rewardGold += b.getGold();
+            rewardGold += addGold;
             b.addAllSpots(allToModel(preBoard));
             builder.addRounds(b.setGold(addGold).setRowRadio(rowRate).build());
             winC++;
             index++;
-            lianxuC++;
+            continueC++;
             if (wildIndex > 0) {
                 break;
             }
+            param.setContinueC(continueC);
             move();
             preBoard.clear();
             preBoard.putAll(board);
@@ -172,8 +194,6 @@ public class ClearRound extends SuperRound {
         sj.add("index:" + index).add("gold1:" + rewardGold);
         if (rewardGold > 0) {
             walletService.changeGold(CommonUser.GoldType.GT_GAME, AddType.ADD, uid, rewardGold, gameType, roomType);
-        } else {
-            lianxuC = 0;
         }
         if (free) {
             user.subFree();
@@ -200,6 +220,9 @@ public class ClearRound extends SuperRound {
 
     public void reset() {
         delMap.clear();
+        param.setScatter(0);
+        param.setBaida(0);
+        param.setBonus(0);
     }
 
     /**
@@ -212,7 +235,6 @@ public class ClearRound extends SuperRound {
         checkBonus();
     }
 
-
     /**
      * 检测普通符号
      */
@@ -222,10 +244,10 @@ public class ClearRound extends SuperRound {
         Collection<SlotModel> row_1 = board.row(0).values();
         for (SlotModel m : row_1) {
             if (m == null) continue;
-            Slot slot = slots.get(m.getType());
+            Slot slot = slots.get(m.getK());
             if (slot.isBonus()) continue;
-            List<SlotModel> list = firstMap.getOrDefault(m.getType(), new ArrayList<>());
-            firstMap.putIfAbsent(m.getType(), list);
+            List<SlotModel> list = firstMap.getOrDefault(m.getK(), new ArrayList<>());
+            firstMap.putIfAbsent(m.getK(), list);
             list.add(m);
         }
         for (int k : firstMap.keySet()) {
@@ -237,14 +259,14 @@ public class ClearRound extends SuperRound {
                 //每列相同的汇总
                 boolean b_col_had = false;
                 for (SlotModel e : list) {
-                    Slot slot = slots.get(e.getType());
-                    if (e.getType() == k || slot.isBaida()) {//百搭处理
+                    Slot slot = slots.get(e.getK());
+                    if (e.getK() == k || slot.isBaida()) {//百搭处理
                         c++;
                         lianjie.add(e);
                         b_col_had = true;
                         log.info(" col:" + i + " type:" + k + "->" + e);
                         break;
-                    }else {
+                    } else {
                         break;
                     }
                 }
@@ -258,9 +280,9 @@ public class ClearRound extends SuperRound {
                 for (var m : lianjie) {
                     int x = m.getX();
                     for (SlotModel e : board.row(x).values()) {
-                        if (e.getType() == k) {
+                        if (e.getK() == k) {
                             toRemove.add(e);
-                        } else if (slots.get(e.getType()).isBaida()) {
+                        } else if (slots.get(e.getK()).isBaida()) {
                             toRemove.add(e);
                         }
                     }
@@ -272,7 +294,7 @@ public class ClearRound extends SuperRound {
                     board.remove(e.getX(), e.getY());
                     if (!e.isBaida() && e.isGold()) {
                         CSlot wildSlot = service.getWild(gameType);
-                        Slot s = slots.get(wildSlot.getType());
+                        Slot s = slots.get(wildSlot.getSymbol());
                         SlotModel baida = SlotCommon.ins.toModel(s, e.getX(), e.getY());
                         board.put(baida.getX(), baida.getY(), baida);
                     }
@@ -303,7 +325,7 @@ public class ClearRound extends SuperRound {
             int y = cell.getColumnKey();
             SlotModel m = cell.getValue();
             if (m == null) continue;
-            if (m.getType() != k) continue;
+            if (m.getK() != k) continue;
             c++;
             map.put(x, y);
         }
@@ -323,18 +345,15 @@ public class ClearRound extends SuperRound {
     }
 
     // 消除符号并让下方的符号前移‘
+
     protected void move() {
         moveForward();
         for (int x = 0; x < COL_SIZE; x++) {
             for (int y = 0; y < ROW_SIZE; y++) {
                 SlotModel m = board.get(x, y);
                 if (m == null) {
-                    Slot slot;
-                    if (x == 1) {
-                        slot = random(slots, x);
-                    } else {
-                        slot = random(slots, x);
-                    }
+                    param.setX(x);
+                    Slot slot = random(slots);
                     SlotModel model = SlotCommon.ins.toModel(slot, x, y);
                     log.info("x:-->" + x + "----->" + model);
                     board.put(x, y, model);
@@ -357,7 +376,7 @@ public class ClearRound extends SuperRound {
     }
 
     // 移动指定列中的数据x
-    private void moveForward(int x) {
+    public void moveForward(int x) {
         // 获取该列的所有SlotModel
         List<SlotModel> list = new ArrayList<>();
         for (int i = 0; i < ROW_SIZE; i++) {
@@ -377,8 +396,25 @@ public class ClearRound extends SuperRound {
 
     }
 
-    public Slot random(Map<Integer, Slot> slots, int i) {
-        return SlotCommon.ins.random(gameType, board, slots, delMap.keySet(), i, free,user);
+    /**
+     * 获取下注金额 比例减少后的
+     *
+     * @return
+     */
+    public long getBetGold() {
+        return betGold / base;
+    }
+
+    public Slot random(Map<Integer, Slot> slots) {
+        Slot slot = SlotCommon.ins.random(gameType, board, slots, delMap.keySet(), param);
+        if (slot.isScatter()) {
+            param.addScatter();
+        } else if (slot.isBonus()) {
+            param.addBonus();
+        } else if (slot.isBaida()) {
+            param.addBaida();
+        }
+        return slot;
     }
 
     public void print(Table<Integer, Integer, SlotModel> board) {

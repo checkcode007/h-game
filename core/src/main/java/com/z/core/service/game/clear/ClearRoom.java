@@ -4,6 +4,7 @@ package com.z.core.service.game.clear;
 import com.z.common.util.PbUtils;
 import com.z.core.service.game.game.IRound;
 import com.z.core.service.game.game.SuperRoom;
+import com.z.core.service.game.majiang.MaJiangRound;
 import com.z.core.service.game.slot.CSlotService;
 import com.z.core.service.user.UserService;
 import com.z.core.util.SpringContext;
@@ -11,14 +12,12 @@ import com.z.model.bo.slot.Slot;
 import com.z.model.bo.user.User;
 import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CRoom;
-import com.z.model.mysql.cfg.CSlot;
+import com.z.model.proto.CommonGame;
 import com.z.model.proto.Game;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -26,13 +25,7 @@ import java.util.Map;
  * 消除游戏房间
  */
 public class ClearRoom extends SuperRoom {
-    protected Logger log = LoggerFactory.getLogger(getClass());
-    CSlotService service;
-    /**
-     * 选择的所有符号
-     */
-   protected Map<Integer, Slot> slots;
-
+    private static final Log log = LogFactory.getLog(ClearRoom.class);
     /**
      * 是否免费轮
      */
@@ -45,25 +38,7 @@ public class ClearRoom extends SuperRoom {
 
     public ClearRoom(CRoom cRoom, long uid) {
         super(cRoom,uid);
-        service = SpringContext.getBean(CSlotService.class);
-        slots = new HashMap<>();
     }
-
-    @Override
-    public void init(CRoom cRoom) {
-        super.init(cRoom);
-        Map<Integer, List<CSlot>> map = service.getMap(gameType);
-        for (List<CSlot> list : map.values()) {
-            for (CSlot slot : list) {
-                int k = slot.getSymbol();
-                Slot s = slots.getOrDefault(k, new Slot(slot.getW1()));
-                slots.putIfAbsent(k, s);
-                BeanUtils.copyProperties(slot, s);
-                s.setK(slot.getSymbol());
-            }
-        }
-    }
-
 
     @Override
     public MsgResult enter(long uid) {
@@ -83,6 +58,7 @@ public class ClearRoom extends SuperRoom {
      */
     public MsgResult<Game.ClearGameMsg> bet(long uid, long gold,boolean free) {
         this.free = free;
+        this.betGold = gold;
         User user = UserService.ins.get(uid);
         ClearRound round =(ClearRound) createRound(uid);
         roundInit(uid,round);
@@ -98,12 +74,19 @@ public class ClearRoom extends SuperRoom {
      * @param uid
      * @return
      */
-    public IRound createRound(long uid) {//百变玛丽
-        return  new ClearRound(roundIndex.incrementAndGet(),gameType,roomType);
+    public IRound createRound(long uid) {
+
+        if(gameType == CommonGame.GameType.MAJIANG_2){
+            return  new MaJiangRound(roundIndex.incrementAndGet(),gameType,roomType,base);
+        }else{
+            return  new ClearRound(roundIndex.incrementAndGet(),gameType,roomType,base);
+        }
+
     }
     public void roundInit(long uid,ClearRound round){
         roundMap.put(round.getId(), round);
         round.init(uid,ROW_SIZE, COL_SIZE);
         round.init(slots);
     }
+
 }

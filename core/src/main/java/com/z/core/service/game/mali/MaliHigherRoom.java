@@ -16,8 +16,8 @@ import com.z.model.proto.CommonGame;
 import com.z.model.proto.CommonUser;
 import com.z.model.proto.Game;
 import com.z.model.type.AddType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
 
@@ -25,12 +25,14 @@ import java.util.*;
  * 高级玩法房间
  */
 public class MaliHigherRoom extends SlotRoom {
-    protected Logger log = LoggerFactory.getLogger(getClass());
+    private static final Log log = LogFactory.getLog(MaliHigherRoom.class);
 
     int winC= 0;
     int totalC= 0;
     public MaliHigherRoom(CRoom cRoom, long uid) {
         super(cRoom, uid);
+        COL_SIZE = 5;
+        ROW_SIZE = 1;
     }
 
 
@@ -59,7 +61,7 @@ public class MaliHigherRoom extends SlotRoom {
             return roundCheck;
         }
         betGold = gold;
-
+        initParam();
         //生成符号
         generate();
         print();
@@ -71,7 +73,7 @@ public class MaliHigherRoom extends SlotRoom {
         for (Integer higher : allList) {
             if (sameType == 0) {
                 sameType = higher;
-                sameC++;
+//                sameC++;
             } else if (sameType == higher) {
                 sameC++;
             } else {
@@ -95,9 +97,9 @@ public class MaliHigherRoom extends SlotRoom {
         long rewardGold = betGold * rate;
 
         Game.MaliHighMsg.Builder b = Game.MaliHighMsg.newBuilder().setGold(rewardGold).setType(CommonGame.MaliHigher.forNumber(sameType)).setGold(rate).setLeaveC(user.getHighC());
-        for (int i = 1; i < 5; i++) {
+        for (int i = 1; i < COL_SIZE; i++) {
             SlotModel m = board.get(i, 0);
-            b.addPools(CommonGame.MaliHigher.forNumber(m.getType()));
+            b.addPools(CommonGame.MaliHigher.forNumber(m.getK()));
         }
         var ret = new MsgResult<Game.MaliHighMsg>(true);
         if (rewardGold > 0) {
@@ -113,19 +115,19 @@ public class MaliHigherRoom extends SlotRoom {
     }
 
     @Override
-    public Slot random(Map<Integer, Slot> slots, int i) {
+    public Slot random(Map<Integer, Slot> slots) {
         Set<Integer> goals = new HashSet<>();
         for (SlotModel m : board.values()) {
-            goals.add(m.getType());
+            goals.add(m.getK());
         }
-        return SlotCommon.ins.randomHigher(gameType, slots,goals, i,winC,totalC);
+        return SlotCommon.ins.randomHigher(gameType, slots,goals,param);
     }
 
     public List<Integer>  allSymbol(){
         List<Integer> highers = new ArrayList<>();
         if(board.isEmpty())return highers;
-        for (int i = 0; i < 5; i++) {
-            int type = board.get(i,0).getType();
+        for (int i = 0; i < COL_SIZE; i++) {
+            int type = board.get(i,0).getK();
             highers.add(type);
         }
         return highers;

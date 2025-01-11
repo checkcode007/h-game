@@ -5,6 +5,7 @@ import com.z.core.service.cfg.CCfgBizService;
 import com.z.core.service.game.game.EsGameBizService;
 import com.z.core.service.user.UserBizService;
 import com.z.core.service.user.UserService;
+import com.z.core.util.SpringContext;
 import com.z.model.mysql.GUser;
 import com.z.model.proto.CommonGame;
 import org.slf4j.LoggerFactory;
@@ -21,8 +22,6 @@ public class CardService {
     @Autowired
     UserBizService userBizService;
     @Autowired
-    CCfgBizService cfgBizService;
-    @Autowired
     EsGameBizService esGameBizService;
 
     Map<Long,CardGame> map = new ConcurrentHashMap<>();
@@ -34,7 +33,8 @@ public class CardService {
         CardPlayer banker = new CardPlayer(robot.getId(),1000,true,false);
         long id = SnowflakeId.ins.gameId();
         CardGame cardGame = new CardGame(id,roomId,roomType,gameType);
-        cardGame.init(banker,cfgBizService.getNiuniuTime());
+
+        cardGame.init(banker,CCfgBizService.ins.getNiuniuTime());
         map.put(id,cardGame);
         List<CardGame> list = roomMap.getOrDefault(roomId,new ArrayList<>());
         list.add(cardGame);

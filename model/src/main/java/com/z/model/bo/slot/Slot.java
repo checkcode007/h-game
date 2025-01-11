@@ -11,7 +11,8 @@ public class Slot {
     int k;//符号的number
     int c1;//普通出现的次数
     int c2;//金色普通出现的次数
-    int rate; // 倍率
+    int rate1; // 倍率最小倍率
+    int rate2; // 倍率最大倍率
     int free; //免费次数
     int w1;//权重1
     int w2;//权重2
