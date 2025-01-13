@@ -167,6 +167,8 @@ message  Spot{
   int32 y = 3;//行。 （列中的第几行）
   int32 changeType = 4;//要变成的符号（金色珍珠周围变成普通珍珠，少林足球要变的类型）
   bool gold = 5;//是否是金色牌
+  int32 c=6;//个数（阿拉丁使用）
+  repeated Point from=7;//来源坐标（用于阿拉丁免费押注，大百搭）
 }
 message Point{
   int32 x = 1; //列 （第几列）

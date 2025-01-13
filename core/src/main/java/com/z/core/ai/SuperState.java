@@ -42,30 +42,26 @@ public abstract class SuperState {
         int continueC =param.getContinueC();
         //检测特定游戏
         list = checkGame(gameType, board, list, param.isFree());
+//        print(list,"random1");
         //检测每轴的个数
         checkCount(board, list, x);
-//        for (Slot slot : list) {
-//            log.info("slot-1--->"+slot.getK()+" w:"+slot.getW());
-//        }
+        print(list,"random2");
         //检测位置
         checkPos(list, x);
-
+        print(list,"random3");
         //检测连续的次数
         checkContinue(board, list, x, continueC);
-//        for (Slot slot : list) {
-//            log.info("slot-2--->"+slot.getK()+" w:"+slot.getW());
-//        }
+        print(list,"random4");
         //高，中，低状态处理
 
         betStateFilter(board, list,param);
-//        for (Slot slot : list) {
-//            log.info("slot-3--->"+slot.getK()+" w:"+slot.getW());
-//        }
+        print(list,"random5");
+        //检查每列
+        checkCol(board,list,param);
+        print(list,"random6");
         //动态修改权重
         var map = weight(slots, list, goals, param);
-//        map.forEach((k,v)->{
-//            log.info("=====>k:"+k+",v:"+v);
-//        });
+        print(list,"random7");
         //高，中，低状态处理
         betStateWight(board, map, slots, param);
         //选择符号
@@ -104,29 +100,41 @@ public abstract class SuperState {
     void betStateWight(Table<Integer, Integer, SlotModel> board, Map<Integer, Integer> map, Map<Integer, Slot> slots, BetParam param){
 
     }
-
+//todo 水浒传从右到左处理
+    public void checkCol(Table<Integer, Integer, SlotModel> board, List<Slot> list,BetParam param) {
+        //选择符号
+        int x = param.getX();
+        switch (x) {
+            case 0:
+                print(list, "checkCol01");
+                col_0(board, list, param);
+                print(list, "checkCol02");
+                break;
+            case 1:
+                print(list, "checkCol11");
+                col_1(board, list, param);
+                print(list, "checkCol12");
+                break;
+            case 2:
+                print(list, "checkCol21");
+                col_2(board, list, param);
+                print(list, "checkCol22");
+                break;
+            case 3:
+                print(list, "checkCol31");
+                col_3(board, list, param);
+                print(list, "checkCol32");
+                break;
+            case 4:
+                print(list, "checkCol41");
+                col_4(board, list, param);
+                print(list, "checkCol42");
+                break;
+        }
+    }
     public Slot selectSlot(Table<Integer, Integer, SlotModel> board,Map<Integer, Integer> map, Map<Integer, Slot> slots, List<Slot> list,BetParam param) {
         //选择符号
         int totalW1 = 0;
-        int x = param.getX();
-        switch (x){
-            case 0:
-                col_0(board,list,param);
-                break;
-            case 1:
-                col_1(board,list,param);
-                break;
-            case 2:
-                col_2(board,list,param);
-                break;
-            case 3:
-                col_3(board,list,param);
-                break;
-            case 4:
-                col_4(board,list,param);
-                break;
-        }
-
         for (Integer v : map.values()) {
             totalW1 += v;
         }
@@ -362,7 +370,7 @@ public abstract class SuperState {
     }
     public void interrupt(Table<Integer, Integer, SlotModel> board ,List<Slot> list,int index){
         Set<Integer> lastSet = new HashSet<>();
-        for (int i = 0; i < index+1; i++) {
+        for (int i = 0; i < index; i++) {
             Set<Integer> set = new HashSet<>();
             for (SlotModel m : board.row(i).values()) {
                 set.add(m.getK());
@@ -373,7 +381,20 @@ public abstract class SuperState {
                 lastSet.retainAll(set);
             }
         }
+        StringJoiner sj = new StringJoiner(",");
+        for (Integer i : lastSet) {
+            sj.add(i+"");
+        }
+        log.info("last-->"+sj);
+        print(list,"interrupt1-->"+index);
         list.removeIf(slot -> lastSet.contains(slot.getK()));
+        print(list,"interrupt2-->"+index);
     }
-
+    public void print(List<Slot> list,String action){
+        StringJoiner sj = new StringJoiner(",");
+        for (Slot slot : list) {
+            sj.add(slot.getK()+"");
+        }
+        log.info(action+"--->"+sj);
+    }
 }

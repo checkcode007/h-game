@@ -19,7 +19,7 @@ public class GLine9RankDao extends AbstractMapperService<GLine9Rank,Long> {
     static final String TABLE_NAME = "g_line9_rank";
 
     @Autowired
-    GBankLogMaper maper;
+    GLine9RankMaper maper;
 
     @Override
     public String cacheNamespace() {
@@ -27,7 +27,7 @@ public class GLine9RankDao extends AbstractMapperService<GLine9Rank,Long> {
     }
 
     @Override
-    protected GBankLogMaper getMapper() {
+    protected GLine9RankMaper getMapper() {
         return maper;
     }
 

@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 每一个slot对象
  * @param
@@ -30,12 +33,29 @@ public class SlotModel{
      */
     int c;
 
+    int x1; // 来源坐标X
+    int y1; //来源坐标X
+    List<Point> fromPoints ;
     public void  addC(int c){
         this.c+=c;
+    }
+    public void  addFrom(int x,int y){
+        if(fromPoints == null){
+            fromPoints = new ArrayList<>();
+        }
+        fromPoints.add(new Point(x, y));
     }
 
     @Override
     public String toString() {
+        return "m{" +
+                "k=" + k +
+                ", x=" + x +
+                ", y=" + y +
+                '}';
+    }
+
+    public String toAllString() {
         return "m{" +
                 "k=" + k +
                 ", x=" + x +

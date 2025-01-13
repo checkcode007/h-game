@@ -58,21 +58,23 @@ public class AladdinRoom extends SlotRoom {
         return ret;
     }
 
+
     public void putPre() {
         if (!free) return;
         preBaida.clear();
         List<SlotModel> list = new ArrayList<>();
-        for (int j = 0; j < ROW_SIZE; j++) {
-            for (int i = 0; i < COL_SIZE; i++) {
+        for (int i = 0; i < COL_SIZE; i++) {
+            for (int j = 0; j < ROW_SIZE; j++) {
                 SlotModel m = board.get(i, j);
-                Slot slot = slots.get(m.getK());
-                if (!slot.isBaida()) continue;
-                if (j == 0) {
+                if (!m.isBaida()) continue;
+                if (i == 0) {
                     list.add(m);
                 } else {
-                    int posY = RandomUtil.randomInt(0, COL_SIZE);
+                    m.setX1(m.getX());
+                    m.setY1(m.getY());
+                    int posY = RandomUtil.randomInt(0, ROW_SIZE);
                     m.setY(posY);
-                    int posX = j - 1;
+                    int posX =i - 1;
                     m.setX(posX);
                     list.add(m);
                 }
@@ -81,10 +83,13 @@ public class AladdinRoom extends SlotRoom {
         for (SlotModel m : list) {
             int x = m.getX();
             int y = m.getY();
+            if(x ==  COL_SIZE-1) continue;
             SlotModel mm = preBaida.get(x, y);
             if (mm == null) {
+                m.addFrom(m.getX1(),m.getY1());
                 preBaida.put(x, y, m);
             } else {
+                mm.addFrom(m.getX1(),m.getY1());
                 mm.addC(m.getC());
             }
         }
@@ -100,7 +105,7 @@ public class AladdinRoom extends SlotRoom {
                 if (model == null) {
                     param.setX(i);
                     Slot slot = random(slots);
-                    model = SlotCommon.ins.toModel(slot,i,j);
+                    model = SlotCommon.ins.toModel(slot, i, j);
                 }
                 board.put(model.getX(), model.getY(), model);
             }

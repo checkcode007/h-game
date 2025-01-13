@@ -4,7 +4,6 @@ package com.z.core.service.game.line9;
 import com.google.protobuf.ByteString;
 import com.z.core.net.channel.UserChannelManager;
 import com.z.core.service.game.PoolService;
-import com.z.core.service.game.majiang.MaJiangRound;
 import com.z.core.service.game.slot.CSlotService;
 import com.z.core.service.game.slot.SlotRoom;
 import com.z.core.service.wallet.WalletService;
@@ -19,14 +18,11 @@ import com.z.model.proto.Game;
 import com.z.model.proto.MyMessage;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 房间
  */
 public class Line9Room extends SlotRoom {
-//    protected Logger log = LoggerFactory.getLogger(getClass());
     private static final Log log = LogFactory.getLog(Line9Room.class);
 
     Line9RankService line9Service;

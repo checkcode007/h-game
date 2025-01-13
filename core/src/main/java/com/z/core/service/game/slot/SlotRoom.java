@@ -116,6 +116,7 @@ public class SlotRoom extends SuperRoom {
                 Slot slot = random(slots);
                 SlotModel model =  SlotCommon.ins.toModel(slot,i,j);
                 board.put(model.getX(), model.getY(), model);
+                log.info(model.toString());
             }
         }
     }
@@ -381,6 +382,12 @@ public class SlotRoom extends SuperRoom {
         for (SlotModel m : board.values()) {
             Game.Spot.Builder b = Game.Spot.newBuilder();
             b.setSymbol(m.getK()).setX(m.getX()).setY(m.getY()).setChangeType(m.getChangeType());
+            b.setC(m.getC());
+            if(m.getFromPoints()!=null){
+                for (Point p : m.getFromPoints()) {
+                    b.addFrom(Game.Point.newBuilder().setX(p.getX()).setY(p.getY()));
+                }
+            }
             list.add(b.build());
         }
         return list;

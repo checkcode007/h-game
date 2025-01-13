@@ -64,4 +64,5 @@ public class Slot {
     public boolean containsPos(int pos) {
         return this.pos.contains(pos);
     }
+
  }
