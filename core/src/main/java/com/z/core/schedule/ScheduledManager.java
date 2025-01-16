@@ -42,19 +42,19 @@ public class ScheduledManager implements ApplicationListener<ApplicationReadyEve
     public void onApplicationEvent(ApplicationReadyEvent event) {
         MySchedule schedule = new MySchedule(1,"common",this::exe,20,10, TimeUnit.SECONDS);
         scheduleList.add(schedule);
-        schedule = new MySchedule(1,"card",this::exe1,25,5, TimeUnit.SECONDS);
+        schedule = new MySchedule(1,"card",this::exe1,25,20, TimeUnit.SECONDS);
         scheduleList.add(schedule);
-        schedule = new MySchedule(1,"user",this::exe2,25,1, TimeUnit.SECONDS);
+        schedule = new MySchedule(1,"user",this::exe2,25,60, TimeUnit.SECONDS);
         scheduleList.add(schedule);
 
         schedule = new MySchedule(1,"cfg",this::exeCfg,10,10, TimeUnit.MINUTES);
         scheduleList.add(schedule);
 
-        schedule = new MySchedule(1,"room",this::exe5,10,5, TimeUnit.SECONDS);
+        schedule = new MySchedule(1,"room",this::exe5,10,10, TimeUnit.SECONDS);
         scheduleList.add(schedule);
 
 
-        schedule = new MySchedule(1,"rwdpool",this::exe6,10,5, TimeUnit.MINUTES);
+        schedule = new MySchedule(1,"rwdpool",this::exe6,10,10, TimeUnit.MINUTES);
         scheduleList.add(schedule);
     }
     public void exe(){

@@ -4,7 +4,7 @@ import com.google.common.collect.Table;
 import com.z.model.BetParam;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
-import com.z.model.type.BetState;
+import com.z.model.type.SlotState;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -16,7 +16,7 @@ import java.util.Set;
 public class LowState extends SuperState {
     private static final Log log = LogFactory.getLog(LowState.class);
 
-    public LowState(BetState k) {
+    public LowState(SlotState k) {
         super(k);
     }
 

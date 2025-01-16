@@ -7,7 +7,7 @@ import com.z.model.BetParam;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
 import com.z.model.proto.CommonGame;
-import com.z.model.type.BetState;
+import com.z.model.type.SlotState;
 import com.z.model.type.PosType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,9 +20,11 @@ public abstract class SuperState {
     public static final int diffW1 = 100;
     public static final int diffHighW1 = 5;
 
-    protected BetState k;
+    public static final Random RANDOM = new Random();
 
-    public SuperState(BetState k) {
+    protected SlotState k;
+
+    public SuperState(SlotState k) {
         this.k = k;
     }
 
@@ -390,6 +392,8 @@ public abstract class SuperState {
         list.removeIf(slot -> lastSet.contains(slot.getK()));
         print(list,"interrupt2-->"+index);
     }
+
+
     public void print(List<Slot> list,String action){
         StringJoiner sj = new StringJoiner(",");
         for (Slot slot : list) {
@@ -397,4 +401,6 @@ public abstract class SuperState {
         }
         log.info(action+"--->"+sj);
     }
+
+
 }

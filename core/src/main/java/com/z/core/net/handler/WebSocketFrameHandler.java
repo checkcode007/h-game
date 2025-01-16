@@ -31,6 +31,10 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocket
 //    protected Logger log = LoggerFactory.getLogger(getClass());
     private static final Log log = LogFactory.getLog(WebSocketFrameHandler.class);
 
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
+    }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, WebSocketFrame frame){
@@ -57,6 +61,7 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocket
         String clientIp = getClientIp(ctx);
         StringJoiner sj = new StringJoiner(",").add("ip:"+clientIp).add("frame:"+frame.getClass());
         log.info(sj.toString());
+
         if (frame instanceof TextWebSocketFrame) {
             log.info(sj.add("type:text").toString());
             // 处理文本帧
@@ -65,12 +70,20 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocket
             ctx.channel().writeAndFlush(new TextWebSocketFrame("Hello from server!"));
             log.debug(sj.add("send").toString());
         } else if (frame instanceof BinaryWebSocketFrame) {
+
             log.debug(sj.add("type:binary").toString());
             // 处理二进制帧（Protobuf）
             MyMessage.MyMsgReq message = MyMessage.MyMsgReq.parseFrom(frame.content().nioBuffer());
-            log.debug(sj.add("msgId:"+message.getId()).add("rec:"+message).toString());
+            log.info(sj.add("msgId:"+message.getId()).add("rec:"+message).toString());
             ProtocolDispatcher dispatcher = SpringContext.getBean(ProtocolDispatcher.class);
 
+            // 心跳协议处理
+            if (message.getId() == 1) { // 假设 10000 为心跳消息的 ID
+                log.info(sj.add("heartbeat received").toString());
+                sendHeartbeat(ctx);
+                log.info(sj.add("heartbeat response sent").toString());
+                return;
+            }
 //            logReq(message);
             AbstractMessageLite res = dispatcher.dispatch(ctx,message);
             // 响应 Protobuf 消息
@@ -157,51 +170,69 @@ public class WebSocketFrameHandler extends SimpleChannelInboundHandler<WebSocket
         super.channelInactive(ctx);
         log.info("remove:"+userId);
     }
+
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+
         cause.printStackTrace();
+
         ctx.close();
+        log.error("exceptionCaught:"+cause.getMessage());
+        log.error("==>",cause);
+        log.error("uid:"+ ctx.channel().attr(ChannelAttributes.USER_ID).get());
     }
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent) evt;
-            if (event.state() == IdleState.READER_IDLE) {
-                // 如果连接空闲超过设定时间，触发心跳机制
-                log.info("Sending Ping to client");
-                PingWebSocketFrame ping = new PingWebSocketFrame();
-                ctx.writeAndFlush(ping);
+            switch (event.state()) {
+                case READER_IDLE:
+                    log.warn("Reader idle detected, no data received.");
+                    ctx.close(); // 超时关闭连接
+                    break;
+                case WRITER_IDLE:
+                    log.warn("Writer idle detected, no data sent.");
+                    sendHeartbeat(ctx);
+                    break;
+                case ALL_IDLE:
+                    log.warn("All idle detected.");
+                    break;
             }
         } else {
             super.userEventTriggered(ctx, evt);
         }
     }
+    private void sendHeartbeat(ChannelHandlerContext ctx) {
+
+        // 构造响应帧
+        // 发送心跳响应
+        MyMessage.MyMsgRes heartbeatResponse = MyMessage.MyMsgRes.newBuilder()
+                .setId(2).setOk(true)
+                .setHeart(MyMessage.Heartbeat.newBuilder()
+                        .setTimestamp(System.currentTimeMillis()).setMessage("ack").build()).build();
+
+        byte[] messageBytes = heartbeatResponse.toByteArray();
+        BinaryWebSocketFrame resFrame = new BinaryWebSocketFrame(Unpooled.wrappedBuffer(messageBytes));
+        ctx.channel().writeAndFlush(resFrame);
+        log.info("Heartbeat request sent.");
+    }
+
+    //    @Override
+//    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+//        if (evt instanceof IdleStateEvent) {
+//            IdleStateEvent event = (IdleStateEvent) evt;
+//            if (event.state() == IdleState.READER_IDLE) {
+//                // 如果连接空闲超过设定时间，触发心跳机制
+//                log.info("Sending Ping to client");
+//                PingWebSocketFrame ping = new PingWebSocketFrame();
+//                ctx.writeAndFlush(ping);
+//            }
+//        } else {
+//            super.userEventTriggered(ctx, evt);
+//        }
+//    }
     private String getClientIp(ChannelHandlerContext ctx) {
         InetSocketAddress socketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
         return socketAddress.getAddress().getHostAddress();
     }
-
-    public static void main(String[] args) {
-
-        //
-        User.C_10001 req =  User.C_10001.newBuilder().setPhone("1232321").setDeviceId("adasfsdfas").build();
-
-        MyMessage.MyMsgReq.Builder builder =  MyMessage.MyMsgReq.newBuilder();
-        builder.addMsg(ByteString.copyFrom(req.toByteArray()));
-        MyMessage.MyMsgReq msgReq = builder.setId(10001).build();
-
-        byte[] bytes = msgReq.toByteArray();
-//        bytes =new byte[]{8, 1, 16, -111, 78, 26, 60, 10, 11, 49, 55, 51, 51, 49, 55, 56, 48, 56, 56, 48, 18, 3, 49, 50, 51, 26, 40, 55, 57, 102, 48, 56, 50, 99, 50, 51, 100, 57, 55, 102, 98, 100, 56, 49, 50, 100, 52, 48, 99, 97, 49, 49, 55, 53, 50, 50, 51, 54, 51, 54, 51, 100, 98, 57, 99, 52, 51, 0, 0, 0, 0};
-
-        try {
-            MyMessage.MyMsgReq myMessage =  MyMessage.MyMsgReq.parseFrom(bytes);
-            List<ByteString> list = myMessage.getMsgList();
-            User.C_10001  res =  User.C_10001.parseFrom(ByteString.copyFrom(list).toByteArray());
-//            log.info("反序列化成功:{}, {}",myMessage,res);
-        } catch (InvalidProtocolBufferException e) {
-//            log.error("反序列化失败: {}", e.getMessage());
-        }
-
-    }
-
 }

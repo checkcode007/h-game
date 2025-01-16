@@ -4,7 +4,7 @@ import com.google.common.collect.Table;
 import com.z.model.BetParam;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
-import com.z.model.type.BetState;
+import com.z.model.type.SlotState;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class HighState extends SuperState{
 
-    public HighState(BetState k) {
+    public HighState(SlotState k) {
         super(k);
     }
 

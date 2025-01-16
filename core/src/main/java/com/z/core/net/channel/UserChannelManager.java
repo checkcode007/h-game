@@ -37,7 +37,7 @@ public class UserChannelManager {
     public static void removeUser(long userId) {
         logger.info("delChannel------->"+userId);
         channelMap.remove(userId);
-        SpringContext.getBean(RoomBizService.class).out(userId);
+        SpringContext.getBean(RoomBizService.class).out(userId,"logout");
     }
     public static Collection<Channel> getAllChannel() {
         return channelMap.values();

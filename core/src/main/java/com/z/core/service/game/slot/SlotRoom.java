@@ -2,18 +2,11 @@ package com.z.core.service.game.slot;
 
 
 import cn.hutool.core.util.RandomUtil;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
 import com.z.core.service.game.PoolService;
 import com.z.core.service.game.game.IRound;
 import com.z.core.service.game.game.Round;
 import com.z.core.service.game.game.SuperRoom;
-import com.z.core.service.user.UserService;
-import com.z.core.service.wallet.WalletService;
-import com.z.model.BetParam;
 import com.z.model.bo.slot.*;
-import com.z.model.bo.user.User;
-import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CRoom;
 import com.z.model.mysql.cfg.CSlot;
@@ -86,8 +79,6 @@ public class SlotRoom extends SuperRoom {
      */
     protected int quitType =0;
 
-    protected BetParam param;
-
 
     public SlotRoom(CRoom cRoom,long uid) {
         super(cRoom,uid);
@@ -101,8 +92,6 @@ public class SlotRoom extends SuperRoom {
         if(slot!=null){
             quitType = slot.getSymbol();
         }
-        param = new BetParam();
-        param.setUid(uid);
     }
     /**
      * 生成符号
@@ -154,15 +143,6 @@ public class SlotRoom extends SuperRoom {
         roundMap.put(uid, round);
         return round;
     }
-    public void initParam(){
-        Wallet wallet = WalletService.ins.get(uid);
-        param.setGameType(gameType);
-        param.setUid(uid);
-        param.setState(user.getBetState().getK());
-        param.setFree(free);
-        param.setWinC(wallet.getWins());
-        param.setTotalC(wallet.getBetC());
-    }
     /**
      * 下注
      *
@@ -174,7 +154,7 @@ public class SlotRoom extends SuperRoom {
         nextRound();
         var round = createRound(uid, gold);
         StringJoiner sj = new StringJoiner(",").add("gameType:"+gameType).add("roomType:"+roomType).add("uid:"+uid).add("rid:" + id).add("roundId:" + round.getId()).add("uid:" + uid).add("gold:" + gold);
-        log.info(sj.add("betState:"+user.getBetState()).toString());
+        log.info(sj.add("betState:"+user.getSlotState()).toString());
         var roundCheck = round.bet(uid, 0, gold, free);
         if (!roundCheck.isOk()) {
             log.error("roundCheck fail");
@@ -189,7 +169,7 @@ public class SlotRoom extends SuperRoom {
         long realGold = getBetGold();
         sj.add("lastG:" + betGold).add("realG:" + realGold);
         //生成符号
-        log.info("用户状态:"+user.getBetState()+"生成------>:" + round.getId());
+        log.info("用户状态:"+user.getSlotState()+"生成------>:" + round.getId());
         generate();
         print();
         spots = toSpots();

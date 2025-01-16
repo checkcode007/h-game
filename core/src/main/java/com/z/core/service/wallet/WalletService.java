@@ -13,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -61,6 +62,7 @@ public enum WalletService {
         for (Wallet bo : map.values()) {
             if(bo.isChange()){
                 log.info(bo.toString());
+                bo.getWallet().setUpdateTime(new Date());
                 dao.update(bo.getWallet());
                 bo.setChange(false);
             }

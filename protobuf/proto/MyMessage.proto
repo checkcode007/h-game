@@ -2,18 +2,26 @@ syntax = "proto3";
 
 package com.z.model.proto;
 
+//心跳 （C->S: 1  S->C:2）
+message Heartbeat {
+  int64 timestamp = 1;  // 心跳时间戳
+  string message = 2;   // 可选心跳附带信息（如"PING"或"ACK"）（客户端是pjng 服务器ack）
+}
+
 //上行 -(c->s)
 message MyMsgReq {
-  int32 id =1; //消息号-- 单数
+  int32 id =1; //消息号-- 单数 （协议号：心跳 1）
   repeated bytes msg=2; //消息体
+  Heartbeat heart=3; //心跳
 }
 //下行-（s->c）
 message MyMsgRes {
-  int32 id =1; //消息号--双数
+  int32 id =1; //消息号--双数。（协议号：心跳 2）
   repeated bytes msg =2; //消息体
   bool ok =3; //消息是否成功 （true 成功，false 失败）
   FailType  failType=4;//失败消息类型（可以为null，null默认普通提示显示）
   string failMsg =5;//失败消息 （失败后的消息提示（可以是null））
+  Heartbeat heart=6; //心跳
 }
 
 //广播消息

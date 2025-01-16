@@ -4,12 +4,12 @@ import com.google.common.collect.Table;
 import com.z.model.BetParam;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
-import com.z.model.type.BetState;
+import com.z.model.type.SlotState;
 
 import java.util.*;
 
 public class MidState extends SuperState {
-    public MidState(BetState k) {
+    public MidState(SlotState k) {
         super(k);
     }
     @Override

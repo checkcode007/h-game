@@ -2,13 +2,13 @@ package com.z.core.service.game.game;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.z.core.service.cfg.CCfgBizService;
 import com.z.core.service.game.slot.CPaylineService;
 import com.z.core.service.game.slot.CSlotService;
 import com.z.core.service.user.UserService;
 import com.z.core.service.wallet.WalletBizService;
 import com.z.core.service.wallet.WalletService;
 import com.z.core.util.SpringContext;
+import com.z.model.BetParam;
 import com.z.model.bo.slot.Payline;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
@@ -105,6 +105,8 @@ public abstract class SuperRoom implements IRoom{
     protected int betMax;
     protected User user;
 
+    protected BetParam param;
+
 
     public SuperRoom(CRoom cRoom,long uid) {
         this.gameType = CommonGame.GameType.forNumber(cRoom.getGameType());
@@ -156,10 +158,19 @@ public abstract class SuperRoom implements IRoom{
         }
         allSlots.addAll(slots.values());
         lines =  paylineService.getMap(gameType);
-
+        param = new BetParam();
+        param.setUid(uid);
+        user = UserService.ins.get(uid);
     }
 
-
+    public void initParam(){
+        Wallet wallet = WalletService.ins.get(uid);
+        param.setGameType(gameType);
+        param.setUid(uid);
+        param.setState(user.getSlotState().getK());
+        param.setWinC(wallet.getWins());
+        param.setTotalC(wallet.getBetC());
+    }
     @Override
     public MsgResult check(long uid,long curGold) {
         if(curC>maxC){
@@ -201,7 +212,7 @@ public abstract class SuperRoom implements IRoom{
             log.error(sj.add("after fail:"+afterRet.getMessage()).toString());
             return ret;
         }
-        user = UserService.ins.get(uid);
+
         return new MsgResult(true);
     }
 
@@ -218,6 +229,7 @@ public abstract class SuperRoom implements IRoom{
         }
         user = null;
         UserService.ins.out(uid);
+        param = null;
         return new MsgResult(true);
     }
 

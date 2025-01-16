@@ -1,7 +1,5 @@
 package com.z.model.mysql;
 
-import com.z.model.type.BetState;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

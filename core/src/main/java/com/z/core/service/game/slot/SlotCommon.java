@@ -4,12 +4,14 @@ import com.google.common.collect.Table;
 import com.z.core.ai.LowState;
 import com.z.core.ai.SpecialState;
 import com.z.core.ai.SuperState;
+import com.z.core.ai.fish.HighState;
+import com.z.core.ai.fish.MidState;
 import com.z.model.BetParam;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
 import com.z.model.proto.CommonGame;
 import com.z.model.proto.Game;
-import com.z.model.type.BetState;
+import com.z.model.type.SlotState;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,7 +29,7 @@ public enum SlotCommon {
 
     public static final int diffHighW1 = 5;
 
-    Map<BetState, SuperState> betStateMap = new HashMap<>();
+    Map<SlotState, SuperState> betStateMap = new HashMap<>();
 
 
     SlotCommon() {
@@ -35,10 +37,10 @@ public enum SlotCommon {
     }
 
     public void init() {
-        betStateMap.put(BetState.LOW_BET,new LowState(BetState.LOW_BET));
-        betStateMap.put(BetState.MEDIUM_BET,new LowState(BetState.MEDIUM_BET));
-        betStateMap.put(BetState.HIGH_BET,new LowState(BetState.HIGH_BET));
-        betStateMap.put(BetState.SPECIAL_BET,new SpecialState(BetState.SPECIAL_BET));
+        betStateMap.put(SlotState.LOW_BET,new LowState(SlotState.LOW_BET));
+        betStateMap.put(SlotState.MEDIUM_BET,new MidState(SlotState.MEDIUM_BET));
+        betStateMap.put(SlotState.HIGH_BET,new HighState(SlotState.HIGH_BET));
+        betStateMap.put(SlotState.SPECIAL_BET,new SpecialState(SlotState.SPECIAL_BET));
     }
 
     /**
@@ -52,14 +54,14 @@ public enum SlotCommon {
      * @return
      */
     public Slot random(CommonGame.GameType gameType, Table<Integer,Integer,SlotModel> board, Map<Integer, Slot> slots, Set<Integer> goals, BetParam param) {
-        SuperState betState = betStateMap.get(BetState.getBetState(param.getState()));
+        SuperState betState = betStateMap.get(SlotState.getBetState(param.getState()));
         if(gameType == CommonGame.GameType.BAIBIAN_XIAOMALI_HIGHER || gameType == CommonGame.GameType.SHUIHUZHUAN_HIGHER){
             return randomHigher(gameType,slots,goals,param);
         }
         return betState.random(gameType, board, slots, goals, param);
     }
     public Slot randomHigher(CommonGame.GameType gameType,Map<Integer, Slot> slots, Collection<Integer> goals, BetParam param) {
-        SuperState betState = betStateMap.get(BetState.SPECIAL_BET);
+        SuperState betState = betStateMap.get(SlotState.SPECIAL_BET);
         return betState.randomHigher(gameType,slots,goals,param);
     }
     public void print(Table<Integer, Integer, SlotModel> board, CommonGame.GameType gameType, CommonGame.RoomType roomType,long roomId,long uid) {

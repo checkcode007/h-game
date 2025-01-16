@@ -110,7 +110,7 @@ public class ClearRound extends SuperRound {
         param.setGameType(gameType);
         param.setFree(free);
         param.setUid(uid);
-        param.setState(user.getBetState().getK());
+        param.setState(user.getSlotState().getK());
         param.setFree(free);
         param.setWinC(wallet.getWins());
         param.setTotalC(wallet.getBetC());

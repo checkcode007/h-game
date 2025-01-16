@@ -149,6 +149,12 @@ enum FishType {
   YIN_SHA_YU = 17;    // 银色鲨鱼
   JIN_SHA_YU = 18;    // 金色鲨鱼
 
+  JIN_LONG_YU = 19;    //金龙
+  LONG = 20;    //龙
+  MEI_REN_YU = 21;    // 美人鱼
+  NE_ZHA = 22;    // 哪吒
+  MONKEY = 23;    // 齐天大圣
+
 
 }
 

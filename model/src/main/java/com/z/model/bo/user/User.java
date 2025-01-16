@@ -3,8 +3,7 @@ package com.z.model.bo.user;
 import com.z.model.mysql.GUser;
 import com.z.model.proto.CommonGame;
 import com.z.model.proto.CommonUser;
-import com.z.model.type.BetState;
-import com.z.model.type.user.UserState;
+import com.z.model.type.SlotState;
 import lombok.Data;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,7 +29,7 @@ public class User {
     CommonGame.GameType gameType;
     CommonGame.RoomType roomType;
     private CommonUser.UserType type;
-    private UserState state;
+    private com.z.model.type.user.UserState state;
     boolean change;
     /**
      * 游戏的免费次数
@@ -44,23 +43,23 @@ public class User {
     int highC;
     int gmFreeC;
     /**
-     * @see BetState
+     * @see SlotState
      */
-    BetState betState= BetState.MEDIUM_BET;
+    SlotState slotState = SlotState.MEDIUM_BET;
 
 
     public void init(GUser user) {
         this.user = user;
         id = user.getId();
         type = CommonUser.UserType.valueOf(user.getType());
-        state = UserState.getUserState(user.getState());
-        betState= BetState.getBetState(user.getBetState());
+        state = com.z.model.type.user.UserState.getUserState(user.getState());
+        slotState = SlotState.getBetState(user.getBetState());
         roomId = user.getRoom();
     }
     public void setLock(boolean lock) {
          user.setLockState(lock);
     }
-    public void setBetState(BetState state) {
+    public void setSlotState(SlotState state) {
         this.user.setBetState(state.getK());
     }
 

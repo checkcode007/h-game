@@ -2319,6 +2319,46 @@ public final class CommonGame {
      * <code>JIN_SHA_YU = 18;</code>
      */
     JIN_SHA_YU(18),
+    /**
+     * <pre>
+     *金龙
+     * </pre>
+     *
+     * <code>JIN_LONG_YU = 19;</code>
+     */
+    JIN_LONG_YU(19),
+    /**
+     * <pre>
+     *龙
+     * </pre>
+     *
+     * <code>LONG = 20;</code>
+     */
+    LONG(20),
+    /**
+     * <pre>
+     * 美人鱼
+     * </pre>
+     *
+     * <code>MEI_REN_YU = 21;</code>
+     */
+    MEI_REN_YU(21),
+    /**
+     * <pre>
+     * 哪吒
+     * </pre>
+     *
+     * <code>NE_ZHA = 22;</code>
+     */
+    NE_ZHA(22),
+    /**
+     * <pre>
+     * 齐天大圣
+     * </pre>
+     *
+     * <code>MONKEY = 23;</code>
+     */
+    MONKEY(23),
     UNRECOGNIZED(-1),
     ;
 
@@ -2474,6 +2514,46 @@ public final class CommonGame {
      * <code>JIN_SHA_YU = 18;</code>
      */
     public static final int JIN_SHA_YU_VALUE = 18;
+    /**
+     * <pre>
+     *金龙
+     * </pre>
+     *
+     * <code>JIN_LONG_YU = 19;</code>
+     */
+    public static final int JIN_LONG_YU_VALUE = 19;
+    /**
+     * <pre>
+     *龙
+     * </pre>
+     *
+     * <code>LONG = 20;</code>
+     */
+    public static final int LONG_VALUE = 20;
+    /**
+     * <pre>
+     * 美人鱼
+     * </pre>
+     *
+     * <code>MEI_REN_YU = 21;</code>
+     */
+    public static final int MEI_REN_YU_VALUE = 21;
+    /**
+     * <pre>
+     * 哪吒
+     * </pre>
+     *
+     * <code>NE_ZHA = 22;</code>
+     */
+    public static final int NE_ZHA_VALUE = 22;
+    /**
+     * <pre>
+     * 齐天大圣
+     * </pre>
+     *
+     * <code>MONKEY = 23;</code>
+     */
+    public static final int MONKEY_VALUE = 23;
 
 
     public final int getNumber() {
@@ -2519,6 +2599,11 @@ public final class CommonGame {
         case 16: return WU_GUI;
         case 17: return YIN_SHA_YU;
         case 18: return JIN_SHA_YU;
+        case 19: return JIN_LONG_YU;
+        case 20: return LONG;
+        case 21: return MEI_REN_YU;
+        case 22: return NE_ZHA;
+        case 23: return MONKEY;
         default: return null;
       }
     }
@@ -6061,7 +6146,7 @@ public final class CommonGame {
       "BONUS\020\007\022\016\n\nH_DINAMITE\020d*v\n\002MJ\022\013\n\007DEFAULT" +
       "\020\000\022\006\n\002FA\020\t\022\007\n\003ZHO\020\010\022\t\n\005KUANG\020\007\022\007\n\003W_8\020\006\022" +
       "\007\n\003B_5\020\005\022\007\n\003T_5\020\004\022\007\n\003B_3\020\003\022\007\n\003B_2\020\002\022\007\n\003T" +
-      "_2\020\001\022\006\n\002HU\0202\022\t\n\005BAIDA\020<*\307\002\n\010FishType\022\016\n\n" +
+      "_2\020\001\022\006\n\002HU\0202\022\t\n\005BAIDA\020<*\212\003\n\010FishType\022\016\n\n" +
       "FT_DEFAULT\020\000\022\017\n\013KONG_QUE_YU\020\001\022\020\n\014XIAO_CH" +
       "OU_YU\020\002\022\017\n\013XIAO_LAN_YU\020\003\022\020\n\014XIAO_QING_YU" +
       "\020\004\022\021\n\rXIAO_HUANG_YU\020\005\022\016\n\nCAI_YUN_YU\020\006\022\020\n" +
@@ -6069,48 +6154,49 @@ public final class CommonGame {
       "YAN_JING_YU\020\t\022\r\n\tCI_WEI_YU\020\n\022\016\n\nSHI_BAN_" +
       "YU\020\013\022\020\n\014SHEN_XIAN_YU\020\014\022\r\n\tHU_DIE_YU\020\r\022\017\n" +
       "\013XI_SHUAI_YU\020\016\022\r\n\tMO_GUI_YU\020\017\022\n\n\006WU_GUI\020" +
-      "\020\022\016\n\nYIN_SHA_YU\020\021\022\016\n\nJIN_SHA_YU\020\022*\212\001\n\010Fi" +
-      "shFire\022\017\n\013FFT_DEFAULT\020\000\022\t\n\005FFT_1\020\001\022\t\n\005FF" +
-      "T_2\020\002\022\t\n\005FFT_3\020\003\022\t\n\005FFT_4\020\004\022\t\n\005FFT_5\020\005\022\t" +
-      "\n\005FFT_6\020\006\022\t\n\005FFT_7\020\007\022\t\n\005FFT_8\020\010\022\t\n\005FFT_9" +
-      "\020\t\022\n\n\006FFT_10\020\n*\342\001\n\005LINE9\022\022\n\016L9_UNSPECIFI" +
-      "ED\020\000\022\r\n\tL9_ANANAS\020\001\022\r\n\tL9_BANANA\020\002\022\013\n\007L9" +
-      "_BELL\020\003\022\014\n\010L9_GRAPE\020\004\022\r\n\tL9_CHERRY\020\005\022\014\n\010" +
-      "L9_APPLE\020\006\022\021\n\rL9_WATERMELON\020\007\022\014\n\010L9_MANG" +
-      "O\020\010\022\014\n\010L9_ORAGE\020\t\022\r\n\tL9_LICHEE\020\n\022\n\n\006L9_B" +
-      "AR\020\013\022\010\n\004L9_7\020M\022\016\n\nL9_DIAMOND\020d\022\013\n\006L9_BOX" +
-      "\020\310\001*\271\001\n\010FOOTBALL\022\022\n\016FT_UNSPECIFIED\020\000\022\t\n\005" +
-      "FT_10\020\001\022\t\n\005FT_11\020\002\022\t\n\005FT_12\020\003\022\t\n\005FT_13\020\004" +
-      "\022\010\n\004FT_A\020\005\022\014\n\010FT_MONK1\020\006\022\014\n\010FT_MONK2\020\007\022\014" +
-      "\n\010FT_MONK3\020\010\022\014\n\010FT_MONK4\020\t\022\014\n\010FT_MONK5\020\n" +
-      "\022\014\n\010FT_BAIDA\020d\022\017\n\nFT_SCATTER\020\310\001*\243\001\n\007Alad" +
-      "din\022\021\n\rA_UNSPECIFIED\020\000\022\010\n\004A_10\020\001\022\010\n\004A_11" +
-      "\020\002\022\010\n\004A_12\020\003\022\010\n\004A_13\020\004\022\007\n\003A_A\020\005\022\t\n\005A_CUP" +
-      "\020\006\022\013\n\007A_Knife\020\007\022\n\n\006A_Ring\020\010\022\014\n\010A_TORQUE\020" +
-      "\t\022\t\n\005A_HAT\020\n\022\n\n\006A_FREE\0202\022\013\n\007A_BAIDA\020<*\243\001" +
-      "\n\004Puck\022\021\n\rP_UNSPECIFIED\020\000\022\t\n\005P_CAR\020\001\022\n\n\006" +
-      "P_SHOE\020\002\022\013\n\007P_STICK\020\003\022\n\n\006P_PUCK\020\004\022\t\n\005P_T" +
-      "WO\020\005\022\013\n\007P_G_FAT\020\006\022\013\n\007P_B_FAT\020\007\022\014\n\010P_G_TH" +
-      "IN\020\010\022\014\n\010P_R_THIN\020\t\022\n\n\006P_FREE\0202\022\013\n\007P_BAID" +
-      "A\020<*\223\001\n\013WaterMargin\022\022\n\016WM_UNSPECIFIED\020\000\022" +
-      "\n\n\006WM_AXE\020\001\022\014\n\010WM_SPEAR\020\002\022\n\n\006WM_CUT\020\003\022\t\n" +
-      "\005WM_LU\020\004\022\n\n\006WM_LIN\020\005\022\013\n\007WM_SONG\020\006\022\n\n\006WM_" +
-      "DAO\020\007\022\013\n\007WM_TANG\020\010\022\r\n\tWM_HIGHER\0202*\216\001\n\010WM" +
-      "Higher\022\022\n\016WH_UNSPECIFIED\020\000\022\n\n\006WH_AXE\020\001\022\014" +
-      "\n\010WH_SPEAR\020\002\022\n\n\006WH_CUT\020\003\022\t\n\005WH_LU\020\004\022\n\n\006W" +
-      "H_LIN\020\005\022\013\n\007WH_SONG\020\006\022\n\n\006WH_DAO\020\007\022\013\n\007WH_T" +
-      "ANG\020\010\022\013\n\007WH_EXIT\020d*B\n\006WMDice\022\022\n\016WD_UNSPE" +
-      "CIFIED\020\000\022\014\n\010WD_SMALL\020\001\022\n\n\006WD_TIE\020\002\022\n\n\006WD" +
-      "_BIG\020\003*\267\001\n\003Pig\022\022\n\016PG_UNSPECIFIED\020\000\022\010\n\004PG" +
-      "_9\020\001\022\t\n\005PG_10\020\002\022\t\n\005PG_11\020\003\022\t\n\005PG_12\020\004\022\t\n" +
-      "\005PG_13\020\005\022\n\n\006PG_TAI\020\006\022\r\n\tPG_COPPER\020\007\022\014\n\010P" +
-      "G_LOTUS\020\010\022\013\n\007PG_GLIM\020\t\022\t\n\005PG_FU\020\n\022\013\n\007PG_" +
-      "FISH\020\013\022\013\n\007PG_FREE\0202\022\013\n\007PG_WILD\020<*\241\001\n\006Cor" +
-      "pse\022\021\n\rC_UNSPECIFIED\020\000\022\010\n\004C_10\020\001\022\010\n\004C_11" +
-      "\020\002\022\010\n\004C_12\020\003\022\010\n\004C_13\020\004\022\007\n\003C_A\020\005\022\013\n\007C_Sku" +
-      "ll\020\006\022\t\n\005C_BOY\020\007\022\t\n\005C_MAN\020\010\022\013\n\007C_BRIDE\020\t\022" +
-      "\n\n\006C_FREE\0202\022\n\n\006C_WILD\020<\022\013\n\007C_BONUS\020db\006pr" +
-      "oto3"
+      "\020\022\016\n\nYIN_SHA_YU\020\021\022\016\n\nJIN_SHA_YU\020\022\022\017\n\013JIN" +
+      "_LONG_YU\020\023\022\010\n\004LONG\020\024\022\016\n\nMEI_REN_YU\020\025\022\n\n\006" +
+      "NE_ZHA\020\026\022\n\n\006MONKEY\020\027*\212\001\n\010FishFire\022\017\n\013FFT" +
+      "_DEFAULT\020\000\022\t\n\005FFT_1\020\001\022\t\n\005FFT_2\020\002\022\t\n\005FFT_" +
+      "3\020\003\022\t\n\005FFT_4\020\004\022\t\n\005FFT_5\020\005\022\t\n\005FFT_6\020\006\022\t\n\005" +
+      "FFT_7\020\007\022\t\n\005FFT_8\020\010\022\t\n\005FFT_9\020\t\022\n\n\006FFT_10\020" +
+      "\n*\342\001\n\005LINE9\022\022\n\016L9_UNSPECIFIED\020\000\022\r\n\tL9_AN" +
+      "ANAS\020\001\022\r\n\tL9_BANANA\020\002\022\013\n\007L9_BELL\020\003\022\014\n\010L9" +
+      "_GRAPE\020\004\022\r\n\tL9_CHERRY\020\005\022\014\n\010L9_APPLE\020\006\022\021\n" +
+      "\rL9_WATERMELON\020\007\022\014\n\010L9_MANGO\020\010\022\014\n\010L9_ORA" +
+      "GE\020\t\022\r\n\tL9_LICHEE\020\n\022\n\n\006L9_BAR\020\013\022\010\n\004L9_7\020" +
+      "M\022\016\n\nL9_DIAMOND\020d\022\013\n\006L9_BOX\020\310\001*\271\001\n\010FOOTB" +
+      "ALL\022\022\n\016FT_UNSPECIFIED\020\000\022\t\n\005FT_10\020\001\022\t\n\005FT" +
+      "_11\020\002\022\t\n\005FT_12\020\003\022\t\n\005FT_13\020\004\022\010\n\004FT_A\020\005\022\014\n" +
+      "\010FT_MONK1\020\006\022\014\n\010FT_MONK2\020\007\022\014\n\010FT_MONK3\020\010\022" +
+      "\014\n\010FT_MONK4\020\t\022\014\n\010FT_MONK5\020\n\022\014\n\010FT_BAIDA\020" +
+      "d\022\017\n\nFT_SCATTER\020\310\001*\243\001\n\007Aladdin\022\021\n\rA_UNSP" +
+      "ECIFIED\020\000\022\010\n\004A_10\020\001\022\010\n\004A_11\020\002\022\010\n\004A_12\020\003\022" +
+      "\010\n\004A_13\020\004\022\007\n\003A_A\020\005\022\t\n\005A_CUP\020\006\022\013\n\007A_Knife" +
+      "\020\007\022\n\n\006A_Ring\020\010\022\014\n\010A_TORQUE\020\t\022\t\n\005A_HAT\020\n\022" +
+      "\n\n\006A_FREE\0202\022\013\n\007A_BAIDA\020<*\243\001\n\004Puck\022\021\n\rP_U" +
+      "NSPECIFIED\020\000\022\t\n\005P_CAR\020\001\022\n\n\006P_SHOE\020\002\022\013\n\007P" +
+      "_STICK\020\003\022\n\n\006P_PUCK\020\004\022\t\n\005P_TWO\020\005\022\013\n\007P_G_F" +
+      "AT\020\006\022\013\n\007P_B_FAT\020\007\022\014\n\010P_G_THIN\020\010\022\014\n\010P_R_T" +
+      "HIN\020\t\022\n\n\006P_FREE\0202\022\013\n\007P_BAIDA\020<*\223\001\n\013Water" +
+      "Margin\022\022\n\016WM_UNSPECIFIED\020\000\022\n\n\006WM_AXE\020\001\022\014" +
+      "\n\010WM_SPEAR\020\002\022\n\n\006WM_CUT\020\003\022\t\n\005WM_LU\020\004\022\n\n\006W" +
+      "M_LIN\020\005\022\013\n\007WM_SONG\020\006\022\n\n\006WM_DAO\020\007\022\013\n\007WM_T" +
+      "ANG\020\010\022\r\n\tWM_HIGHER\0202*\216\001\n\010WMHigher\022\022\n\016WH_" +
+      "UNSPECIFIED\020\000\022\n\n\006WH_AXE\020\001\022\014\n\010WH_SPEAR\020\002\022" +
+      "\n\n\006WH_CUT\020\003\022\t\n\005WH_LU\020\004\022\n\n\006WH_LIN\020\005\022\013\n\007WH" +
+      "_SONG\020\006\022\n\n\006WH_DAO\020\007\022\013\n\007WH_TANG\020\010\022\013\n\007WH_E" +
+      "XIT\020d*B\n\006WMDice\022\022\n\016WD_UNSPECIFIED\020\000\022\014\n\010W" +
+      "D_SMALL\020\001\022\n\n\006WD_TIE\020\002\022\n\n\006WD_BIG\020\003*\267\001\n\003Pi" +
+      "g\022\022\n\016PG_UNSPECIFIED\020\000\022\010\n\004PG_9\020\001\022\t\n\005PG_10" +
+      "\020\002\022\t\n\005PG_11\020\003\022\t\n\005PG_12\020\004\022\t\n\005PG_13\020\005\022\n\n\006P" +
+      "G_TAI\020\006\022\r\n\tPG_COPPER\020\007\022\014\n\010PG_LOTUS\020\010\022\013\n\007" +
+      "PG_GLIM\020\t\022\t\n\005PG_FU\020\n\022\013\n\007PG_FISH\020\013\022\013\n\007PG_" +
+      "FREE\0202\022\013\n\007PG_WILD\020<*\241\001\n\006Corpse\022\021\n\rC_UNSP" +
+      "ECIFIED\020\000\022\010\n\004C_10\020\001\022\010\n\004C_11\020\002\022\010\n\004C_12\020\003\022" +
+      "\010\n\004C_13\020\004\022\007\n\003C_A\020\005\022\013\n\007C_Skull\020\006\022\t\n\005C_BOY" +
+      "\020\007\022\t\n\005C_MAN\020\010\022\013\n\007C_BRIDE\020\t\022\n\n\006C_FREE\0202\022\n" +
+      "\n\006C_WILD\020<\022\013\n\007C_BONUS\020db\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -24,21 +24,25 @@ namespace Com.Z.Model.Proto {
     static MyMessageReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "Cg9NeU1lc3NhZ2UucHJvdG8SEWNvbS56Lm1vZGVsLnByb3RvIiMKCE15TXNn",
-            "UmVxEgoKAmlkGAEgASgFEgsKA21zZxgCIAMoDCJvCghNeU1zZ1JlcxIKCgJp",
-            "ZBgBIAEoBRILCgNtc2cYAiADKAwSCgoCb2sYAyABKAgSLQoIZmFpbFR5cGUY",
-            "BCABKA4yGy5jb20uei5tb2RlbC5wcm90by5GYWlsVHlwZRIPCgdmYWlsTXNn",
-            "GAUgASgJIlkKCUJyb2FkY2FzdBIqCgR0eXBlGAEgASgOMhwuY29tLnoubW9k",
-            "ZWwucHJvdG8uQnJvYWRUeXBlEgsKA21zZxgCIAEoCRITCgtzcGVjaWZpY01z",
-            "ZxgDIAMoDCozCgdNc2dUeXBlEg4KCk1UX0RFRkFVTFQQABILCgdNVF9VU0VS",
-            "EAESCwoHTVRfR0FNRRACKikKCEZhaWxUeXBlEg4KCkZUX0RFRkFVTFQQABIN",
-            "CglGVF9FRkZFQ1QQASoqCglCcm9hZFR5cGUSDgoKQlRfREVGQVVMVBAAEg0K",
-            "CUJUX0VGRkVDVBABYgZwcm90bzM="));
+            "Cg9NeU1lc3NhZ2UucHJvdG8SEWNvbS56Lm1vZGVsLnByb3RvIi8KCUhlYXJ0",
+            "YmVhdBIRCgl0aW1lc3RhbXAYASABKAMSDwoHbWVzc2FnZRgCIAEoCSJQCghN",
+            "eU1zZ1JlcRIKCgJpZBgBIAEoBRILCgNtc2cYAiADKAwSKwoFaGVhcnQYAyAB",
+            "KAsyHC5jb20uei5tb2RlbC5wcm90by5IZWFydGJlYXQinAEKCE15TXNnUmVz",
+            "EgoKAmlkGAEgASgFEgsKA21zZxgCIAMoDBIKCgJvaxgDIAEoCBItCghmYWls",
+            "VHlwZRgEIAEoDjIbLmNvbS56Lm1vZGVsLnByb3RvLkZhaWxUeXBlEg8KB2Zh",
+            "aWxNc2cYBSABKAkSKwoFaGVhcnQYBiABKAsyHC5jb20uei5tb2RlbC5wcm90",
+            "by5IZWFydGJlYXQiWQoJQnJvYWRjYXN0EioKBHR5cGUYASABKA4yHC5jb20u",
+            "ei5tb2RlbC5wcm90by5Ccm9hZFR5cGUSCwoDbXNnGAIgASgJEhMKC3NwZWNp",
+            "ZmljTXNnGAMgAygMKjMKB01zZ1R5cGUSDgoKTVRfREVGQVVMVBAAEgsKB01U",
+            "X1VTRVIQARILCgdNVF9HQU1FEAIqKQoIRmFpbFR5cGUSDgoKRlRfREVGQVVM",
+            "VBAAEg0KCUZUX0VGRkVDVBABKioKCUJyb2FkVHlwZRIOCgpCVF9ERUZBVUxU",
+            "EAASDQoJQlRfRUZGRUNUEAFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Com.Z.Model.Proto.MsgType), typeof(global::Com.Z.Model.Proto.FailType), typeof(global::Com.Z.Model.Proto.BroadType), }, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Z.Model.Proto.MyMsgReq), global::Com.Z.Model.Proto.MyMsgReq.Parser, new[]{ "Id", "Msg" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Z.Model.Proto.MyMsgRes), global::Com.Z.Model.Proto.MyMsgRes.Parser, new[]{ "Id", "Msg", "Ok", "FailType", "FailMsg" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Z.Model.Proto.Heartbeat), global::Com.Z.Model.Proto.Heartbeat.Parser, new[]{ "Timestamp", "Message" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Z.Model.Proto.MyMsgReq), global::Com.Z.Model.Proto.MyMsgReq.Parser, new[]{ "Id", "Msg", "Heart" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Z.Model.Proto.MyMsgRes), global::Com.Z.Model.Proto.MyMsgRes.Parser, new[]{ "Id", "Msg", "Ok", "FailType", "FailMsg", "Heart" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Com.Z.Model.Proto.Broadcast), global::Com.Z.Model.Proto.Broadcast.Parser, new[]{ "Type", "Msg", "SpecificMsg" }, null, null, null, null)
           }));
     }
@@ -96,6 +100,241 @@ namespace Com.Z.Model.Proto {
 
   #region Messages
   /// <summary>
+  ///心跳 （C->S: 1  S->C:2）
+  /// </summary>
+  public sealed partial class Heartbeat : pb::IMessage<Heartbeat>
+  #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      , pb::IBufferMessage
+  #endif
+  {
+    private static readonly pb::MessageParser<Heartbeat> _parser = new pb::MessageParser<Heartbeat>(() => new Heartbeat());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pb::MessageParser<Heartbeat> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Com.Z.Model.Proto.MyMessageReflection.Descriptor.MessageTypes[0]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public Heartbeat() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public Heartbeat(Heartbeat other) : this() {
+      timestamp_ = other.timestamp_;
+      message_ = other.message_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public Heartbeat Clone() {
+      return new Heartbeat(this);
+    }
+
+    /// <summary>Field number for the "timestamp" field.</summary>
+    public const int TimestampFieldNumber = 1;
+    private long timestamp_;
+    /// <summary>
+    /// 心跳时间戳
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public long Timestamp {
+      get { return timestamp_; }
+      set {
+        timestamp_ = value;
+      }
+    }
+
+    /// <summary>Field number for the "message" field.</summary>
+    public const int MessageFieldNumber = 2;
+    private string message_ = "";
+    /// <summary>
+    /// 可选心跳附带信息（如"PING"或"ACK"）（客户端是pjng 服务器ack）
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string Message {
+      get { return message_; }
+      set {
+        message_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override bool Equals(object other) {
+      return Equals(other as Heartbeat);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public bool Equals(Heartbeat other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Timestamp != other.Timestamp) return false;
+      if (Message != other.Message) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Timestamp != 0L) hash ^= Timestamp.GetHashCode();
+      if (Message.Length != 0) hash ^= Message.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void WriteTo(pb::CodedOutputStream output) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      output.WriteRawMessage(this);
+    #else
+      if (Timestamp != 0L) {
+        output.WriteRawTag(8);
+        output.WriteInt64(Timestamp);
+      }
+      if (Message.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Message);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (Timestamp != 0L) {
+        output.WriteRawTag(8);
+        output.WriteInt64(Timestamp);
+      }
+      if (Message.Length != 0) {
+        output.WriteRawTag(18);
+        output.WriteString(Message);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(ref output);
+      }
+    }
+    #endif
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public int CalculateSize() {
+      int size = 0;
+      if (Timestamp != 0L) {
+        size += 1 + pb::CodedOutputStream.ComputeInt64Size(Timestamp);
+      }
+      if (Message.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(Message);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(Heartbeat other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Timestamp != 0L) {
+        Timestamp = other.Timestamp;
+      }
+      if (other.Message.Length != 0) {
+        Message = other.Message;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public void MergeFrom(pb::CodedInputStream input) {
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+      input.ReadRawMessage(this);
+    #else
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Timestamp = input.ReadInt64();
+            break;
+          }
+          case 18: {
+            Message = input.ReadString();
+            break;
+          }
+        }
+      }
+    #endif
+    }
+
+    #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
+            break;
+          case 8: {
+            Timestamp = input.ReadInt64();
+            break;
+          }
+          case 18: {
+            Message = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+    #endif
+
+  }
+
+  /// <summary>
   ///上行 -(c->s)
   /// </summary>
   public sealed partial class MyMsgReq : pb::IMessage<MyMsgReq>
@@ -112,7 +351,7 @@ namespace Com.Z.Model.Proto {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Z.Model.Proto.MyMessageReflection.Descriptor.MessageTypes[0]; }
+      get { return global::Com.Z.Model.Proto.MyMessageReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -134,6 +373,7 @@ namespace Com.Z.Model.Proto {
     public MyMsgReq(MyMsgReq other) : this() {
       id_ = other.id_;
       msg_ = other.msg_.Clone();
+      heart_ = other.heart_ != null ? other.heart_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -147,7 +387,7 @@ namespace Com.Z.Model.Proto {
     public const int IdFieldNumber = 1;
     private int id_;
     /// <summary>
-    ///消息号-- 单数
+    ///消息号-- 单数 （协议号：心跳 1）
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -172,6 +412,21 @@ namespace Com.Z.Model.Proto {
       get { return msg_; }
     }
 
+    /// <summary>Field number for the "heart" field.</summary>
+    public const int HeartFieldNumber = 3;
+    private global::Com.Z.Model.Proto.Heartbeat heart_;
+    /// <summary>
+    ///心跳
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Com.Z.Model.Proto.Heartbeat Heart {
+      get { return heart_; }
+      set {
+        heart_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -189,6 +444,7 @@ namespace Com.Z.Model.Proto {
       }
       if (Id != other.Id) return false;
       if(!msg_.Equals(other.msg_)) return false;
+      if (!object.Equals(Heart, other.Heart)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -198,6 +454,7 @@ namespace Com.Z.Model.Proto {
       int hash = 1;
       if (Id != 0) hash ^= Id.GetHashCode();
       hash ^= msg_.GetHashCode();
+      if (heart_ != null) hash ^= Heart.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -221,6 +478,10 @@ namespace Com.Z.Model.Proto {
         output.WriteInt32(Id);
       }
       msg_.WriteTo(output, _repeated_msg_codec);
+      if (heart_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Heart);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -236,6 +497,10 @@ namespace Com.Z.Model.Proto {
         output.WriteInt32(Id);
       }
       msg_.WriteTo(ref output, _repeated_msg_codec);
+      if (heart_ != null) {
+        output.WriteRawTag(26);
+        output.WriteMessage(Heart);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -250,6 +515,9 @@ namespace Com.Z.Model.Proto {
         size += 1 + pb::CodedOutputStream.ComputeInt32Size(Id);
       }
       size += msg_.CalculateSize(_repeated_msg_codec);
+      if (heart_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Heart);
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -266,6 +534,12 @@ namespace Com.Z.Model.Proto {
         Id = other.Id;
       }
       msg_.Add(other.msg_);
+      if (other.heart_ != null) {
+        if (heart_ == null) {
+          Heart = new global::Com.Z.Model.Proto.Heartbeat();
+        }
+        Heart.MergeFrom(other.Heart);
+      }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -289,6 +563,13 @@ namespace Com.Z.Model.Proto {
             msg_.AddEntriesFrom(input, _repeated_msg_codec);
             break;
           }
+          case 26: {
+            if (heart_ == null) {
+              Heart = new global::Com.Z.Model.Proto.Heartbeat();
+            }
+            input.ReadMessage(Heart);
+            break;
+          }
         }
       }
     #endif
@@ -310,6 +591,13 @@ namespace Com.Z.Model.Proto {
           }
           case 18: {
             msg_.AddEntriesFrom(ref input, _repeated_msg_codec);
+            break;
+          }
+          case 26: {
+            if (heart_ == null) {
+              Heart = new global::Com.Z.Model.Proto.Heartbeat();
+            }
+            input.ReadMessage(Heart);
             break;
           }
         }
@@ -336,7 +624,7 @@ namespace Com.Z.Model.Proto {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Z.Model.Proto.MyMessageReflection.Descriptor.MessageTypes[1]; }
+      get { return global::Com.Z.Model.Proto.MyMessageReflection.Descriptor.MessageTypes[2]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -361,6 +649,7 @@ namespace Com.Z.Model.Proto {
       ok_ = other.ok_;
       failType_ = other.failType_;
       failMsg_ = other.failMsg_;
+      heart_ = other.heart_ != null ? other.heart_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -374,7 +663,7 @@ namespace Com.Z.Model.Proto {
     public const int IdFieldNumber = 1;
     private int id_;
     /// <summary>
-    ///消息号--双数
+    ///消息号--双数。（协议号：心跳 2）
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
@@ -444,6 +733,21 @@ namespace Com.Z.Model.Proto {
       }
     }
 
+    /// <summary>Field number for the "heart" field.</summary>
+    public const int HeartFieldNumber = 6;
+    private global::Com.Z.Model.Proto.Heartbeat heart_;
+    /// <summary>
+    ///心跳
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Com.Z.Model.Proto.Heartbeat Heart {
+      get { return heart_; }
+      set {
+        heart_ = value;
+      }
+    }
+
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
@@ -464,6 +768,7 @@ namespace Com.Z.Model.Proto {
       if (Ok != other.Ok) return false;
       if (FailType != other.FailType) return false;
       if (FailMsg != other.FailMsg) return false;
+      if (!object.Equals(Heart, other.Heart)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -476,6 +781,7 @@ namespace Com.Z.Model.Proto {
       if (Ok != false) hash ^= Ok.GetHashCode();
       if (FailType != global::Com.Z.Model.Proto.FailType.FtDefault) hash ^= FailType.GetHashCode();
       if (FailMsg.Length != 0) hash ^= FailMsg.GetHashCode();
+      if (heart_ != null) hash ^= Heart.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -511,6 +817,10 @@ namespace Com.Z.Model.Proto {
         output.WriteRawTag(42);
         output.WriteString(FailMsg);
       }
+      if (heart_ != null) {
+        output.WriteRawTag(50);
+        output.WriteMessage(Heart);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -538,6 +848,10 @@ namespace Com.Z.Model.Proto {
         output.WriteRawTag(42);
         output.WriteString(FailMsg);
       }
+      if (heart_ != null) {
+        output.WriteRawTag(50);
+        output.WriteMessage(Heart);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -560,6 +874,9 @@ namespace Com.Z.Model.Proto {
       }
       if (FailMsg.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(FailMsg);
+      }
+      if (heart_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Heart);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -585,6 +902,12 @@ namespace Com.Z.Model.Proto {
       }
       if (other.FailMsg.Length != 0) {
         FailMsg = other.FailMsg;
+      }
+      if (other.heart_ != null) {
+        if (heart_ == null) {
+          Heart = new global::Com.Z.Model.Proto.Heartbeat();
+        }
+        Heart.MergeFrom(other.Heart);
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -619,6 +942,13 @@ namespace Com.Z.Model.Proto {
           }
           case 42: {
             FailMsg = input.ReadString();
+            break;
+          }
+          case 50: {
+            if (heart_ == null) {
+              Heart = new global::Com.Z.Model.Proto.Heartbeat();
+            }
+            input.ReadMessage(Heart);
             break;
           }
         }
@@ -656,6 +986,13 @@ namespace Com.Z.Model.Proto {
             FailMsg = input.ReadString();
             break;
           }
+          case 50: {
+            if (heart_ == null) {
+              Heart = new global::Com.Z.Model.Proto.Heartbeat();
+            }
+            input.ReadMessage(Heart);
+            break;
+          }
         }
       }
     }
@@ -680,7 +1017,7 @@ namespace Com.Z.Model.Proto {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Z.Model.Proto.MyMessageReflection.Descriptor.MessageTypes[2]; }
+      get { return global::Com.Z.Model.Proto.MyMessageReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]

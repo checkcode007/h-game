@@ -2,8 +2,7 @@ package com.z.core.service.game.fish;
 
 import com.google.protobuf.AbstractMessageLite;
 import com.google.protobuf.ByteString;
-import com.z.common.game.FishCommon;
-import com.z.core.service.game.football.BallRoom;
+import com.z.core.service.game.game.RoomBizService;
 import com.z.core.service.game.game.SuperRoom;
 import com.z.core.service.game.room.RoomService;
 import com.z.core.service.user.UserBizService;
@@ -13,7 +12,6 @@ import com.z.core.service.wallet.WalletService;
 import com.z.model.bo.user.User;
 import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgId;
-import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CFish;
 import com.z.model.mysql.cfg.CFishFire;
 import com.z.model.proto.CommonGame;
@@ -23,8 +21,6 @@ import com.z.model.proto.MyMessage;
 import com.z.model.type.AddType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +42,10 @@ public class FishBizService {
 
     @Autowired
     WalletBizService walletBizService;
+    @Autowired
+    private RoomBizService roomBizService;
+
+
 
     public AbstractMessageLite initInfo(long uid, CommonGame.RoomType roomType) {
         StringJoiner sj = new StringJoiner(",").add("uid:" + uid);
@@ -125,7 +125,7 @@ public class FishBizService {
      */
     public AbstractMessageLite fishGet(long uid, CommonGame.FishFire fishFire, List<Game.Fish> fishList) {
         StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("fire:" + fishFire)
-                .add("fishList:" + fishList);
+                .add("fishs:" + fishList);
         log.info(sj.toString());
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_FISH_GET).setOk(true);
         User user = UserService.ins.get(uid);
@@ -141,40 +141,21 @@ public class FishBizService {
         }
         CommonGame.GameType gameType = user.getGameType();
         CommonGame.RoomType roomType = user.getRoomType();
-        sj.add("roomId:" + user.getRoomId()).add("gameType:" + gameType).add("roomType:" + roomType);
+        sj.add("rId:" + user.getRoomId()).add("gType:" + gameType).add("rType:" + roomType);
         CFishFire cFishFire = cFishService.getFire(fishFire,roomType);
         if(cFishFire == null) {
             log.error(sj.add("cFishFire null").toString());
             res.setOk(false).setFailMsg("配置异常");
             return res.build();
         }
-        sj.add("cfg:" + cFishFire.getId()).add("gold:" + cFishFire.getGold());
-        Map<Long,CFish> goalMap = new HashMap<>();
-        sj.add("goal:");
-        if(fishList != null && !fishList.isEmpty()) {
-            for (Game.Fish fish : fishList) {
-                CFish cFish = cFishService.get(fish.getType(),roomType);
-                if(cFish == null){
-                    log.error("cFish null:"+fish.getType());
-                    continue;
-                }
-                if(FishCommon.ins.isCaught(cFish.getRadio(),cFishFire.getRadio())){
-                    goalMap.put(fish.getId(),cFish);
-                    sj.add(fish.getId()+"");
-                }
-            }
+       SuperRoom room =  RoomService.ins.getRoom(user.getRoomId());
+        if(room == null){
+            log.error(sj.add("room null").toString());
+            res.setOk(false).setFailMsg("没有进入房间");
+            return res.build();
         }
-        AtomicLong addGold = new AtomicLong(0);
-        Game.S_20204.Builder b = Game.S_20204.newBuilder();
-        goalMap.forEach((k,v)->{
-            long rewardGold = v.getRate()*cFishFire.getGold();
-            addGold.getAndAdd(rewardGold);
-            b.addFishs(Game.FishGoal.newBuilder().setId(k).setType(CommonGame.FishType.valueOf(v.getType())).setGold(rewardGold).build());
-
-        });
-        walletBizService.changeGold(CommonUser.GoldType.GT_GAME, AddType.ADD, uid, addGold.get(),gameType,roomType);
-        Wallet wallet = WalletService.ins.get(uid);
-        b.setLeaveGold(wallet.getGold());
+        FishRoom fishRoom =(FishRoom)room;
+        Game.S_20204.Builder b =fishRoom.fishCatch(uid,cFishFire,fishList);
         log.info(sj.add("success").toString());
         return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
     }

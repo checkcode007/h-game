@@ -415,13 +415,697 @@ public final class MyMessage {
     // @@protoc_insertion_point(enum_scope:com.z.model.proto.BroadType)
   }
 
+  public interface HeartbeatOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.z.model.proto.Heartbeat)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * 心跳时间戳
+     * </pre>
+     *
+     * <code>int64 timestamp = 1;</code>
+     * @return The timestamp.
+     */
+    long getTimestamp();
+
+    /**
+     * <pre>
+     * 可选心跳附带信息（如"PING"或"ACK"）（客户端是pjng 服务器ack）
+     * </pre>
+     *
+     * <code>string message = 2;</code>
+     * @return The message.
+     */
+    java.lang.String getMessage();
+    /**
+     * <pre>
+     * 可选心跳附带信息（如"PING"或"ACK"）（客户端是pjng 服务器ack）
+     * </pre>
+     *
+     * <code>string message = 2;</code>
+     * @return The bytes for message.
+     */
+    com.google.protobuf.ByteString
+        getMessageBytes();
+  }
+  /**
+   * <pre>
+   *心跳 （C-&gt;S: 1  S-&gt;C:2）
+   * </pre>
+   *
+   * Protobuf type {@code com.z.model.proto.Heartbeat}
+   */
+  public static final class Heartbeat extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:com.z.model.proto.Heartbeat)
+      HeartbeatOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use Heartbeat.newBuilder() to construct.
+    private Heartbeat(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private Heartbeat() {
+      message_ = "";
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new Heartbeat();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.z.model.proto.MyMessage.internal_static_com_z_model_proto_Heartbeat_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.z.model.proto.MyMessage.internal_static_com_z_model_proto_Heartbeat_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.z.model.proto.MyMessage.Heartbeat.class, com.z.model.proto.MyMessage.Heartbeat.Builder.class);
+    }
+
+    public static final int TIMESTAMP_FIELD_NUMBER = 1;
+    private long timestamp_;
+    /**
+     * <pre>
+     * 心跳时间戳
+     * </pre>
+     *
+     * <code>int64 timestamp = 1;</code>
+     * @return The timestamp.
+     */
+    @java.lang.Override
+    public long getTimestamp() {
+      return timestamp_;
+    }
+
+    public static final int MESSAGE_FIELD_NUMBER = 2;
+    private volatile java.lang.Object message_;
+    /**
+     * <pre>
+     * 可选心跳附带信息（如"PING"或"ACK"）（客户端是pjng 服务器ack）
+     * </pre>
+     *
+     * <code>string message = 2;</code>
+     * @return The message.
+     */
+    @java.lang.Override
+    public java.lang.String getMessage() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        message_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * 可选心跳附带信息（如"PING"或"ACK"）（客户端是pjng 服务器ack）
+     * </pre>
+     *
+     * <code>string message = 2;</code>
+     * @return The bytes for message.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getMessageBytes() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        message_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (timestamp_ != 0L) {
+        output.writeInt64(1, timestamp_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(message_)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, message_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (timestamp_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(1, timestamp_);
+      }
+      if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(message_)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, message_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.z.model.proto.MyMessage.Heartbeat)) {
+        return super.equals(obj);
+      }
+      com.z.model.proto.MyMessage.Heartbeat other = (com.z.model.proto.MyMessage.Heartbeat) obj;
+
+      if (getTimestamp()
+          != other.getTimestamp()) return false;
+      if (!getMessage()
+          .equals(other.getMessage())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + TIMESTAMP_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getTimestamp());
+      hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getMessage().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static com.z.model.proto.MyMessage.Heartbeat parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.z.model.proto.MyMessage.Heartbeat parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.z.model.proto.MyMessage.Heartbeat parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.z.model.proto.MyMessage.Heartbeat parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.z.model.proto.MyMessage.Heartbeat parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.z.model.proto.MyMessage.Heartbeat parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.z.model.proto.MyMessage.Heartbeat parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.z.model.proto.MyMessage.Heartbeat parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.z.model.proto.MyMessage.Heartbeat parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static com.z.model.proto.MyMessage.Heartbeat parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.z.model.proto.MyMessage.Heartbeat parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.z.model.proto.MyMessage.Heartbeat parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(com.z.model.proto.MyMessage.Heartbeat prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     *心跳 （C-&gt;S: 1  S-&gt;C:2）
+     * </pre>
+     *
+     * Protobuf type {@code com.z.model.proto.Heartbeat}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.z.model.proto.Heartbeat)
+        com.z.model.proto.MyMessage.HeartbeatOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.z.model.proto.MyMessage.internal_static_com_z_model_proto_Heartbeat_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.z.model.proto.MyMessage.internal_static_com_z_model_proto_Heartbeat_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.z.model.proto.MyMessage.Heartbeat.class, com.z.model.proto.MyMessage.Heartbeat.Builder.class);
+      }
+
+      // Construct using com.z.model.proto.MyMessage.Heartbeat.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        timestamp_ = 0L;
+
+        message_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.z.model.proto.MyMessage.internal_static_com_z_model_proto_Heartbeat_descriptor;
+      }
+
+      @java.lang.Override
+      public com.z.model.proto.MyMessage.Heartbeat getDefaultInstanceForType() {
+        return com.z.model.proto.MyMessage.Heartbeat.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public com.z.model.proto.MyMessage.Heartbeat build() {
+        com.z.model.proto.MyMessage.Heartbeat result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public com.z.model.proto.MyMessage.Heartbeat buildPartial() {
+        com.z.model.proto.MyMessage.Heartbeat result = new com.z.model.proto.MyMessage.Heartbeat(this);
+        result.timestamp_ = timestamp_;
+        result.message_ = message_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.z.model.proto.MyMessage.Heartbeat) {
+          return mergeFrom((com.z.model.proto.MyMessage.Heartbeat)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.z.model.proto.MyMessage.Heartbeat other) {
+        if (other == com.z.model.proto.MyMessage.Heartbeat.getDefaultInstance()) return this;
+        if (other.getTimestamp() != 0L) {
+          setTimestamp(other.getTimestamp());
+        }
+        if (!other.getMessage().isEmpty()) {
+          message_ = other.message_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                timestamp_ = input.readInt64();
+
+                break;
+              } // case 8
+              case 18: {
+                message_ = input.readStringRequireUtf8();
+
+                break;
+              } // case 18
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+
+      private long timestamp_ ;
+      /**
+       * <pre>
+       * 心跳时间戳
+       * </pre>
+       *
+       * <code>int64 timestamp = 1;</code>
+       * @return The timestamp.
+       */
+      @java.lang.Override
+      public long getTimestamp() {
+        return timestamp_;
+      }
+      /**
+       * <pre>
+       * 心跳时间戳
+       * </pre>
+       *
+       * <code>int64 timestamp = 1;</code>
+       * @param value The timestamp to set.
+       * @return This builder for chaining.
+       */
+      public Builder setTimestamp(long value) {
+        
+        timestamp_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 心跳时间戳
+       * </pre>
+       *
+       * <code>int64 timestamp = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearTimestamp() {
+        
+        timestamp_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object message_ = "";
+      /**
+       * <pre>
+       * 可选心跳附带信息（如"PING"或"ACK"）（客户端是pjng 服务器ack）
+       * </pre>
+       *
+       * <code>string message = 2;</code>
+       * @return The message.
+       */
+      public java.lang.String getMessage() {
+        java.lang.Object ref = message_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          message_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 可选心跳附带信息（如"PING"或"ACK"）（客户端是pjng 服务器ack）
+       * </pre>
+       *
+       * <code>string message = 2;</code>
+       * @return The bytes for message.
+       */
+      public com.google.protobuf.ByteString
+          getMessageBytes() {
+        java.lang.Object ref = message_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          message_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 可选心跳附带信息（如"PING"或"ACK"）（客户端是pjng 服务器ack）
+       * </pre>
+       *
+       * <code>string message = 2;</code>
+       * @param value The message to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMessage(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        message_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 可选心跳附带信息（如"PING"或"ACK"）（客户端是pjng 服务器ack）
+       * </pre>
+       *
+       * <code>string message = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearMessage() {
+        
+        message_ = getDefaultInstance().getMessage();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 可选心跳附带信息（如"PING"或"ACK"）（客户端是pjng 服务器ack）
+       * </pre>
+       *
+       * <code>string message = 2;</code>
+       * @param value The bytes for message to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMessageBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        message_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:com.z.model.proto.Heartbeat)
+    }
+
+    // @@protoc_insertion_point(class_scope:com.z.model.proto.Heartbeat)
+    private static final com.z.model.proto.MyMessage.Heartbeat DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new com.z.model.proto.MyMessage.Heartbeat();
+    }
+
+    public static com.z.model.proto.MyMessage.Heartbeat getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<Heartbeat>
+        PARSER = new com.google.protobuf.AbstractParser<Heartbeat>() {
+      @java.lang.Override
+      public Heartbeat parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<Heartbeat> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Heartbeat> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.z.model.proto.MyMessage.Heartbeat getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface MyMsgReqOrBuilder extends
       // @@protoc_insertion_point(interface_extends:com.z.model.proto.MyMsgReq)
       com.google.protobuf.MessageOrBuilder {
 
     /**
      * <pre>
-     *消息号-- 单数
+     *消息号-- 单数 （协议号：心跳 1）
      * </pre>
      *
      * <code>int32 id = 1;</code>
@@ -457,6 +1141,33 @@ public final class MyMessage {
      * @return The msg at the given index.
      */
     com.google.protobuf.ByteString getMsg(int index);
+
+    /**
+     * <pre>
+     *心跳
+     * </pre>
+     *
+     * <code>.com.z.model.proto.Heartbeat heart = 3;</code>
+     * @return Whether the heart field is set.
+     */
+    boolean hasHeart();
+    /**
+     * <pre>
+     *心跳
+     * </pre>
+     *
+     * <code>.com.z.model.proto.Heartbeat heart = 3;</code>
+     * @return The heart.
+     */
+    com.z.model.proto.MyMessage.Heartbeat getHeart();
+    /**
+     * <pre>
+     *心跳
+     * </pre>
+     *
+     * <code>.com.z.model.proto.Heartbeat heart = 3;</code>
+     */
+    com.z.model.proto.MyMessage.HeartbeatOrBuilder getHeartOrBuilder();
   }
   /**
    * <pre>
@@ -507,7 +1218,7 @@ public final class MyMessage {
     private int id_;
     /**
      * <pre>
-     *消息号-- 单数
+     *消息号-- 单数 （协议号：心跳 1）
      * </pre>
      *
      * <code>int32 id = 1;</code>
@@ -557,6 +1268,44 @@ public final class MyMessage {
       return msg_.get(index);
     }
 
+    public static final int HEART_FIELD_NUMBER = 3;
+    private com.z.model.proto.MyMessage.Heartbeat heart_;
+    /**
+     * <pre>
+     *心跳
+     * </pre>
+     *
+     * <code>.com.z.model.proto.Heartbeat heart = 3;</code>
+     * @return Whether the heart field is set.
+     */
+    @java.lang.Override
+    public boolean hasHeart() {
+      return heart_ != null;
+    }
+    /**
+     * <pre>
+     *心跳
+     * </pre>
+     *
+     * <code>.com.z.model.proto.Heartbeat heart = 3;</code>
+     * @return The heart.
+     */
+    @java.lang.Override
+    public com.z.model.proto.MyMessage.Heartbeat getHeart() {
+      return heart_ == null ? com.z.model.proto.MyMessage.Heartbeat.getDefaultInstance() : heart_;
+    }
+    /**
+     * <pre>
+     *心跳
+     * </pre>
+     *
+     * <code>.com.z.model.proto.Heartbeat heart = 3;</code>
+     */
+    @java.lang.Override
+    public com.z.model.proto.MyMessage.HeartbeatOrBuilder getHeartOrBuilder() {
+      return getHeart();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -576,6 +1325,9 @@ public final class MyMessage {
       }
       for (int i = 0; i < msg_.size(); i++) {
         output.writeBytes(2, msg_.get(i));
+      }
+      if (heart_ != null) {
+        output.writeMessage(3, getHeart());
       }
       getUnknownFields().writeTo(output);
     }
@@ -599,6 +1351,10 @@ public final class MyMessage {
         size += dataSize;
         size += 1 * getMsgList().size();
       }
+      if (heart_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, getHeart());
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -618,6 +1374,11 @@ public final class MyMessage {
           != other.getId()) return false;
       if (!getMsgList()
           .equals(other.getMsgList())) return false;
+      if (hasHeart() != other.hasHeart()) return false;
+      if (hasHeart()) {
+        if (!getHeart()
+            .equals(other.getHeart())) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -634,6 +1395,10 @@ public final class MyMessage {
       if (getMsgCount() > 0) {
         hash = (37 * hash) + MSG_FIELD_NUMBER;
         hash = (53 * hash) + getMsgList().hashCode();
+      }
+      if (hasHeart()) {
+        hash = (37 * hash) + HEART_FIELD_NUMBER;
+        hash = (53 * hash) + getHeart().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -771,6 +1536,12 @@ public final class MyMessage {
 
         msg_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000001);
+        if (heartBuilder_ == null) {
+          heart_ = null;
+        } else {
+          heart_ = null;
+          heartBuilder_ = null;
+        }
         return this;
       }
 
@@ -804,6 +1575,11 @@ public final class MyMessage {
           bitField0_ = (bitField0_ & ~0x00000001);
         }
         result.msg_ = msg_;
+        if (heartBuilder_ == null) {
+          result.heart_ = heart_;
+        } else {
+          result.heart_ = heartBuilder_.build();
+        }
         onBuilt();
         return result;
       }
@@ -865,6 +1641,9 @@ public final class MyMessage {
           }
           onChanged();
         }
+        if (other.hasHeart()) {
+          mergeHeart(other.getHeart());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -902,6 +1681,13 @@ public final class MyMessage {
                 msg_.add(v);
                 break;
               } // case 18
+              case 26: {
+                input.readMessage(
+                    getHeartFieldBuilder().getBuilder(),
+                    extensionRegistry);
+
+                break;
+              } // case 26
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -922,7 +1708,7 @@ public final class MyMessage {
       private int id_ ;
       /**
        * <pre>
-       *消息号-- 单数
+       *消息号-- 单数 （协议号：心跳 1）
        * </pre>
        *
        * <code>int32 id = 1;</code>
@@ -934,7 +1720,7 @@ public final class MyMessage {
       }
       /**
        * <pre>
-       *消息号-- 单数
+       *消息号-- 单数 （协议号：心跳 1）
        * </pre>
        *
        * <code>int32 id = 1;</code>
@@ -949,7 +1735,7 @@ public final class MyMessage {
       }
       /**
        * <pre>
-       *消息号-- 单数
+       *消息号-- 单数 （协议号：心跳 1）
        * </pre>
        *
        * <code>int32 id = 1;</code>
@@ -1074,6 +1860,161 @@ public final class MyMessage {
         onChanged();
         return this;
       }
+
+      private com.z.model.proto.MyMessage.Heartbeat heart_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.z.model.proto.MyMessage.Heartbeat, com.z.model.proto.MyMessage.Heartbeat.Builder, com.z.model.proto.MyMessage.HeartbeatOrBuilder> heartBuilder_;
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 3;</code>
+       * @return Whether the heart field is set.
+       */
+      public boolean hasHeart() {
+        return heartBuilder_ != null || heart_ != null;
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 3;</code>
+       * @return The heart.
+       */
+      public com.z.model.proto.MyMessage.Heartbeat getHeart() {
+        if (heartBuilder_ == null) {
+          return heart_ == null ? com.z.model.proto.MyMessage.Heartbeat.getDefaultInstance() : heart_;
+        } else {
+          return heartBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 3;</code>
+       */
+      public Builder setHeart(com.z.model.proto.MyMessage.Heartbeat value) {
+        if (heartBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          heart_ = value;
+          onChanged();
+        } else {
+          heartBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 3;</code>
+       */
+      public Builder setHeart(
+          com.z.model.proto.MyMessage.Heartbeat.Builder builderForValue) {
+        if (heartBuilder_ == null) {
+          heart_ = builderForValue.build();
+          onChanged();
+        } else {
+          heartBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 3;</code>
+       */
+      public Builder mergeHeart(com.z.model.proto.MyMessage.Heartbeat value) {
+        if (heartBuilder_ == null) {
+          if (heart_ != null) {
+            heart_ =
+              com.z.model.proto.MyMessage.Heartbeat.newBuilder(heart_).mergeFrom(value).buildPartial();
+          } else {
+            heart_ = value;
+          }
+          onChanged();
+        } else {
+          heartBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 3;</code>
+       */
+      public Builder clearHeart() {
+        if (heartBuilder_ == null) {
+          heart_ = null;
+          onChanged();
+        } else {
+          heart_ = null;
+          heartBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 3;</code>
+       */
+      public com.z.model.proto.MyMessage.Heartbeat.Builder getHeartBuilder() {
+        
+        onChanged();
+        return getHeartFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 3;</code>
+       */
+      public com.z.model.proto.MyMessage.HeartbeatOrBuilder getHeartOrBuilder() {
+        if (heartBuilder_ != null) {
+          return heartBuilder_.getMessageOrBuilder();
+        } else {
+          return heart_ == null ?
+              com.z.model.proto.MyMessage.Heartbeat.getDefaultInstance() : heart_;
+        }
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.z.model.proto.MyMessage.Heartbeat, com.z.model.proto.MyMessage.Heartbeat.Builder, com.z.model.proto.MyMessage.HeartbeatOrBuilder> 
+          getHeartFieldBuilder() {
+        if (heartBuilder_ == null) {
+          heartBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.z.model.proto.MyMessage.Heartbeat, com.z.model.proto.MyMessage.Heartbeat.Builder, com.z.model.proto.MyMessage.HeartbeatOrBuilder>(
+                  getHeart(),
+                  getParentForChildren(),
+                  isClean());
+          heart_ = null;
+        }
+        return heartBuilder_;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -1144,7 +2085,7 @@ public final class MyMessage {
 
     /**
      * <pre>
-     *消息号--双数
+     *消息号--双数。（协议号：心跳 2）
      * </pre>
      *
      * <code>int32 id = 1;</code>
@@ -1229,6 +2170,33 @@ public final class MyMessage {
      */
     com.google.protobuf.ByteString
         getFailMsgBytes();
+
+    /**
+     * <pre>
+     *心跳
+     * </pre>
+     *
+     * <code>.com.z.model.proto.Heartbeat heart = 6;</code>
+     * @return Whether the heart field is set.
+     */
+    boolean hasHeart();
+    /**
+     * <pre>
+     *心跳
+     * </pre>
+     *
+     * <code>.com.z.model.proto.Heartbeat heart = 6;</code>
+     * @return The heart.
+     */
+    com.z.model.proto.MyMessage.Heartbeat getHeart();
+    /**
+     * <pre>
+     *心跳
+     * </pre>
+     *
+     * <code>.com.z.model.proto.Heartbeat heart = 6;</code>
+     */
+    com.z.model.proto.MyMessage.HeartbeatOrBuilder getHeartOrBuilder();
   }
   /**
    * <pre>
@@ -1281,7 +2249,7 @@ public final class MyMessage {
     private int id_;
     /**
      * <pre>
-     *消息号--双数
+     *消息号--双数。（协议号：心跳 2）
      * </pre>
      *
      * <code>int32 id = 1;</code>
@@ -1419,6 +2387,44 @@ public final class MyMessage {
       }
     }
 
+    public static final int HEART_FIELD_NUMBER = 6;
+    private com.z.model.proto.MyMessage.Heartbeat heart_;
+    /**
+     * <pre>
+     *心跳
+     * </pre>
+     *
+     * <code>.com.z.model.proto.Heartbeat heart = 6;</code>
+     * @return Whether the heart field is set.
+     */
+    @java.lang.Override
+    public boolean hasHeart() {
+      return heart_ != null;
+    }
+    /**
+     * <pre>
+     *心跳
+     * </pre>
+     *
+     * <code>.com.z.model.proto.Heartbeat heart = 6;</code>
+     * @return The heart.
+     */
+    @java.lang.Override
+    public com.z.model.proto.MyMessage.Heartbeat getHeart() {
+      return heart_ == null ? com.z.model.proto.MyMessage.Heartbeat.getDefaultInstance() : heart_;
+    }
+    /**
+     * <pre>
+     *心跳
+     * </pre>
+     *
+     * <code>.com.z.model.proto.Heartbeat heart = 6;</code>
+     */
+    @java.lang.Override
+    public com.z.model.proto.MyMessage.HeartbeatOrBuilder getHeartOrBuilder() {
+      return getHeart();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1447,6 +2453,9 @@ public final class MyMessage {
       }
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(failMsg_)) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 5, failMsg_);
+      }
+      if (heart_ != null) {
+        output.writeMessage(6, getHeart());
       }
       getUnknownFields().writeTo(output);
     }
@@ -1481,6 +2490,10 @@ public final class MyMessage {
       if (!com.google.protobuf.GeneratedMessageV3.isStringEmpty(failMsg_)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, failMsg_);
       }
+      if (heart_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(6, getHeart());
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -1505,6 +2518,11 @@ public final class MyMessage {
       if (failType_ != other.failType_) return false;
       if (!getFailMsg()
           .equals(other.getFailMsg())) return false;
+      if (hasHeart() != other.hasHeart()) return false;
+      if (hasHeart()) {
+        if (!getHeart()
+            .equals(other.getHeart())) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -1529,6 +2547,10 @@ public final class MyMessage {
       hash = (53 * hash) + failType_;
       hash = (37 * hash) + FAILMSG_FIELD_NUMBER;
       hash = (53 * hash) + getFailMsg().hashCode();
+      if (hasHeart()) {
+        hash = (37 * hash) + HEART_FIELD_NUMBER;
+        hash = (53 * hash) + getHeart().hashCode();
+      }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1671,6 +2693,12 @@ public final class MyMessage {
 
         failMsg_ = "";
 
+        if (heartBuilder_ == null) {
+          heart_ = null;
+        } else {
+          heart_ = null;
+          heartBuilder_ = null;
+        }
         return this;
       }
 
@@ -1707,6 +2735,11 @@ public final class MyMessage {
         result.ok_ = ok_;
         result.failType_ = failType_;
         result.failMsg_ = failMsg_;
+        if (heartBuilder_ == null) {
+          result.heart_ = heart_;
+        } else {
+          result.heart_ = heartBuilder_.build();
+        }
         onBuilt();
         return result;
       }
@@ -1778,6 +2811,9 @@ public final class MyMessage {
           failMsg_ = other.failMsg_;
           onChanged();
         }
+        if (other.hasHeart()) {
+          mergeHeart(other.getHeart());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
         return this;
@@ -1830,6 +2866,13 @@ public final class MyMessage {
 
                 break;
               } // case 42
+              case 50: {
+                input.readMessage(
+                    getHeartFieldBuilder().getBuilder(),
+                    extensionRegistry);
+
+                break;
+              } // case 50
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -1850,7 +2893,7 @@ public final class MyMessage {
       private int id_ ;
       /**
        * <pre>
-       *消息号--双数
+       *消息号--双数。（协议号：心跳 2）
        * </pre>
        *
        * <code>int32 id = 1;</code>
@@ -1862,7 +2905,7 @@ public final class MyMessage {
       }
       /**
        * <pre>
-       *消息号--双数
+       *消息号--双数。（协议号：心跳 2）
        * </pre>
        *
        * <code>int32 id = 1;</code>
@@ -1877,7 +2920,7 @@ public final class MyMessage {
       }
       /**
        * <pre>
-       *消息号--双数
+       *消息号--双数。（协议号：心跳 2）
        * </pre>
        *
        * <code>int32 id = 1;</code>
@@ -2214,6 +3257,161 @@ public final class MyMessage {
         failMsg_ = value;
         onChanged();
         return this;
+      }
+
+      private com.z.model.proto.MyMessage.Heartbeat heart_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.z.model.proto.MyMessage.Heartbeat, com.z.model.proto.MyMessage.Heartbeat.Builder, com.z.model.proto.MyMessage.HeartbeatOrBuilder> heartBuilder_;
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 6;</code>
+       * @return Whether the heart field is set.
+       */
+      public boolean hasHeart() {
+        return heartBuilder_ != null || heart_ != null;
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 6;</code>
+       * @return The heart.
+       */
+      public com.z.model.proto.MyMessage.Heartbeat getHeart() {
+        if (heartBuilder_ == null) {
+          return heart_ == null ? com.z.model.proto.MyMessage.Heartbeat.getDefaultInstance() : heart_;
+        } else {
+          return heartBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 6;</code>
+       */
+      public Builder setHeart(com.z.model.proto.MyMessage.Heartbeat value) {
+        if (heartBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          heart_ = value;
+          onChanged();
+        } else {
+          heartBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 6;</code>
+       */
+      public Builder setHeart(
+          com.z.model.proto.MyMessage.Heartbeat.Builder builderForValue) {
+        if (heartBuilder_ == null) {
+          heart_ = builderForValue.build();
+          onChanged();
+        } else {
+          heartBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 6;</code>
+       */
+      public Builder mergeHeart(com.z.model.proto.MyMessage.Heartbeat value) {
+        if (heartBuilder_ == null) {
+          if (heart_ != null) {
+            heart_ =
+              com.z.model.proto.MyMessage.Heartbeat.newBuilder(heart_).mergeFrom(value).buildPartial();
+          } else {
+            heart_ = value;
+          }
+          onChanged();
+        } else {
+          heartBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 6;</code>
+       */
+      public Builder clearHeart() {
+        if (heartBuilder_ == null) {
+          heart_ = null;
+          onChanged();
+        } else {
+          heart_ = null;
+          heartBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 6;</code>
+       */
+      public com.z.model.proto.MyMessage.Heartbeat.Builder getHeartBuilder() {
+        
+        onChanged();
+        return getHeartFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 6;</code>
+       */
+      public com.z.model.proto.MyMessage.HeartbeatOrBuilder getHeartOrBuilder() {
+        if (heartBuilder_ != null) {
+          return heartBuilder_.getMessageOrBuilder();
+        } else {
+          return heart_ == null ?
+              com.z.model.proto.MyMessage.Heartbeat.getDefaultInstance() : heart_;
+        }
+      }
+      /**
+       * <pre>
+       *心跳
+       * </pre>
+       *
+       * <code>.com.z.model.proto.Heartbeat heart = 6;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.z.model.proto.MyMessage.Heartbeat, com.z.model.proto.MyMessage.Heartbeat.Builder, com.z.model.proto.MyMessage.HeartbeatOrBuilder> 
+          getHeartFieldBuilder() {
+        if (heartBuilder_ == null) {
+          heartBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.z.model.proto.MyMessage.Heartbeat, com.z.model.proto.MyMessage.Heartbeat.Builder, com.z.model.proto.MyMessage.HeartbeatOrBuilder>(
+                  getHeart(),
+                  getParentForChildren(),
+                  isClean());
+          heart_ = null;
+        }
+        return heartBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -3240,6 +4438,11 @@ public final class MyMessage {
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_z_model_proto_Heartbeat_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_com_z_model_proto_Heartbeat_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_z_model_proto_MyMsgReq_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -3263,36 +4466,46 @@ public final class MyMessage {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\017MyMessage.proto\022\021com.z.model.proto\"#\n\010" +
-      "MyMsgReq\022\n\n\002id\030\001 \001(\005\022\013\n\003msg\030\002 \003(\014\"o\n\010MyM" +
-      "sgRes\022\n\n\002id\030\001 \001(\005\022\013\n\003msg\030\002 \003(\014\022\n\n\002ok\030\003 \001" +
-      "(\010\022-\n\010failType\030\004 \001(\0162\033.com.z.model.proto" +
-      ".FailType\022\017\n\007failMsg\030\005 \001(\t\"Y\n\tBroadcast\022" +
-      "*\n\004type\030\001 \001(\0162\034.com.z.model.proto.BroadT" +
-      "ype\022\013\n\003msg\030\002 \001(\t\022\023\n\013specificMsg\030\003 \003(\014*3\n" +
-      "\007MsgType\022\016\n\nMT_DEFAULT\020\000\022\013\n\007MT_USER\020\001\022\013\n" +
-      "\007MT_GAME\020\002*)\n\010FailType\022\016\n\nFT_DEFAULT\020\000\022\r" +
-      "\n\tFT_EFFECT\020\001**\n\tBroadType\022\016\n\nBT_DEFAULT" +
-      "\020\000\022\r\n\tBT_EFFECT\020\001b\006proto3"
+      "\n\017MyMessage.proto\022\021com.z.model.proto\"/\n\t" +
+      "Heartbeat\022\021\n\ttimestamp\030\001 \001(\003\022\017\n\007message\030" +
+      "\002 \001(\t\"P\n\010MyMsgReq\022\n\n\002id\030\001 \001(\005\022\013\n\003msg\030\002 \003" +
+      "(\014\022+\n\005heart\030\003 \001(\0132\034.com.z.model.proto.He" +
+      "artbeat\"\234\001\n\010MyMsgRes\022\n\n\002id\030\001 \001(\005\022\013\n\003msg\030" +
+      "\002 \003(\014\022\n\n\002ok\030\003 \001(\010\022-\n\010failType\030\004 \001(\0162\033.co" +
+      "m.z.model.proto.FailType\022\017\n\007failMsg\030\005 \001(" +
+      "\t\022+\n\005heart\030\006 \001(\0132\034.com.z.model.proto.Hea" +
+      "rtbeat\"Y\n\tBroadcast\022*\n\004type\030\001 \001(\0162\034.com." +
+      "z.model.proto.BroadType\022\013\n\003msg\030\002 \001(\t\022\023\n\013" +
+      "specificMsg\030\003 \003(\014*3\n\007MsgType\022\016\n\nMT_DEFAU" +
+      "LT\020\000\022\013\n\007MT_USER\020\001\022\013\n\007MT_GAME\020\002*)\n\010FailTy" +
+      "pe\022\016\n\nFT_DEFAULT\020\000\022\r\n\tFT_EFFECT\020\001**\n\tBro" +
+      "adType\022\016\n\nBT_DEFAULT\020\000\022\r\n\tBT_EFFECT\020\001b\006p" +
+      "roto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         });
-    internal_static_com_z_model_proto_MyMsgReq_descriptor =
+    internal_static_com_z_model_proto_Heartbeat_descriptor =
       getDescriptor().getMessageTypes().get(0);
+    internal_static_com_z_model_proto_Heartbeat_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_com_z_model_proto_Heartbeat_descriptor,
+        new java.lang.String[] { "Timestamp", "Message", });
+    internal_static_com_z_model_proto_MyMsgReq_descriptor =
+      getDescriptor().getMessageTypes().get(1);
     internal_static_com_z_model_proto_MyMsgReq_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_z_model_proto_MyMsgReq_descriptor,
-        new java.lang.String[] { "Id", "Msg", });
+        new java.lang.String[] { "Id", "Msg", "Heart", });
     internal_static_com_z_model_proto_MyMsgRes_descriptor =
-      getDescriptor().getMessageTypes().get(1);
+      getDescriptor().getMessageTypes().get(2);
     internal_static_com_z_model_proto_MyMsgRes_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_z_model_proto_MyMsgRes_descriptor,
-        new java.lang.String[] { "Id", "Msg", "Ok", "FailType", "FailMsg", });
+        new java.lang.String[] { "Id", "Msg", "Ok", "FailType", "FailMsg", "Heart", });
     internal_static_com_z_model_proto_Broadcast_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_com_z_model_proto_Broadcast_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_z_model_proto_Broadcast_descriptor,

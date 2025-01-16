@@ -67,8 +67,8 @@ public class RoomBizService {
         return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
     }
 
-    public  AbstractMessageLite out(long uid){
-        StringJoiner sj = new StringJoiner(",").add("uid:" + uid);
+    public  AbstractMessageLite out(long uid,String action){
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid).add("action:" + action);
         log.info(sj.toString());
         MyMessage.MyMsgRes.Builder res = MyMessage.MyMsgRes.newBuilder().setId(MsgId.S_OUT_ROON).setOk(true);
         User user = UserService.ins.get(uid);

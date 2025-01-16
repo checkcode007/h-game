@@ -48,6 +48,10 @@ private static final Log logger = LogFactory.getLog(WebSocketServer.class);
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
+                    .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000) // 设置连接超时为 10 秒
+                    .option(ChannelOption.TCP_NODELAY, true) // 禁用 Nagle 算法，提升小数据包传输效率
+                    .option(ChannelOption.SO_REUSEADDR, true) // 允许重用地址
+                    .childOption(ChannelOption.SO_KEEPALIVE, true) // 开启 TCP 长连接
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel( SocketChannel ch) {
@@ -59,7 +63,7 @@ private static final Log logger = LogFactory.getLog(WebSocketServer.class);
                             pipeline.addLast(new WebSocketFrameAggregator(65536)); // 添加帧聚合器
                             pipeline.addLast(new ProtobufDecoder(MyMessage.MyMsgReq.getDefaultInstance()));
                             pipeline.addLast(new ProtobufEncoder());
-                            pipeline.addLast(new IdleStateHandler(30,30,0, TimeUnit.SECONDS));
+                            pipeline.addLast(new IdleStateHandler(30,15,0, TimeUnit.SECONDS));
                             pipeline.addLast(new WebSocketFrameHandler());
                             pipeline.addLast(new SimpleChannelInboundHandler<BinaryWebSocketFrame>() {
                                 @Override

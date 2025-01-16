@@ -54,6 +54,15 @@ public class BetParam {
      * 总下注次数
      */
     long totalC;
+
+    /**
+     * 房间里赢的总次数
+     */
+    long roomWinC;
+    /**
+     * 房间里总下注次数
+     */
+    long roomTotalC;
     /**
      * scatter 个数
      */

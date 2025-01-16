@@ -4,8 +4,7 @@ package com.z.core.service.user;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.z.common.util.DateTimeUtil;
-import com.z.core.service.cfg.CCfgBizService;
+import com.z.core.ai.PlayerStateController;
 import com.z.core.service.wallet.WalletService;
 import com.z.core.util.SpringContext;
 import com.z.dbmysql.dao.user.GUserDao;
@@ -14,8 +13,7 @@ import com.z.model.bo.user.Wallet;
 import com.z.model.mysql.GUser;
 import com.z.model.proto.CommonGame;
 import com.z.model.proto.CommonUser;
-import com.z.model.type.BetState;
-import com.z.model.type.user.UserState;
+import com.z.model.type.SlotState;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -63,41 +61,15 @@ public enum UserService {
     public void reloadBetState(User bo) {
         StringJoiner sj = new StringJoiner(",").add("uid:"+bo.getId()).add("lock:"+bo.isLock());
         if(bo.isLock()){
-            bo.setBetState(BetState.LOW_BET);
+            bo.setSlotState(SlotState.LOW_BET);
             offer(bo.getId());
-            log.info(sj.add("low").toString());
-            return;
-        }
-        //新用户
-        long t = System.currentTimeMillis();
-        Wallet wallet = WalletService.ins.get(bo.getId());
-        if(wallet == null || t-wallet.getWallet().getCreateTime().getTime()<DateTimeUtil.DAY_MILLS ){
-            bo.setBetState(BetState.MEDIUM_BET);
-            offer(bo.getId());
-            log.info(sj.add("wallet less mid").toString());
-            return;
-        }
-        //老用户
-        long winGold = wallet.getWinGold();
-        long betGold = wallet.getBetGold();
-        if(winGold<1){
-            bo.setBetState(BetState.HIGH_BET);
-            offer(bo.getId());
-            log.info(sj.add("betGold less high").toString());
-            return;
-        }
 
-        float radio = winGold*100/betGold;
-
-        if(radio>CCfgBizService.ins.getUV1()){
-            bo.setBetState(BetState.LOW_BET);
-        } else  if(radio>CCfgBizService.ins.getUV2()){
-            bo.setBetState(BetState.MEDIUM_BET);
         }else{
-            bo.setBetState(BetState.HIGH_BET);
+            Wallet wallet = WalletService.ins.get(bo.getId());
+            PlayerStateController.reload(wallet,bo);
         }
-        offer(bo.getId());
-        log.info(sj.add("radio :"+radio).add("state:"+bo.getBetState()).toString());
+        log.info(sj.add("state:"+bo.getSlotState()).toString());
+
     }
     Queue<Long> queue = new ConcurrentLinkedQueue<>();
 
@@ -153,7 +125,7 @@ public enum UserService {
         BeanUtils.copyProperties(user,bo);
         bo.setId(user.getId());
         bo.setType(CommonUser.UserType.valueOf(user.getType()));
-        bo.setState(UserState.getUserState(user.getState()));
+        bo.setState(com.z.model.type.user.UserState.getUserState(user.getState()));
         bo.setUser(user);
         cache.put(user.getId(),bo);
         return bo;
@@ -164,7 +136,7 @@ public enum UserService {
         BeanUtils.copyProperties(user,bo);
         bo.setId(user.getId());
         bo.setType(CommonUser.UserType.valueOf(user.getType()));
-        bo.setState(UserState.getUserState(user.getState()));
+        bo.setState(com.z.model.type.user.UserState.getUserState(user.getState()));
         bo.setUser(user);
         cache.put(user.getId(),bo);
         return user;
