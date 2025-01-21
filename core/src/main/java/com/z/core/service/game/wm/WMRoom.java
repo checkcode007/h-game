@@ -4,10 +4,7 @@ package com.z.core.service.game.wm;
 import cn.hutool.core.util.RandomUtil;
 import com.z.core.service.game.slot.SlotRoom;
 import com.z.core.service.wallet.WalletService;
-import com.z.model.bo.slot.Payline;
-import com.z.model.bo.slot.Point;
-import com.z.model.bo.slot.Rewardline;
-import com.z.model.bo.slot.SlotModel;
+import com.z.model.bo.slot.*;
 import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CRoom;
@@ -74,7 +71,7 @@ public class WMRoom extends SlotRoom {
         }
 
         List<Rewardline> rewardlines = new ArrayList<>();
-        for (Payline payline : lines.values()) {
+        for (Line payline : lineMap.values()) {
             Rewardline line = checkLine(payline);
             if (line == null) continue;
             rewardlines.add(line);
@@ -98,14 +95,14 @@ public class WMRoom extends SlotRoom {
      * @param line
      * @return ()
      */
-    public Rewardline checkLine(Payline line){
+    public Rewardline checkLine(Line line){
         Rewardline payline = checkHigher(line);
         if (payline != null) return payline;
         //从左到右
         int leftType = 0;
-        List<Point> leftList = new ArrayList<>();
+        List<SlotModel> leftList = new ArrayList<>();
 
-        for (Point p : line.getPoints()) {
+        for (SlotModel p : line.getPoints()) {
             int x = p.getX();
             SlotModel m = board.get(x,p.getY());
             int type = m.getK();
@@ -120,9 +117,9 @@ public class WMRoom extends SlotRoom {
         }
         //从右到左
         int rightType = 0;
-        List<Point> rightList = new ArrayList<>();
+        List<SlotModel> rightList = new ArrayList<>();
         for (int i = line.getPoints().size() - 1; i >= 0; i--) {
-            Point p =line.getPoints().get(i);
+            SlotModel p =line.getPoints().get(i);
             int x = p.getX();
             SlotModel m = board.get(x,p.getY());
             int type = m.getK();
@@ -168,12 +165,12 @@ public class WMRoom extends SlotRoom {
      * @param line
      * @return
      */
-    public Rewardline checkHigher(Payline line){
+    public Rewardline checkHigher(Line line){
         int leftC = 0,rightC = 0;
-        List<Point> leftList = new ArrayList<>();
-        List<Point> rightList = new ArrayList<>();
+        List<SlotModel> leftList = new ArrayList<>();
+        List<SlotModel> rightList = new ArrayList<>();
         //从左到右
-        for (Point p : line.getPoints()) {
+        for (SlotModel p : line.getPoints()) {
             int x = p.getX();
             SlotModel m = board.get(x,p.getY());
             if(!m.isScatter()) continue;
@@ -182,7 +179,7 @@ public class WMRoom extends SlotRoom {
         }
         //从右到左
         for (int i = line.getPoints().size() - 1; i >= 0; i--) {
-            Point p =line.getPoints().get(i);
+            SlotModel p =line.getPoints().get(i);
             int x = p.getX();
             SlotModel m = board.get(x,p.getY());
             if(!m.isScatter()) continue;

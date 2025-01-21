@@ -14,6 +14,7 @@ import com.z.core.service.game.mali.MaliRoom;
 import com.z.core.service.game.pig.PigRoom;
 import com.z.core.service.game.puck.PuckRoom;
 import com.z.core.service.game.room.RoomService;
+import com.z.core.service.game.slot.SlotMachineService;
 import com.z.core.service.game.wm.WMHigherRoom;
 import com.z.core.service.game.wm.WMRoom;
 import com.z.core.service.user.UserService;
@@ -40,7 +41,8 @@ import java.util.StringJoiner;
 public class RoomBizService {
 //    protected Logger log = LoggerFactory.getLogger(getClass());
     private static final Log log = LogFactory.getLog(RoomBizService.class);
-
+    @Autowired
+    SlotMachineService slotMachineService;
     @Autowired
     WalletBizService walletBizService;
 
@@ -152,6 +154,11 @@ public class RoomBizService {
                     return res.build();
                 }
             }else{
+                if(!room.betCheck(uid,gold)){
+                    log.error(sj.add("bet gold fail").add("min:"+room.getBetMin()).add("max:"+room.getBetMax()).toString());
+                    res.setOk(false).setFailMsg("扣除金币失败");
+                    return res.build();
+                }
                 if (!walletBizService.changeGold(CommonUser.GoldType.GT_GAME, AddType.SUB, uid, gold,gameType,user.getRoomType())) {
                     log.error(sj.add("sub gold fail").toString());
                     res.setOk(false).setFailMsg("扣除金币失败");
@@ -159,11 +166,7 @@ public class RoomBizService {
                 }
             }
         }
-        if(!room.betCheck(uid,gold)){
-            log.error(sj.add("bet gold fail").add("min:"+room.getBetMin()).add("max:"+room.getBetMax()).toString());
-            res.setOk(false).setFailMsg("扣除金币失败");
-            return res.build();
-        }
+
         MsgResult msgResult = null;
         Game.S_20104.Builder b = Game.S_20104.newBuilder();
         if (gameType == CommonGame.GameType.BAIBIAN_XIAOMALI || gameType == CommonGame.GameType.JINGDIAN_XIAOMALI ) {

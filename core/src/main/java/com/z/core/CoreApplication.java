@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan(basePackages = {
 
-        "com.z.dbmysql", "com.z.dbes","com.z.core" ,"com.z.common"   // 指定app模块的包
+        "com.z.dbmysql", "com.z.dbes","com.z.core" ,"com.z.common","com.z.core.service.game.slot" // 指定app模块的包
 })
 @EnableScheduling
 @SpringBootApplication

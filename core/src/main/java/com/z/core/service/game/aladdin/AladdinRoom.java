@@ -104,6 +104,7 @@ public class AladdinRoom extends SlotRoom {
                 SlotModel model = preBaida.get(i, j);
                 if (model == null) {
                     param.setX(i);
+                    param.setY(j);
                     Slot slot = random(slots);
                     model = SlotCommon.ins.toModel(slot, i, j);
                 }

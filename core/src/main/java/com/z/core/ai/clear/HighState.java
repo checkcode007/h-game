@@ -1,5 +1,6 @@
-package com.z.core.ai;
+package com.z.core.ai.clear;
 
+import com.z.core.ai.SuperState;
 import com.z.model.BetParam;
 import com.z.model.bo.slot.Slot;
 import com.z.model.type.SlotState;
@@ -9,15 +10,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class HighState extends SuperState{
+public class HighState extends ClearState {
 
     public HighState(SlotState k) {
         super(k);
-        C1 =0.8f;
-        C2=0.5f;
-        C3=0.1f;
+        C1 =0.5f;
+        C2=0.1f;
+        C3=0.05f;
         C4=0.01f;
-
     }
     @Override
     public Map<Integer, Integer> weight(Map<Integer, Slot> slots, List<Slot> list, Set<Integer> goals, BetParam param) {

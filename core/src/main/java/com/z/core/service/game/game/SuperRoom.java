@@ -4,6 +4,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.z.core.service.game.slot.CPaylineService;
 import com.z.core.service.game.slot.CSlotService;
+import com.z.core.service.game.slot.SlotMachineService;
 import com.z.core.service.user.UserService;
 import com.z.core.service.wallet.WalletBizService;
 import com.z.core.service.wallet.WalletService;
@@ -34,6 +35,7 @@ public abstract class SuperRoom implements IRoom{
     protected CSlotService service;
     protected CPaylineService paylineService;
     protected WalletBizService walletBizService;
+    protected SlotMachineService machineService;
     /**
      * 房间id
      */
@@ -107,6 +109,10 @@ public abstract class SuperRoom implements IRoom{
 
     protected BetParam param;
 
+    protected long roomBetGold= 0l;
+    protected long roomWinGold= 0l;
+
+
 
     public SuperRoom(CRoom cRoom,long uid) {
         this.gameType = CommonGame.GameType.forNumber(cRoom.getGameType());
@@ -126,6 +132,7 @@ public abstract class SuperRoom implements IRoom{
         service = SpringContext.getBean(CSlotService.class);
         paylineService = SpringContext.getBean(CPaylineService.class);
         walletBizService = SpringContext.getBean(WalletBizService.class);
+        machineService = SpringContext.getBean(SlotMachineService.class);
     }
 
 
@@ -170,6 +177,7 @@ public abstract class SuperRoom implements IRoom{
         param.setState(user.getSlotState().getK());
         param.setWinC(wallet.getWins());
         param.setTotalC(wallet.getBetC());
+        param.clearLine();
     }
     @Override
     public MsgResult check(long uid,long curGold) {

@@ -162,15 +162,15 @@ public class ClearRound extends SuperRound {
                 }
                 rate += g.getRate();
                 freeCout += g.getFree();
-                log.info("k:" + g.getK() + " c:" + g.getC() + " rate:" + g.getRate() + " free:" + free);
+//                log.info("k:" + g.getK() + " c:" + g.getC() + " rate:" + g.getRate() + " free:" + free);
             }
             freeC += freeCout;
             int rowRate = rowRadio.get(index > rowRadio.size() - 1 ? rowRadio.size() - 1 : index);
             rowRate = free ? rowRate : rowRate * 2;
             long addGold = realGold * rate * rowRate;
             StringJoiner sj1 = new StringJoiner(",");
-            sj1.add("r:" + rate).add("rowR:" + rowRate).add("index:" + index).add("realG:" + realGold).add("addG:" + addGold).add("freeC:" + freeCout);
-            log.info(sj1.toString());
+//            sj1.add("r:" + rate).add("rowR:" + rowRate).add("index:" + index).add("realG:" + realGold).add("addG:" + addGold).add("freeC:" + freeCout);
+//            log.info(sj1.toString());
             rewardGold += addGold;
             b.addAllSpots(allToModel(preBoard));
             builder.addRounds(b.setGold(addGold).setRowRadio(rowRate).build());
@@ -264,7 +264,7 @@ public class ClearRound extends SuperRound {
                         c++;
                         lianjie.add(e);
                         b_col_had = true;
-                        log.info(" col:" + i + " type:" + k + "->" + e);
+//                        log.info(" col:" + i + " type:" + k + "->" + e);
                         break;
                     } else {
                         break;
@@ -286,7 +286,7 @@ public class ClearRound extends SuperRound {
                             toRemove.add(e);
                         }
                     }
-                    log.info("del--->" + x + "--->" + k + "-->del-->" + m);
+//                    log.info("del--->" + x + "--->" + k + "-->del-->" + m);
                 }
                 // 进行删除操作
                 Map<Integer, Integer> rateMap = new HashMap();

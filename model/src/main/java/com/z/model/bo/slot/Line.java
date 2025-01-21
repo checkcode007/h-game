@@ -7,12 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class Payline {
-
-    int id;
+public class Line {
     /**
      * 游戏类型
-     * @see com.z.model.proto.CommonGame.GameType
+     * @see CommonGame.GameType
      */
     CommonGame.GameType type;
     /**
@@ -20,17 +18,22 @@ public class Payline {
      */
     int lineId;
 
-    List<Point> points;//坐标
+    List<SlotModel> points;//坐标
 
+    int k;
+    int c;
+    int rate;
 
-    public Payline(int id, CommonGame.GameType type, int lineId) {
-        this.id = id;
+    public Line(CommonGame.GameType type, int lineId, int k, int c, int rate) {
         this.type = type;
         this.lineId = lineId;
         this.points = new ArrayList<>();
+        this.k = k;
+        this.c = c;
+        this.rate = rate;
     }
 
-    public void addPoints(List<Point> points) {
+    public void addPoints(List<SlotModel> points) {
         this.points.addAll(points);
     }
 

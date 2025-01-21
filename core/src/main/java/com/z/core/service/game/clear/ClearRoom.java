@@ -65,6 +65,11 @@ public class ClearRoom extends SuperRoom {
         user.setRoundId(round.getId());
         log.info("uid:"+uid+" roundId:"+user.getRoundId()+"================>start");
         MsgResult<Game.ClearGameMsg> ret = round.bet(uid, 0, gold, free);
+
+        roomWinGold += ret.getT().getGold();
+        roomBetGold+= gold;
+        param.setRoomWinGold(roomWinGold);
+        param.setRoomBetGold(roomBetGold);
         log.info("uid:"+uid+" roundId:"+user.getRoundId()+"==>ret:"+ PbUtils.pbToJson(ret.getT()));
         return ret;
     }

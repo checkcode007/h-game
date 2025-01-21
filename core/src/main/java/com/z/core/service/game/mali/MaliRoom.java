@@ -58,30 +58,35 @@ public class MaliRoom extends SlotRoom {
             int x = m.getX();
             int y = m.getY();
             m.setChangeType(getChangeType());
+            m.setBaida(true);
             SlotModel m1 = board.get(x - 1, y);
             if (m1 != null) {
                 m1.setChangeType(getChangeType());
+                m1.setBaida(true);
             }
             m1 = board.get(x + 1, y);
             if (m1 != null) {
                 m1.setChangeType(getChangeType());
+                m1.setBaida(true);
             }
             m1 = board.get(x, y - 1);
             if (m1 != null) {
                 m1.setChangeType(getChangeType());
+                m1.setBaida(true);
             }
             m1 = board.get(x, y + 1);
             if (m1 != null) {
                 m1.setChangeType(getChangeType());
+                m1.setBaida(true);
             }
         }
     }
 
 
     @Override
-    public Rewardline checkHigher(Payline line) {
+    public Rewardline checkHigher(Line line) {
         Rewardline payline = null;
-        for (Point p : line.getPoints()) {
+        for (SlotModel p : line.getPoints()) {
             int x = p.getX();
             SlotModel m = board.get(x,p.getY());
             int type = m.getChangeType()>0 ?m.getChangeType():m.getK();

@@ -3,6 +3,9 @@ package com.z.model;
 import com.z.model.proto.CommonGame;
 import lombok.Data;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Data
 public class BetParam {
     public BetParam() {
@@ -34,6 +37,7 @@ public class BetParam {
      *  第几排
      */
     int x;
+    int y;
     /**
      * 是否免费次数
      */
@@ -63,6 +67,17 @@ public class BetParam {
      * 房间里总下注次数
      */
     long roomTotalC;
+
+    /**
+     * 房间里下注的总金额
+     */
+    long roomBetGold;
+    /**
+     * 房间里赢的金额
+     */
+    long roomWinGold;
+
+
     /**
      * scatter 个数
      */
@@ -75,6 +90,15 @@ public class BetParam {
      * 百搭 个数
      */
     int baida;
+
+    Set<Integer> lineSet = new HashSet<>();
+    public void addLine(int type){
+        lineSet.add(type);
+    }
+    public void clearLine(){
+        lineSet.clear();
+    }
+
 
     public void addScatter(){
         this.scatter++;

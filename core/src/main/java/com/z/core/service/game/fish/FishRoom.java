@@ -2,6 +2,7 @@ package com.z.core.service.game.fish;
 
 
 import com.z.core.service.game.game.SuperRoom;
+import com.z.core.service.game.slot.SlotCommon;
 import com.z.core.service.wallet.WalletService;
 import com.z.core.util.SpringContext;
 import com.z.model.bo.user.Wallet;
@@ -89,7 +90,7 @@ public class FishRoom extends SuperRoom {
                     log.error("cFish null:"+fish.getType());
                     continue;
                 }
-                if(FishCommon.ins.isCaught(param,cFish.getType(),cFish.getRadio(),cFishFire.getRadio())){
+                if(SlotCommon.ins.isCaught(param,cFish.getType(),cFish.getRadio(),cFishFire.getRadio())){
                     goalMap.put(fish.getId(),cFish);
                     sj.add(fish.getId()+"");
                     roomWinC++;

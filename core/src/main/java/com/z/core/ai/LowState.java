@@ -18,6 +18,12 @@ public class LowState extends SuperState {
 
     public LowState(SlotState k) {
         super(k);
+        C1 =0.2f;
+        C2= 0.1f;
+        C3=0f;
+        C4=0f;
+        roomC3 = 0.05;  // 房间输赢次数差的权重
+        roomC4 = 0.001;  // 房间输赢金额差的权重
     }
 
     @Override
@@ -34,11 +40,6 @@ public class LowState extends SuperState {
         }
     }
 
-
-    @Override
-    void betStateWight(Table<Integer, Integer, SlotModel> board, Map<Integer, Integer> map, Map<Integer, Slot> slots,BetParam param) {
-
-    }
 
     @Override
     public Map<Integer, Integer> weight(Map<Integer, Slot> slots, List<Slot> list, Set<Integer> goals, BetParam param) {
@@ -60,70 +61,7 @@ public class LowState extends SuperState {
     }
 
     @Override
-    public void col_0(Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
-        boolean free = param.isFree();
-        int continueC = param.getContinueC();
-        long winC = param.getWinC();
-        long totalC = param.getTotalC();
-        list.removeIf(e -> e.getK()>7);
-
+    public Slot winSlot(Table<Integer, Integer, SlotModel> board, Map<Integer, Integer> map, Map<Integer, Slot> slots, List<Slot> list, BetParam param) {
+        return null;
     }
-    @Override
-    public void col_1(Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
-        int x = param.getX();
-        boolean free = param.isFree();
-        int continueC = param.getContinueC();
-        long winC = param.getWinC();
-        long totalC = param.getTotalC();
-        long radio = (winC*100)/totalC;
-        boolean b = false;
-        if(radio>95){
-            b = winC%50!=0;
-        } else if (radio>80) {
-            b = winC%40!=0;
-        }else if (radio>50) {
-            b = winC%30!=0;
-        }else {
-            b = winC%10!=0;
-        }
-        if(continueC>0){
-            b = true;
-        }
-        if(b){
-            log.info("=====>interrupt: winC"+winC +" totalC:"+totalC+" radio:"+radio);
-            interrupt(board,list,x);
-        }else{
-            log.info("----->interrupt: winC"+winC +" totalC:"+totalC+" radio:"+radio);
-        }
-    }
-
-    @Override
-    public void col_2(Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
-        int x = param.getX();
-        boolean free = param.isFree();
-        int continueC = param.getContinueC();
-        long winC = param.getWinC();
-        long totalC = param.getTotalC();
-        long radio = (winC*100)/totalC;
-        boolean b = false;
-        if(radio>95){
-            b = winC%50!=0;
-        } else if (radio>80) {
-            b = winC%40!=0;
-        }else if (radio>50) {
-            b = winC%30!=0;
-        }else {
-            b = winC%10!=0;
-        }
-        if(continueC>0){
-            b = true;
-        }
-        if(b){
-            log.info("====>interrupt: winC"+winC +" totalC:"+totalC+" radio:"+radio);
-            interrupt(board,list,x);
-        }else {
-            log.info("----->interrupt: winC"+winC +" totalC:"+totalC+" radio:"+radio);
-        }
-    }
-
 }

@@ -19,7 +19,7 @@ public class Rewardline {
      */
     int lineId;
 
-    List<Point> points;//坐标
+    List<SlotModel> points;//坐标
     /**
      * 倍率
      */
@@ -42,11 +42,11 @@ public class Rewardline {
         this.points = new ArrayList<>();
     }
 
-    public void addPoints(List<Point> points) {
+    public void addPoints(List<SlotModel> points) {
         this.points.addAll(points);
     }
 
-    public void addPoint(Point p) {
+    public void addPoint(SlotModel p) {
         this.points.add(p);
     }
     public void addSpecicalC() {

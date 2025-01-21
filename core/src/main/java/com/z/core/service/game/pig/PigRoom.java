@@ -11,6 +11,7 @@ import com.z.core.service.game.slot.CSlotService;
 import com.z.core.service.game.slot.SlotRoom;
 import com.z.core.service.wallet.WalletService;
 import com.z.core.util.SpringContext;
+import com.z.model.bo.slot.Line;
 import com.z.model.bo.slot.Payline;
 import com.z.model.bo.slot.Rewardline;
 import com.z.model.bo.user.Wallet;
@@ -72,7 +73,7 @@ public class PigRoom extends SlotRoom {
     @Override
     public void checklines() {
         List<Rewardline> rewardlines = new ArrayList<>();
-        for (Payline payline : lines.values()) {
+        for (Line payline : lineMap.values()) {
             Rewardline line = checkLine(payline);
             if (line == null) continue;
             rewardlines.add(line);

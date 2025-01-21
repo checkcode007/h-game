@@ -11,7 +11,12 @@ import java.util.*;
 public class MidState extends SuperState {
     public MidState(SlotState k) {
         super(k);
+        C1 =0.3f;
+        C2= 0.2f;
+        C3=0.01f;
+        C4=0f;
     }
+
     @Override
     void betStateFilter(Table<Integer,Integer, SlotModel> board, List<Slot> list, BetParam param) {
         int x = param.getX();

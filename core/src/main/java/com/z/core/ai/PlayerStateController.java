@@ -1,8 +1,11 @@
 package com.z.core.ai;
 
+import com.z.core.service.user.UserService;
 import com.z.model.bo.user.User;
 import com.z.model.bo.user.Wallet;
 import com.z.model.type.SlotState;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /*
 玩家状态切换逻辑设计（适用于 Slot 游戏通用设计）
@@ -55,14 +58,15 @@ import com.z.model.type.SlotState;
    - 在高概率状态下，引入额外奖励机制（如 Jackpot）以提高玩家兴奋感和参与度。
 */
 public class PlayerStateController {
+    private static final Log log = LogFactory.getLog(PlayerStateController.class);
 
     // 状态阈值和倍率因子
-    private static final double T1 = 50.0;  // 高概率状态阈值
-    private static final double T2 = -50.0; // 低概率状态阈值
+    private static final double T1 = 10000.0;  // 高概率状态阈值
+    private static final double T2 = -10000.0; // 低概率状态阈值
 
     // 平衡系数
-    private static final double C1 = 0.5;  // 输赢次数差的权重
-    private static final double C2 = 10.0;  // 输赢金额差的权重
+    private static final double C1 = 0.1;  // 输赢次数差的权重
+    private static final double C2 = 0.01;  // 输赢金额差的权重
 
     // 计算状态值
     private static double calculateStateValue(long winCount, long loseCount, double betAmount, double winAmount) {
@@ -72,7 +76,13 @@ public class PlayerStateController {
     // 判定玩家状态
     public static SlotState determineState(long winCount, long loseCount, double betAmount, double winAmount) {
         double stateValue = calculateStateValue(winCount, loseCount, betAmount, winAmount);
+        // 特殊情况：初始数据
 
+        log.info("stateValue: " + stateValue+" winC:"+winCount+" loseC:"+loseCount+" betAmount:"+betAmount+" winAmount:"+winAmount);
+        System.err.println(stateValue);
+        if (winCount == 0 && loseCount == 0 && betAmount == 0.0 && winAmount == 0.0) {
+            return SlotState.MEDIUM_BET;
+        }
         if (stateValue > T1) {
             return SlotState.HIGH_BET;
         } else if (stateValue >= T2) {
@@ -98,10 +108,10 @@ public class PlayerStateController {
         PlayerStateController controller = new PlayerStateController();
 
         // 测试参数
-        int winCount = 10;
-        int loseCount = 100000;
-        double betAmount = 1000.0;
-        double winAmount = 2000.0;
+        int winCount = 5;
+        int loseCount = 90;
+        double betAmount = 500000;
+        double winAmount = 3300.0;
 
         // 计算中奖概率
         SlotState state  = controller.determineState(winCount, loseCount, betAmount, winAmount);
