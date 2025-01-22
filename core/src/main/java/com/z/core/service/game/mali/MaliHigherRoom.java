@@ -114,14 +114,14 @@ public class MaliHigherRoom extends SlotRoom {
         return ret;
     }
 
-    @Override
-    public Slot random(Map<Integer, Slot> slots) {
-        Set<Integer> goals = new HashSet<>();
-        for (SlotModel m : board.values()) {
-            goals.add(m.getK());
-        }
-        return SlotCommon.ins.randomHigher(gameType, slots,goals,param);
-    }
+//    @Override
+//    public Slot random(Map<Integer, Slot> slots) {
+//        Set<Integer> goals = new HashSet<>();
+//        for (SlotModel m : board.values()) {
+//            goals.add(m.getK());
+//        }
+//        return SlotCommon.ins.randomHigher(gameType, slots,goals,param);
+//    }
 
     public List<Integer>  allSymbol(){
         List<Integer> highers = new ArrayList<>();

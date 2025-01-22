@@ -52,50 +52,50 @@ public class WMRoom extends SlotRoom {
         ret.ok(b.build());
         return ret;
     }
-    @Override
-    public void checklines() {
-        //全屏判断
-        int fullType=0;
-        for (SlotModel m : board.values()) {
-            if(fullType == 0){
-                fullType = m.getK();
-            } else if ( fullType != m.getK()) {
-                fullType= 0;
-                break;
-            }
-        }
-        if(fullType >1){
-            this.fullType = fullType;
-            this.fullRate= service.getFull(gameType,fullType).getRate();
-            return;
-        }
-
-        List<Rewardline> rewardlines = new ArrayList<>();
-        for (Line payline : lineMap.values()) {
-            Rewardline line = checkLine(payline);
-            if (line == null) continue;
-            rewardlines.add(line);
-        }
-        long base = getBetGold();
-        for (Rewardline line : rewardlines) {
-            CSlot cSlot = service.get(gameType, line.getK(), line.getPoints().size());
-            if (cSlot == null) continue;
-            line.setRate(cSlot.getRate());
-            line.setGold(base * line.getRate());
-            line.setSpecialC(cSlot.getC1());
-            this.rewardlines.add(line);
-            highC +=cSlot.getC1();
-            log.info(line.toString());
-        }
-
-    }
+//    @Override
+//    public void checklines() {
+//        //全屏判断
+//        int fullType=0;
+//        for (SlotModel m : board.values()) {
+//            if(fullType == 0){
+//                fullType = m.getK();
+//            } else if ( fullType != m.getK()) {
+//                fullType= 0;
+//                break;
+//            }
+//        }
+//        if(fullType >1){
+//            this.fullType = fullType;
+//            this.fullRate= service.getFull(gameType,fullType).getRate();
+//            return;
+//        }
+//
+//        List<Rewardline> rewardlines = new ArrayList<>();
+//        for (Rewardline payline : lineMap.values()) {
+//            Rewardline line = checkLine(payline);
+//            if (line == null) continue;
+//            rewardlines.add(line);
+//        }
+//        long base = getBetGold();
+//        for (Rewardline line : rewardlines) {
+//            CSlot cSlot = service.get(gameType, line.getK(), line.getPoints().size());
+//            if (cSlot == null) continue;
+//            line.setRate(cSlot.getRate());
+//            line.setGold(base * line.getRate());
+//            line.setSpecialC(cSlot.getC1());
+//            this.rewardlines.add(line);
+//            highC +=cSlot.getC1();
+//            log.info(line.toString());
+//        }
+//
+//    }
 
     /**
      * 检查一条线
      * @param line
      * @return ()
      */
-    public Rewardline checkLine(Line line){
+    public Rewardline checkLine(Rewardline line){
         Rewardline payline = checkHigher(line);
         if (payline != null) return payline;
         //从左到右
@@ -165,7 +165,7 @@ public class WMRoom extends SlotRoom {
      * @param line
      * @return
      */
-    public Rewardline checkHigher(Line line){
+    public Rewardline checkHigher(Rewardline line){
         int leftC = 0,rightC = 0;
         List<SlotModel> leftList = new ArrayList<>();
         List<SlotModel> rightList = new ArrayList<>();

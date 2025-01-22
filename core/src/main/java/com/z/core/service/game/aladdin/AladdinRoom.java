@@ -95,53 +95,53 @@ public class AladdinRoom extends SlotRoom {
         }
     }
 
-    @Override
-    public void generate() {
-        board.clear();
-        initParam();
-        for (int i = 0; i < COL_SIZE; i++) {
-            for (int j = 0; j < ROW_SIZE; j++) {
-                SlotModel model = preBaida.get(i, j);
-                if (model == null) {
-                    param.setX(i);
-                    param.setY(j);
-                    Slot slot = random(slots);
-                    model = SlotCommon.ins.toModel(slot, i, j);
-                }
-                board.put(model.getX(), model.getY(), model);
-            }
-        }
-    }
+//    @Override
+//    public void generate() {
+//        board.clear();
+//        initParam();
+//        for (int i = 0; i < COL_SIZE; i++) {
+//            for (int j = 0; j < ROW_SIZE; j++) {
+//                SlotModel model = preBaida.get(i, j);
+//                if (model == null) {
+//                    param.setX(i);
+//                    param.setY(j);
+//                    Slot slot = random(slots);
+//                    model = SlotCommon.ins.toModel(slot, i, j);
+//                }
+//                board.put(model.getX(), model.getY(), model);
+//            }
+//        }
+//    }
 
-    @Override
-    public Slot random(Map<Integer, Slot> slots) {
-        if (param.getX() != 4 && free) {//免费押注非最后一排不生成百搭
-            Map<Integer, Slot> slots1 = new HashMap<>();
-            for (Slot s : slots.values()) {
-                if (s.isBaida()) continue;
-                slots1.put(s.getK(), s);
-            }
-            return super.random(slots1);
-        } else {
-            if (free) { //免费选择第五排最少有一个百搭
-                Slot slot = super.random(slots);
-                if (slot.isBaida()) return slot;
-                boolean hadBaida = false;
-                for (SlotModel s : board.row(4).values()) {
-                    if (slots.get(s.getK()).isBaida()) {
-                        hadBaida = true;
-                        break;
-                    }
-                }
-                if (!hadBaida) {
-                    return slots.get(CommonGame.Aladdin.A_BAIDA_VALUE);
-                }
-                return slot;
-            } else {
-                return super.random(slots);
-            }
-        }
-    }
+//    @Override
+//    public Slot random(Map<Integer, Slot> slots) {
+//        if (param.getX() != 4 && free) {//免费押注非最后一排不生成百搭
+//            Map<Integer, Slot> slots1 = new HashMap<>();
+//            for (Slot s : slots.values()) {
+//                if (s.isBaida()) continue;
+//                slots1.put(s.getK(), s);
+//            }
+//            return super.random(slots1);
+//        } else {
+//            if (free) { //免费选择第五排最少有一个百搭
+//                Slot slot = super.random(slots);
+//                if (slot.isBaida()) return slot;
+//                boolean hadBaida = false;
+//                for (SlotModel s : board.row(4).values()) {
+//                    if (slots.get(s.getK()).isBaida()) {
+//                        hadBaida = true;
+//                        break;
+//                    }
+//                }
+//                if (!hadBaida) {
+//                    return slots.get(CommonGame.Aladdin.A_BAIDA_VALUE);
+//                }
+//                return slot;
+//            } else {
+//                return super.random(slots);
+//            }
+//        }
+//    }
 
 
 }

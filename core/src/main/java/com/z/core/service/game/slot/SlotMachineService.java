@@ -1,6 +1,8 @@
 package com.z.core.service.game.slot;
 
 import com.z.model.bo.slot.Payline;
+import com.z.model.bo.slot.Rewardline;
+import com.z.model.bo.slot.SlotModel;
 import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonGame;
 import org.apache.commons.logging.Log;
@@ -39,6 +41,17 @@ public class SlotMachineService  implements ApplicationListener<ApplicationReady
             machine.initLines(lineMap,slotMap);
             map.put(gameType, machine);
             log.info("machine init:"+gameType +" lines:"+machine.getLineSize());
+
+            if(gameType == CommonGame.GameType.BAIBIAN_XIAOMALI){
+                log.info("gameType=======>:"+gameType);
+                machine.print();
+            } else if (gameType == CommonGame.GameType.JIUXIANLAWANG) {
+                log.info("gameType=======>:"+gameType);
+                machine.print();
+            }else if (gameType == CommonGame.GameType.SHUIHUZHUAN) {
+                log.info("gameType=======>:"+gameType);
+                machine.print();
+            }
         }
     }
 

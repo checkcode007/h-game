@@ -79,7 +79,7 @@ public class CorpseRoom extends SlotRoom {
 
     public void addRecord(long uid) {
         long gold = 0L;
-        for (Rewardline m : rewardlines) {
+        for (Rewardline m : lineMap.values()) {
             if (m.getK() == CommonGame.LINE9.L9_BOX_VALUE) {
                 gold += m.getGold();
             }

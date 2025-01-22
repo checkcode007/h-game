@@ -70,34 +70,34 @@ public class PigRoom extends SlotRoom {
     /**
      * 所有支付线
      */
-    @Override
-    public void checklines() {
-        List<Rewardline> rewardlines = new ArrayList<>();
-        for (Line payline : lineMap.values()) {
-            Rewardline line = checkLine(payline);
-            if (line == null) continue;
-            rewardlines.add(line);
-        }
-        long base = getBetGold();
-        for (Rewardline line : rewardlines) {
-            CSlot cSlot = service.get(gameType, line.getK(), line.getPoints().size());
-            if (cSlot == null) continue;
-            int rate = cSlot.getRate();
-            if(line.isHadBaida()){
-                rate += rate * RandomUtil.randomInt(1,7);
-            }
-            line.setRate(rate);
-            if (isPool(line.getK())) {
-                poolLine(line);
-            }else {
-                line.setGold(base * rate);
-            }
-            line.setSpecialC(cSlot.getC1());
-            this.rewardlines.add(line);
-            highC +=cSlot.getC1();
-            log.info(line.toString());
-        }
-    }
+//    @Override
+//    public void checklines() {
+//        List<Rewardline> rewardlines = new ArrayList<>();
+//        for (Rewardline payline : lineMap.values()) {
+//            Rewardline line = checkLine(payline);
+//            if (line == null) continue;
+//            rewardlines.add(line);
+//        }
+//        long base = getBetGold();
+//        for (Rewardline line : rewardlines) {
+//            CSlot cSlot = service.get(gameType, line.getK(), line.getPoints().size());
+//            if (cSlot == null) continue;
+//            int rate = cSlot.getRate();
+//            if(line.isHadBaida()){
+//                rate += rate * RandomUtil.randomInt(1,7);
+//            }
+//            line.setRate(rate);
+//            if (isPool(line.getK())) {
+//                poolLine(line);
+//            }else {
+//                line.setGold(base * rate);
+//            }
+//            line.setSpecialC(cSlot.getC1());
+//            this.rewardlines.add(line);
+//            highC +=cSlot.getC1();
+//            log.info(line.toString());
+//        }
+//    }
 
     @Override
     public boolean isPool(int type) {
@@ -115,7 +115,7 @@ public class PigRoom extends SlotRoom {
 
     public void addRecord(long uid) {
         long gold = 0L;
-        for (Rewardline m : rewardlines) {
+        for (Rewardline m : lineMap.values()) {
             if (m.getK() == CommonGame.LINE9.L9_BOX_VALUE) {
                 gold += m.getGold();
             }

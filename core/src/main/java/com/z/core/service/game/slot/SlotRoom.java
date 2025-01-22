@@ -25,11 +25,6 @@ public class SlotRoom extends SuperRoom {
     private static final Log log = LogFactory.getLog(SlotRoom.class);
 
     /**
-     * 中奖的集合
-     */
-    protected List<Rewardline> rewardlines = new ArrayList<>();
-
-    /**
      * 是否免费轮
      */
     protected  boolean free;
@@ -83,7 +78,7 @@ public class SlotRoom extends SuperRoom {
 
     protected SlotMachine machine;
 
-    protected  Map<Integer,Line> lineMap;
+    protected  Map<Integer,Rewardline> lineMap;
 
 
     public SlotRoom(CRoom cRoom,long uid) {
@@ -104,6 +99,20 @@ public class SlotRoom extends SuperRoom {
 
 
     }
+    public boolean checkPayLine(Rewardline line){
+        for (Rewardline line1 : lineMap.values()) {
+            for (SlotModel m : line1.getPoints()) {
+                for (SlotModel m1 : line.getPoints()) {
+                    if(m.getX() == m1.getX() && m.getY() == m1.getY()){
+                        if(line1.getK()!=line.getK()){
+                           return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
     /**
      * 生成符号
      */
@@ -113,11 +122,26 @@ public class SlotRoom extends SuperRoom {
         int num = RandomUtil.randomInt(0, 3);
         List<Slot> list = new ArrayList<>(slots.values());
         list.removeIf(e->e.isBonus()|| e.isScatter()|| e.isBaida());
+        Set<Integer> hadSet = new HashSet<>();
+
         for (int i = 0; i < num; i++) {
-            Line line = machine.randomLine();
+            Rewardline line = machine.randomLine();
+//            if(hadSet.contains(line.getK())){
+//                continue;
+//            }
+            if (!checkPayLine(line)) {
+               continue;
+            }
+
             lineMap.put(line.getLineId(), line);
+            hadSet.add(line.getK());
         }
-        for (Line line : lineMap.values()) {
+        StringJoiner sj = new StringJoiner(",");
+        for (Integer i : hadSet) {
+            sj.add(i.toString());
+        }
+        log.info("had:"+sj);
+        for (Rewardline line : lineMap.values()) {
             list.removeIf(e->e.getK()== line.getK());
             for (SlotModel m : line.getPoints()) {
                 board.put(m.getX(), m.getY(), m);
@@ -150,7 +174,6 @@ public class SlotRoom extends SuperRoom {
      * 进入下一轮的初始化
      */
     public void nextRound(){
-        rewardlines.clear();
         freeC = 0;
         free = false;
         rewardGold = 0L;
@@ -282,65 +305,19 @@ public class SlotRoom extends SuperRoom {
      * 所有支付线
      */
     public void checklines() {
-        List<Rewardline> rewardlines = new ArrayList<>();
-        for (Line payline : lineMap.values()) {
-            Rewardline line = checkLine(payline);
-            if (line == null) continue;
-            rewardlines.add(line);
+        if(lineMap.isEmpty()){
+            return;
         }
+        List<Rewardline> rewardlines = new ArrayList<>();
         long realGold = getBetGold();
-        for (Rewardline line : rewardlines) {
-            CSlot cSlot = service.get(gameType, line.getK(), line.getPoints().size());
-            if (cSlot == null) continue;
-            line.setRate(cSlot.getRate());
-            if (isPool(line.getK())) {
-                poolLine(line);
-            }else {
-                line.setGold(realGold * line.getRate());
-            }
-            line.setSpecialC(cSlot.getC1());
-            this.rewardlines.add(line);
-            highC +=cSlot.getC1();
+        for (Rewardline line : lineMap.values()) {
+            highC += line.getSpecialC();
+            line.setGold(highC);
+            line.setGold(realGold * line.getRate());
             log.info(line.toString());
         }
     }
-    /**
-     * 检查一条线
-     * @param line
-     * @return ()
-     */
-    public Rewardline checkLine(Line line){
-        Rewardline payline = checkHigher(line);
-        if(payline!=null){
-            return payline;
-        }
-        //从左到右
-        int leftType = 0;
-        List<SlotModel> leftList = new ArrayList<>();
-        boolean had_baida = false;
-        for (SlotModel p : line.getPoints()) {
-            int x = p.getX();
-            SlotModel m = board.get(x,p.getY());
-            int type = m.getK();
-            if(m.isBaida()){
-               had_baida = true;
-            }
-            if(leftType<1){
-                leftType = type;
-                leftList.add(p);
-            }else if(isSame(x,leftType,type)){
-                leftList.add(p);
-            }else{
-                break;
-            }
-        }
-        if(payline == null){
-            payline = new Rewardline(leftType,line.getLineId());
-        }
-        payline.addPoints(leftList);
-        payline.setHadBaida(had_baida);
-        return payline;
-    }
+
 
     /**
      * 检查触发高级玩法的符号
@@ -374,21 +351,21 @@ public class SlotRoom extends SuperRoom {
         return false;
     }
 
-    public Slot random (Map < Integer, Slot > slots) {
-        Set<Integer> rewardSymbols = new HashSet<>();
-        for (Rewardline line : rewardlines) {
-            rewardSymbols.add(line.getK());
-        }
-        Slot slot =  SlotCommon.ins.random(gameType,board,slots, rewardSymbols, param);
-        if(slot.isScatter()){
-            param.addScatter();
-        } else if (slot.isBonus()) {
-            param.addBonus();
-        } else if (slot.isBaida()) {
-            param.addBaida();
-        }
-        return slot;
-    }
+//    public Slot random (Map < Integer, Slot > slots) {
+//        Set<Integer> rewardSymbols = new HashSet<>();
+//        for (Rewardline line : rewardlines) {
+//            rewardSymbols.add(line.getK());
+//        }
+//        Slot slot =  SlotCommon.ins.random(gameType,board,slots, rewardSymbols, param);
+//        if(slot.isScatter()){
+//            param.addScatter();
+//        } else if (slot.isBonus()) {
+//            param.addBonus();
+//        } else if (slot.isBaida()) {
+//            param.addBaida();
+//        }
+//        return slot;
+//    }
     public void print () {
         SlotCommon.ins.print(board,gameType,roomType,id,uid);
     }
@@ -409,7 +386,7 @@ public class SlotRoom extends SuperRoom {
     }
     public List<Game.PayLine> toPayLines(){
         List<Game.PayLine> list = new ArrayList<>();
-        for (Rewardline m : rewardlines) {
+        for (Rewardline m : lineMap.values()) {
             Game.PayLine.Builder b= Game.PayLine.newBuilder();
             b.setLineId(m.getLineId()).setGold(m.getGold()).setRate(m.getRate()).setHighC(m.getSpecialC());
             for (SlotModel p : m.getPoints()) {
