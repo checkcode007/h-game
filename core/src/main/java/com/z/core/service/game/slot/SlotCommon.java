@@ -5,6 +5,9 @@ import com.google.common.collect.Table;
 import com.z.core.ai.LowState;
 import com.z.core.ai.SpecialState;
 import com.z.core.ai.SuperState;
+import com.z.core.ai.clear.ClearHighState;
+import com.z.core.ai.clear.ClearLowState;
+import com.z.core.ai.clear.ClearMidState;
 import com.z.core.ai.fish.FishState;
 import com.z.core.ai.fish.HighState;
 import com.z.core.ai.fish.MidState;
@@ -52,16 +55,16 @@ public enum SlotCommon {
         table.put(CommonGame.GameType.FISH,SlotState.SPECIAL_BET,new com.z.core.ai.fish.SpecialState(SlotState.SPECIAL_BET));
 
         //麻将2
-        table.put(CommonGame.GameType.MAJIANG_2,SlotState.LOW_BET,new com.z.core.ai.clear.LowState(SlotState.LOW_BET));
-        table.put(CommonGame.GameType.MAJIANG_2,SlotState.MEDIUM_BET,new com.z.core.ai.clear.MidState(SlotState.MEDIUM_BET));
-        table.put(CommonGame.GameType.MAJIANG_2,SlotState.HIGH_BET,new com.z.core.ai.clear.HighState(SlotState.HIGH_BET));
+        table.put(CommonGame.GameType.MAJIANG_2,SlotState.LOW_BET,new ClearLowState(SlotState.LOW_BET));
+        table.put(CommonGame.GameType.MAJIANG_2,SlotState.MEDIUM_BET,new ClearMidState(SlotState.MEDIUM_BET));
+        table.put(CommonGame.GameType.MAJIANG_2,SlotState.HIGH_BET,new ClearHighState(SlotState.HIGH_BET));
         table.put(CommonGame.GameType.MAJIANG_2,SlotState.SPECIAL_BET,new com.z.core.ai.clear.SpecialState(SlotState.SPECIAL_BET));
 
 
         //冰球
-        table.put(CommonGame.GameType.BINGQIUTUPO,SlotState.LOW_BET,new com.z.core.ai.clear.LowState(SlotState.LOW_BET));
-        table.put(CommonGame.GameType.BINGQIUTUPO,SlotState.MEDIUM_BET,new com.z.core.ai.clear.MidState(SlotState.MEDIUM_BET));
-        table.put(CommonGame.GameType.BINGQIUTUPO,SlotState.HIGH_BET,new com.z.core.ai.clear.HighState(SlotState.HIGH_BET));
+        table.put(CommonGame.GameType.BINGQIUTUPO,SlotState.LOW_BET,new ClearLowState(SlotState.LOW_BET));
+        table.put(CommonGame.GameType.BINGQIUTUPO,SlotState.MEDIUM_BET,new ClearMidState(SlotState.MEDIUM_BET));
+        table.put(CommonGame.GameType.BINGQIUTUPO,SlotState.HIGH_BET,new ClearHighState(SlotState.HIGH_BET));
         table.put(CommonGame.GameType.BINGQIUTUPO,SlotState.SPECIAL_BET,new com.z.core.ai.clear.SpecialState(SlotState.SPECIAL_BET));
     }
 
@@ -97,7 +100,7 @@ public enum SlotCommon {
     }
     public void print(Table<Integer, Integer, SlotModel> board, CommonGame.GameType gameType, CommonGame.RoomType roomType,long roomId,long uid) {
         board.rowKeySet().forEach(x -> {
-            StringJoiner sj = new StringJoiner(" ").add("gType:"+gameType).add("rType:"+roomType.getNumber()).add("rId:"+roomId).add("uid:"+uid);
+            StringJoiner sj = new StringJoiner(" ").add("gType:"+gameType).add("rType:"+roomType).add("rId:"+roomId).add("uid:"+uid);
             board.row(x).forEach((y, m) -> {
                 sj.add(m.getK() + "=x" + x + "y" + y+ "t:"+m.getChangeType()+"g:"+(m.isGold()?"t":"f"));
             });

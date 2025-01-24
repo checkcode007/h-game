@@ -31,7 +31,6 @@ public class SlotMachine {
     /**
      * 预生成支付线
      */
-    protected Table<Integer,Integer, CSlot> table = HashBasedTable.create();
     protected List<Rewardline> lines = new ArrayList<>();
     public SlotMachine(CommonGame.GameType gameType, int colsize, int rowsize) {
         random = new Random();
@@ -40,10 +39,14 @@ public class SlotMachine {
         this.ROW_SIZE=rowsize;
     }
 
-    public void initLines( Map<Integer, Payline>  map, Map<Integer, List<CSlot>> slotMap){
+    public void initLines(CommonGame.GameType gameType, Map<Integer, Payline>  map, Map<Integer, List<CSlot>> slotMap){
         if(map.isEmpty()) return;
 
         for (Payline payline : map.values()) {
+            int lineId = payline.getLineId();
+//            if(gameType == CommonGame.GameType.SHAOLIN_ZUQIU){
+//               log.info("id:"+payline.getLineId() +" p: "+payline.getPoints());
+//            }
             for (int k : slotMap.keySet()) {
                 List<CSlot> list = slotMap.get(k);
                 for (CSlot slot : list) {
@@ -59,17 +62,16 @@ public class SlotMachine {
                            break;
                         }
                     }
-                    Rewardline line = new Rewardline(k,c);
+                    Rewardline line = new Rewardline(k,lineId);
                     line.setRate(rate);
                     line.setHadBaida(false);
                     line.setSpecialC(slot.getC1());
-//                    Rewardline line = new Rewardline(payline.getLineId(),k,c,rate);
                     lines.add(line);
                     line.addPoints(points);
                 }
             }
         }
-
+//        print();
 
     }
     // 从结果池中随机选择一个支付线结果
@@ -95,9 +97,9 @@ public class SlotMachine {
         for (Rewardline line : lines) {
             StringJoiner sj = new StringJoiner(",");
             for (SlotModel p : line.getPoints()) {
-                sj.add(p.getK()+":"+p.getX()+":"+p.getY());
+                sj.add(p.getX()+":"+p.getY());
             }
-            log.info(sj.toString());
+            log.info(line.getLineId()+"---->"+sj);
         }
     }
 }

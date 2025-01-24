@@ -122,7 +122,6 @@ public class SlotRoom extends SuperRoom {
         int num = RandomUtil.randomInt(0, 3);
         List<Slot> list = new ArrayList<>(slots.values());
         list.removeIf(e->e.isBonus()|| e.isScatter()|| e.isBaida());
-        Set<Integer> hadSet = new HashSet<>();
 
         for (int i = 0; i < num; i++) {
             Rewardline line = machine.randomLine();
@@ -132,15 +131,9 @@ public class SlotRoom extends SuperRoom {
             if (!checkPayLine(line)) {
                continue;
             }
-
             lineMap.put(line.getLineId(), line);
-            hadSet.add(line.getK());
         }
-        StringJoiner sj = new StringJoiner(",");
-        for (Integer i : hadSet) {
-            sj.add(i.toString());
-        }
-        log.info("had:"+sj);
+
         for (Rewardline line : lineMap.values()) {
             list.removeIf(e->e.getK()== line.getK());
             for (SlotModel m : line.getPoints()) {

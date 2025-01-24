@@ -1,8 +1,6 @@
 package com.z.core.service.game.slot;
 
 import com.z.model.bo.slot.Payline;
-import com.z.model.bo.slot.Rewardline;
-import com.z.model.bo.slot.SlotModel;
 import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonGame;
 import org.apache.commons.logging.Log;
@@ -38,20 +36,23 @@ public class SlotMachineService  implements ApplicationListener<ApplicationReady
             int COL_SIZE=5,ROW_SIZE=3;
             Map<Integer, List<CSlot>> slotMap = cSlotService.getMap(gameType);
             SlotMachine machine = new SlotMachine(gameType,COL_SIZE,ROW_SIZE);
-            machine.initLines(lineMap,slotMap);
+            machine.initLines(gameType,lineMap,slotMap);
             map.put(gameType, machine);
             log.info("machine init:"+gameType +" lines:"+machine.getLineSize());
-
-            if(gameType == CommonGame.GameType.BAIBIAN_XIAOMALI){
-                log.info("gameType=======>:"+gameType);
-                machine.print();
-            } else if (gameType == CommonGame.GameType.JIUXIANLAWANG) {
-                log.info("gameType=======>:"+gameType);
-                machine.print();
-            }else if (gameType == CommonGame.GameType.SHUIHUZHUAN) {
-                log.info("gameType=======>:"+gameType);
-                machine.print();
-            }
+//
+//            if(gameType == CommonGame.GameType.BAIBIAN_XIAOMALI){
+//                log.info("gameType=======>:"+gameType);
+//                machine.print();
+//            } else if (gameType == CommonGame.GameType.JIUXIANLAWANG) {
+//                log.info("gameType=======>:"+gameType);
+//                machine.print();
+//            }else if (gameType == CommonGame.GameType.SHUIHUZHUAN) {
+//                log.info("gameType=======>:"+gameType);
+//                machine.print();
+//            }else if (gameType == CommonGame.GameType.SHAOLIN_ZUQIU) {
+//                log.info("gameType=======>:"+gameType);
+//                machine.print();
+//            }
         }
     }
 

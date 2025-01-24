@@ -70,7 +70,7 @@ public class ClearRoom extends SuperRoom {
         roomBetGold+= gold;
         param.setRoomWinGold(roomWinGold);
         param.setRoomBetGold(roomBetGold);
-        log.info("uid:"+uid+" roundId:"+user.getRoundId()+"==>ret:"+ PbUtils.pbToJson(ret.getT()));
+        log.info("uid:"+uid+" roundId:"+user.getRoundId());
         return ret;
     }
 

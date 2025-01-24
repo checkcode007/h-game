@@ -3,6 +3,8 @@ package com.z.core.ai;
 
 import cn.hutool.core.util.RandomUtil;
 import com.google.common.collect.Table;
+import com.z.core.ai.clear.ClearLowState;
+import com.z.core.ai.fish.SpecialState;
 import com.z.model.BetParam;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
@@ -37,7 +39,7 @@ public abstract class SuperState {
 
 
     protected  double roomC3 = 0.05;  // 房间输赢次数差的权重
-    protected  double roomC4 = 0.0005;  // 房间输赢金额差的权重
+    protected  double roomC4 = 0.00001;  // 房间输赢金额差的权重
 
     public SuperState(SlotState k) {
         this.k = k;
@@ -126,13 +128,19 @@ public abstract class SuperState {
         int x = param.getX();
         switch (x) {
             case 0:
+                print(list,"col0-->1");
                 col_0(slots, board, list, param);
+                print(list,"col0-->2");
                 break;
             case 1:
+                print(list,"col1-->1");
                 col_1(slots, board, list, param);
+                print(list,"col1-->2");
                 break;
             case 2:
+                print(list,"col2-->1");
                 col_2(slots, board, list, param);
+                print(list,"col2-->2");
                 break;
             case 3:
                 col_3(slots, board, list, param);
@@ -224,49 +232,105 @@ public abstract class SuperState {
     }
 
     public void col_0(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
-
+//        reflushCol(slots, board, list, param, C1);
     }
 
     public void col_1(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
-        reflushList(slots, board, list, param, C1);
+        reflushCol(slots, board, list, param, C1);
     }
 
     public void col_2(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
-        reflushList(slots, board, list, param, C2);
+        reflushCol(slots, board, list, param, C2);
     }
 
     public void col_3(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
-        reflushList(slots, board, list, param, C3);
+        reflushCol(slots, board, list, param, C3);
     }
 
     public void col_4(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
-        reflushList(slots, board, list, param, C4);
+        reflushCol(slots, board, list, param, C4);
     }
 
-    public void reflushList(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param, float probalityLimit) {
-//        Set<Integer> set = new HashSet<>();
-//        for (SlotModel m : board.row(param.getX() - 1).values()) {
-//            set.add(m.getK());
-//        }
-//        double roomStateFactor = calculateRoomStateFactor(param.getRoomWinC(),param.getRoomTotalC(),param.getRoomBetGold(),param.getRoomWinGold());
-//        boolean win = calculateWinProbability(roomStateFactor);
-//        if (win) {
-//            list.clear();
-//            for (Integer k : set) {
-//                list.add(slots.get(k));
-//            }
-//        } else {
-//            interrupt(board, list, param.getX());
-//        }
+    public void reflushCol(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param, float probalityLimit) {
+        double roomStateFactor = calculateRoomStateFactor(param.getRoomWinC(),param.getRoomTotalC(),param.getRoomBetGold(),param.getRoomWinGold());
+        if (!calculateWinProbability(roomStateFactor,probalityLimit)) {
+            log.info("roomStateFactor--->"+roomStateFactor+" probalityLimit--->"+probalityLimit);
+            long loss = param.getTotalC()-param.getWinC();
+            if(loss%10!=0){
+                interrupt(board, list, param.getX());
+            }
+        }
     }
 
+    /**
+     * 计算房间状态影响因子，综合考虑房间的输赢数据
+     *
+     * @param winCount 房间内所有玩家的总赢次数
+     * @param loseCount 房间内所有玩家的总输次数
+     * @param betAmount 房间内所有玩家的总投注金额
+     * @param winAmount 房间内所有玩家的总赢得金额
+     * @return 房间状态影响因子
+     */
+    private  double calculateRoomStateFactor(long winCount, long loseCount, double betAmount, double winAmount) {
+        // 基础参数系数（可以根据实际情况调整）
+        // 房间状态因子 = C1 * (loseCount - winCount) + C2 * (betAmount - winAmount)
+       long radio1 =(loseCount - winCount);
+       double radio2 =(betAmount - winAmount);
+        System.err.println(radio1+" :"+radio2);
+        return roomC3 *radio1 + roomC4 * radio2;
+    }
+
+    public static void main(String[] args) {
+        SuperState superState = new ClearLowState(null);
+        int winCount = 228;
+        int loseCount = 578-228;
+        double betAmount = 1787200;
+        double winAmount = 135505810;
+       double f1 = superState.calculateRoomStateFactor(winCount,loseCount,betAmount,winAmount);
+        System.err.println(f1);
+
+        System.err.println(superState.calculateWinProbability(f1,superState.C1));
+        System.err.println(superState.calculateWinProbability(f1,superState.C2));
+    }
+    /**
+     * 计算符号的出现概率并结合房间的输赢数据进行调整
+     *
+     * @param symbolWeight 符号的权重（例如，某个符号的基础权重）
+     * @param winCount 房间内的玩家赢的次数
+     * @param loseCount 房间内的玩家输的次数
+     * @param betAmount 房间内的玩家投注金额
+     * @param winAmount 房间内的玩家赢得金额
+     * @return 调整后的符号出现概率
+     */
+    private double calculateSymbolProbability(double symbolWeight, int winCount, int loseCount, double betAmount, double winAmount) {
+        // 计算房间状态影响因子（S_state）
+        double roomStateFactor = calculateRoomStateFactor(winCount, loseCount, betAmount, winAmount);
+
+        // 计算符号的最终出现概率
+        return symbolWeight * roomStateFactor;
+    }
 
     /**
      * 计算中奖概率，基于房间状态因子的调整
      *
      * @param roomStateFactor 房间状态影响因子
+     * @param limit 当前随机生成的中奖概率阈值（0~1之间）
      * @return 是否中奖
      */
+    private  boolean calculateWinProbability(double roomStateFactor, float limit) {
+        // 基础中奖概率为 10%
+        double baseProbability = 0.1;
+
+        // 状态因子对中奖概率的影响
+        double adjustedProbability = baseProbability + (roomStateFactor * 0.05); // 状态因子影响中奖概率
+
+        // 限制中奖概率在 [0, 1] 之间
+        adjustedProbability = Math.max(0, Math.min(adjustedProbability, 1));
+
+        // 进行中奖判断
+        return adjustedProbability >= limit;
+    }
+
     private boolean calculateWinProbability(double roomStateFactor) {
         // 基础中奖概率为 10%
         double baseProbability = 0.1;
@@ -278,10 +342,7 @@ public abstract class SuperState {
         if (adjustedProbability > 1) {
             adjustedProbability = 1;
         }
-
-        // 根据调整后的中奖概率计算是否中奖
-        double probability = Math.random();
-        return probability < adjustedProbability;
+        return RandomUtil.randomDouble() <adjustedProbability;
     }
 
     public Map<Integer, Integer> weight(Map<Integer, Slot> slots, List<Slot> list, Set<Integer> goals, BetParam param) {
@@ -306,57 +367,7 @@ public abstract class SuperState {
         freeWeight(map, slots, param);
         return map;
     }
-    /**
-     * 计算房间状态影响因子，综合考虑房间的输赢数据
-     *
-     * @param winCount 房间内所有玩家的总赢次数
-     * @param loseCount 房间内所有玩家的总输次数
-     * @param betAmount 房间内所有玩家的总投注金额
-     * @param winAmount 房间内所有玩家的总赢得金额
-     * @return 房间状态影响因子
-     */
-    private double calculateRoomStateFactor(long winCount, long loseCount, double betAmount, double winAmount) {
-        // 基础参数系数（可以根据实际情况调整）
-        // 房间状态因子 = C1 * (loseCount - winCount) + C2 * (betAmount - winAmount)
-        return roomC3 * (loseCount - winCount) + roomC4 * (betAmount - winAmount);
-    }
-    /**
-     * 计算符号的出现概率并结合房间的输赢数据进行调整
-     *
-     * @param symbolWeight 符号的权重（例如，某个符号的基础权重）
-     * @param winCount 房间内的玩家赢的次数
-     * @param loseCount 房间内的玩家输的次数
-     * @param betAmount 房间内的玩家投注金额
-     * @param winAmount 房间内的玩家赢得金额
-     * @return 调整后的符号出现概率
-     */
-    private double calculateSymbolProbability(double symbolWeight, int winCount, int loseCount, double betAmount, double winAmount) {
-        // 计算房间状态影响因子（S_state）
-        double roomStateFactor = calculateRoomStateFactor(winCount, loseCount, betAmount, winAmount);
 
-        // 计算符号的最终出现概率
-        return symbolWeight * roomStateFactor;
-    }
-
-
-    /**
-     * 更新每个符号在支付线上的出现概率
-     *
-     * @param symbolWeights 符号权重数组（每个符号对应的基础权重）
-     * @param winCount 房间内的玩家赢的次数
-     * @param loseCount 房间内的玩家输的次数
-     * @param betAmount 房间内的玩家投注金额
-     * @param winAmount 房间内的玩家赢得金额
-     * @return 符号出现概率数组
-     */
-    private double[] updateSymbolProbabilities(double[] symbolWeights, int winCount, int loseCount, double betAmount, double winAmount) {
-        double[] adjustedProbabilities = new double[symbolWeights.length];
-        for (int i = 0; i < symbolWeights.length; i++) {
-            // 根据每个符号的权重和房间状态计算调整后的概率
-            adjustedProbabilities[i] = calculateSymbolProbability(symbolWeights[i], winCount, loseCount, betAmount, winAmount);
-        }
-        return adjustedProbabilities;
-    }
 
     public void freeWeight(Map<Integer, Integer> map, Map<Integer, Slot> slots, BetParam param) {
         int freeC = param.getFreeC();

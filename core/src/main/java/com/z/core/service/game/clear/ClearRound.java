@@ -162,15 +162,15 @@ public class ClearRound extends SuperRound {
                 }
                 rate += g.getRate();
                 freeCout += g.getFree();
-//                log.info("k:" + g.getK() + " c:" + g.getC() + " rate:" + g.getRate() + " free:" + free);
+                log.info(g.toString());
             }
             freeC += freeCout;
             int rowRate = rowRadio.get(index > rowRadio.size() - 1 ? rowRadio.size() - 1 : index);
+            int rowRate1 = rowRate;
             rowRate = free ? rowRate : rowRate * 2;
-            long addGold = realGold * rate * rowRate;
-            StringJoiner sj1 = new StringJoiner(",");
-//            sj1.add("r:" + rate).add("rowR:" + rowRate).add("index:" + index).add("realG:" + realGold).add("addG:" + addGold).add("freeC:" + freeCout);
-//            log.info(sj1.toString());
+            int lastRate =  rate * rowRate;
+            long addGold = realGold *lastRate;
+            log.info(" rowRate1:"+rowRate1+" rowRate2:"+rowRate +"rate:"+rate+" lastRate:" + lastRate+" addGold:"+addGold);
             rewardGold += addGold;
             b.addAllSpots(allToModel(preBoard));
             builder.addRounds(b.setGold(addGold).setRowRadio(rowRate).build());
@@ -227,7 +227,6 @@ public class ClearRound extends SuperRound {
 
     /**
      * 检测
-     *
      * @return
      */
     public void check() {
@@ -264,7 +263,6 @@ public class ClearRound extends SuperRound {
                         c++;
                         lianjie.add(e);
                         b_col_had = true;
-//                        log.info(" col:" + i + " type:" + k + "->" + e);
                         break;
                     } else {
                         break;
@@ -286,7 +284,6 @@ public class ClearRound extends SuperRound {
                             toRemove.add(e);
                         }
                     }
-//                    log.info("del--->" + x + "--->" + k + "-->del-->" + m);
                 }
                 // 进行删除操作
                 Map<Integer, Integer> rateMap = new HashMap();
@@ -304,7 +301,9 @@ public class ClearRound extends SuperRound {
                 for (Integer v : rateMap.values()) {
                     rate = rate * v;
                 }
+                int rate1=rate;
                 rate = rate * slot.getRate();
+                log.info("rate1:"+rate1+" slotrate:"+slot.getRate()+" rate:"+rate);
                 Goal goal = new Goal(k, c, rate, slot.getFree());
                 goal.addPoint(lianjie);
                 delMap.put(k, goal);
@@ -339,7 +338,7 @@ public class ClearRound extends SuperRound {
             SlotModel model = board.remove(x, y);
             if (model != null) {
                 goal.addPoint(model);
-                log.info("del--->" + x + "--->" + k + "-->del-->" + model);
+//                log.info("del--->" + x + "--->" + k + "-->del-->" + model);
             }
         });
     }

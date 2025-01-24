@@ -11,13 +11,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class MidState extends ClearState {
-    public MidState(SlotState k) {
+public class ClearMidState extends ClearState {
+    public ClearMidState(SlotState k) {
         super(k);
         C1 =0.3f;
         C2= 0.1f;
         C3=0.01f;
         C4=0f;
+        roomC3 = 0.01;  // 房间输赢次数差的权重
+        roomC4 = 0.005;  // 房间输赢金额差的权重
     }
 
 
@@ -45,9 +47,23 @@ public class MidState extends ClearState {
         return map;
     }
 
+
     @Override
-    public void col_0(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
-        super.col_0(slots, board, list, param);
-        list.removeIf(e->e.getK()<6);
+    public void checkCol(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
+        super.checkCol(slots, board, list, param);
+        list.removeIf(e->e.isBonus()|| e.isBaida());
+    }
+
+    @Override
+    public void col_3(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
+        super.col_3( slots, board, list, param);
+        int x = param.getX();
+        interrupt(board,list,x);
+    }
+    @Override
+    public void col_4(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
+        super.col_4(slots, board, list, param);
+        int x = param.getX();
+        interrupt(board,list,x);
     }
 }

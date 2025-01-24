@@ -3,11 +3,9 @@ package com.z.core.service.game.majiang;
 import com.google.common.collect.Table;
 import com.z.core.service.game.clear.ClearRound;
 import com.z.core.service.game.slot.SlotCommon;
-import com.z.core.service.wallet.WalletService;
 import com.z.model.bo.slot.Goal;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
-import com.z.model.bo.user.Wallet;
 import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonGame;
 import org.apache.commons.logging.Log;
@@ -74,7 +72,7 @@ public class MaJiangRound extends ClearRound {
         for (int k : firstMap.keySet()) {
             List<SlotModel> lianjie = new ArrayList<>(firstMap.get(k));
             //连接各数，
-            int c = 1;
+            int lianjieCols = 0;
             for (int i = 1; i < COL_SIZE; i++) {
                 //每列加1
                 Collection<SlotModel> list = board.row(i).values();
@@ -84,33 +82,25 @@ public class MaJiangRound extends ClearRound {
                     if (e.getK() == k || e.isBaida()) {//百搭处理
                         lianjie.add(e);
                         b_col_had = true;
-//                        log.info(" col:" + i + " type:" + k + "->" + e);
+                        lianjieCols = e.getX();
                     }
                 }
-                if (b_col_had) {
-                    c++;
-                } else {
+                if (!b_col_had) {
                     break;
                 }
             }
-            log.info("k------->:" + k + " c--->" + c);
-            if (c < 2) continue;
+            if (lianjieCols < 2) continue;
+
             //移除匹配的
-            CSlot slot = service.get(gameType, k, c);
+            CSlot slot = service.get(gameType, k, lianjieCols+1);
             if (slot != null) {
-                List<SlotModel> toRemove = new ArrayList<>();
-                for (var m : lianjie) {
-                    int x = m.getX();
-                    for (SlotModel e : board.row(x).values()) {
-                        if (e.getK() == k || e.isBaida()) {
-                            toRemove.add(e);
-                        }
-                    }
-                    log.info("del--->" + x + "--->" + k + "-->del-->" + m);
+                log.info("k---------->" +k);
+                for (SlotModel m : lianjie) {
+                    log.info("lianjie-->"+m);
                 }
                 // 进行删除操作
                 Map<Integer, Integer> colCMap = new HashMap();//每排个数
-                for (var e : toRemove) {
+                for (var e : lianjie) {
                     board.remove(e.getX(), e.getY());
                     if (!e.isBaida() && e.isGold()) {
                         CSlot wildSlot = service.getWild(gameType);
@@ -119,13 +109,16 @@ public class MaJiangRound extends ClearRound {
                         board.put(baida.getX(), baida.getY(), baida);
                     }
                     colCMap.put(e.getX(), colCMap.getOrDefault(e.getX(), 0) + 1);
+//                    log.info("x:" + e.getX()+" c:"+colCMap.get(e.getX()));
                 }
                 int rate = 1;
                 for (Integer v : colCMap.values()) {
                     rate = rate * v;
                 }
+                int rate1=rate;
                 rate = rate * slot.getRate();
-                Goal goal = new Goal(k, c, rate, slot.getFree());
+                log.info("rate1:"+rate1+" slotrate:"+slot.getRate()+" rate:"+rate);
+                Goal goal = new Goal(k, lianjieCols+1, rate, slot.getFree());
                 goal.addPoint(lianjie);
                 delMap.put(k, goal);
             }
@@ -160,7 +153,7 @@ public class MaJiangRound extends ClearRound {
             SlotModel model = board.remove(x, y);
             if (model != null) {
                 goal.addPoint(model);
-                log.info("del--->" + x + "--->" + type + "-->del-->" + model);
+//                log.info("del--->" + x + "--->" + type + "-->del-->" + model);
             }
         });
     }
@@ -168,7 +161,6 @@ public class MaJiangRound extends ClearRound {
     // 消除符号并让下方的符号前移‘
     @Override
     public void move() {
-        Wallet wallet = WalletService.ins.get(uid);
         moveForward();
         Map<Integer, Integer> huMap = new HashMap<>();
         for (int x = 0; x < 5; x++) {

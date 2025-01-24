@@ -22,7 +22,9 @@ public class Goal {
      * 免费次数
      */
     int free;
+
     List<SlotModel> points;
+
     public Goal(int k, int c, int rate) {
         this.k = k;
         this.c = c;
