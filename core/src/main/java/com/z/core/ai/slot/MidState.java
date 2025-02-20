@@ -79,7 +79,6 @@ public class MidState extends CommonState{
     @Override
     public List<Rewardline> getRandomline(Map<LineType, List<Rewardline>> lineMap, BetParam param) {
         double r = RandomUtil.randomDouble();
-        log.info("r---->"+r);
         if( r > 0.5){
             return null;
         }

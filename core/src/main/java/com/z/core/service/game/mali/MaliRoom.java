@@ -84,9 +84,9 @@ public class MaliRoom extends SlotRoom {
 
 
     @Override
-    public Rewardline checkHigher(Line line) {
+    public Rewardline checkHigher(Payline line) {
         Rewardline payline = null;
-        for (SlotModel p : line.getPoints()) {
+        for (Point p : line.getPoints()) {
             int x = p.getX();
             SlotModel m = board.get(x,p.getY());
             int type = m.getChangeType()>0 ?m.getChangeType():m.getK();
@@ -95,7 +95,7 @@ public class MaliRoom extends SlotRoom {
                 payline =new Rewardline(type,line.getLineId());
             }
             payline.addSpecicalC();
-            payline.addPoint(p);
+            payline.addPoint(m);
         }
         return payline;
     }

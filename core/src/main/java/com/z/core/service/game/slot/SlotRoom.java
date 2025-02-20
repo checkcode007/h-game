@@ -268,7 +268,7 @@ public class SlotRoom extends SuperRoom {
         param.setRoomWinGold(roomWinGold);
         param.setRoomBetGold(roomBetGold);
         log.info(sj.add("free:" + freeC).add("highC:" + highC).add("rewardGold:" + rewardGold).add("success").toString());
-        return new MsgResult<Game.Line9BetMsg>(true);
+        return new MsgResult(true);
     }
 
     public void checkBounus() {
@@ -309,7 +309,7 @@ public class SlotRoom extends SuperRoom {
             if(rewardline!=null){
                 lineMap.put(rewardline.getLineId(),rewardline);
             }
-            rewardline = checkLine(payline);
+            rewardline = checkHigher(payline);
             if(rewardline!=null){
                 lineMap.put(rewardline.getLineId(),rewardline);
             }
@@ -320,7 +320,7 @@ public class SlotRoom extends SuperRoom {
         long realGold = getBetGold();
         for (Rewardline line : lineMap.values()) {
             highC += line.getSpecialC();
-            line.setGold(highC);
+            line.setSpecialC(highC);
             line.setGold(realGold * line.getRate());
             log.info(line.toString());
         }
@@ -330,6 +330,7 @@ public class SlotRoom extends SuperRoom {
         SlotModel first= null;
         int sameC = 0;
         boolean baida = false;
+        List<SlotModel> points = new ArrayList<>();
         for (Point p : line.getPoints()) {
             SlotModel m = board.get(p.getX(),p.getY());
             if(m.isBaida()){
@@ -338,11 +339,14 @@ public class SlotRoom extends SuperRoom {
             if(first == null){
                 first = m;
                 sameC++;
+                points.add(m);
+                continue;
             }
             if(!isSame(p.getX(),first.getK(),m.getK())){
                 break;
             }else{
                 sameC++;
+                points.add(m);
             }
         }
         if(sameC<2){
@@ -353,8 +357,9 @@ public class SlotRoom extends SuperRoom {
             return null;
         }
         Rewardline rewardline = new Rewardline(first.getK(),line.getLineId());
-        rewardline.setRate(rate);
+        rewardline.setRate(cSlot.getRate());
         rewardline.setHadBaida(baida);
+        rewardline.addPoints(points);
         return  rewardline;
     }
     /**
@@ -362,10 +367,10 @@ public class SlotRoom extends SuperRoom {
      * @param line
      * @return
      */
-    public Rewardline checkHigher(Line line) {
+    public Rewardline checkHigher(Payline line) {
         Rewardline payline = null;
         int type = 0;
-        for (SlotModel p : line.getPoints()) {
+        for (Point p : line.getPoints()) {
             int x = p.getX();
             SlotModel m = board.get(x, p.getY());
             type = m.getK();
@@ -374,7 +379,7 @@ public class SlotRoom extends SuperRoom {
                 payline = new Rewardline(type, line.getLineId());
             }
             payline.addSpecicalC();
-            payline.addPoint(p);
+            payline.addPoint(m);
         }
         if (payline == null) {
             return null;
