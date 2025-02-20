@@ -324,7 +324,7 @@ public class SlotRoom extends SuperRoom {
 
     public Rewardline checkLine(Payline line){
         SlotModel first= null;
-        boolean b = true;
+        int sameC = 0;
         boolean baida = false;
         for (Point p : line.getPoints()) {
             SlotModel m = board.get(p.getX(),p.getY());
@@ -333,14 +333,22 @@ public class SlotRoom extends SuperRoom {
             }
             if(first == null){
                 first = m;
+                sameC++;
                 break;
             }
             if(!isSame(p.getX(),first.getK(),m.getK())){
-                b=false;
                 break;
+            }else{
+                sameC++;
             }
         }
-        if(!b) return null;
+        if(sameC<2){
+            return null;
+        }
+        CSlot cSlot = service.get(gameType,first.getK(),sameC);
+        if (cSlot == null){
+            return null;
+        }
         Rewardline rewardline = new Rewardline(first.getK(),line.getLineId());
         rewardline.setRate(rate);
         rewardline.setHadBaida(baida);
