@@ -238,56 +238,45 @@ public class ClearRound extends SuperRound {
      * 检测普通符号
      */
     public void checkCommon() {
+        log.info("checkCommon---------->start");
         // 1. 遍历行列位置和对应的值
         Map<Integer, List<SlotModel>> firstMap = new HashMap<>();
         Collection<SlotModel> row_1 = board.row(0).values();
         for (SlotModel m : row_1) {
             if (m == null) continue;
-            Slot slot = slots.get(m.getK());
-            if (slot.isBonus()) continue;
+            if (m.isBonus()) continue;
             List<SlotModel> list = firstMap.getOrDefault(m.getK(), new ArrayList<>());
             firstMap.putIfAbsent(m.getK(), list);
             list.add(m);
         }
         for (int k : firstMap.keySet()) {
             List<SlotModel> lianjie = new ArrayList<>(firstMap.get(k));
-            int c = 1;
+            //连接各数，
+            int lianjieCols = 0;
             for (int i = 1; i < COL_SIZE; i++) {
                 //每列加1
                 Collection<SlotModel> list = board.row(i).values();
                 //每列相同的汇总
                 boolean b_col_had = false;
                 for (SlotModel e : list) {
-                    Slot slot = slots.get(e.getK());
-                    if (e.getK() == k || slot.isBaida()) {//百搭处理
-                        c++;
+                    if (e.getK() == k || e.isBaida()) {//百搭处理
                         lianjie.add(e);
                         b_col_had = true;
-                        break;
-                    } else {
-                        break;
+                        lianjieCols = e.getX();
                     }
                 }
-                if (!b_col_had) break;
+                if (!b_col_had) {
+                    break;
+                }
             }
-            if (c < 2) continue;
+            if (lianjieCols < 2) continue;
+
             //移除匹配的
-            CSlot slot = service.get(gameType, k, c);
+            CSlot slot = service.get(gameType, k, lianjieCols+1);
             if (slot != null) {
-                List<SlotModel> toRemove = new ArrayList<>();
-                for (var m : lianjie) {
-                    int x = m.getX();
-                    for (SlotModel e : board.row(x).values()) {
-                        if (e.getK() == k) {
-                            toRemove.add(e);
-                        } else if (slots.get(e.getK()).isBaida()) {
-                            toRemove.add(e);
-                        }
-                    }
-                }
                 // 进行删除操作
-                Map<Integer, Integer> rateMap = new HashMap();
-                for (var e : toRemove) {
+                Map<Integer, Integer> colCMap = new HashMap();//每排个数
+                for (var e : lianjie) {
                     board.remove(e.getX(), e.getY());
                     if (!e.isBaida() && e.isGold()) {
                         CSlot wildSlot = service.getWild(gameType);
@@ -295,16 +284,17 @@ public class ClearRound extends SuperRound {
                         SlotModel baida = SlotCommon.ins.toModel(s, e.getX(), e.getY());
                         board.put(baida.getX(), baida.getY(), baida);
                     }
-                    rateMap.put(e.getX(), rateMap.getOrDefault(e.getX(), 0) + 1);
+                    colCMap.put(e.getX(), colCMap.getOrDefault(e.getX(), 0) + 1);
+//                    log.info("x:" + e.getX()+" c:"+colCMap.get(e.getX()));
                 }
                 int rate = 1;
-                for (Integer v : rateMap.values()) {
+                for (Integer v : colCMap.values()) {
                     rate = rate * v;
                 }
                 int rate1=rate;
                 rate = rate * slot.getRate();
                 log.info("rate1:"+rate1+" slotrate:"+slot.getRate()+" rate:"+rate);
-                Goal goal = new Goal(k, c, rate, slot.getFree());
+                Goal goal = new Goal(k, lianjieCols+1, rate, slot.getFree());
                 goal.addPoint(lianjie);
                 delMap.put(k, goal);
             }

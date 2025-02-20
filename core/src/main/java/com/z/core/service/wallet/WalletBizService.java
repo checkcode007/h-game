@@ -2,6 +2,7 @@ package com.z.core.service.wallet;
 
 
 import com.google.protobuf.ByteString;
+import com.z.core.net.channel.ChannelAttributes;
 import com.z.core.net.channel.UserChannelManager;
 import com.z.core.service.email.MailBizService;
 import com.z.core.service.transfer.TransferBizService;
@@ -80,6 +81,8 @@ public class WalletBizService {
             if(goldType == CommonUser.GoldType.GT_GAME){
                 wallet.addWinGold(gold);
                 wallet.addWins();
+
+                UserChannelManager.broadReward(gameType,uid,gold);
             }
         } else {
             if (wallet.getGold() < gold) {

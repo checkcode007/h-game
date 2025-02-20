@@ -3,18 +3,16 @@ package com.z.core.ai.fish;
 import com.z.model.BetParam;
 import com.z.model.type.SlotState;
 
-public class HighState  extends FishState  {
+public class FishMidState extends FishState {
 
-    public HighState(SlotState k) {
+    public FishMidState(SlotState k) {
         super(k);
-        C1 = 0.1;
-        C3 = 0.5;
+        C1 = 0.05;
+        C3 = 0.1;
     }
 
     @Override
     public boolean catchFish(BetParam param, int fishType,double fish, double bullet) {
-        long winC = param.getWinC();
-        long totalC = param.getTotalC();
         if(fishType>18){
             C1 = 0.01;
             C3 = 0.05;
@@ -22,4 +20,5 @@ public class HighState  extends FishState  {
 
         return  super.catchFish(param, fishType,fish, bullet);
     }
+
 }

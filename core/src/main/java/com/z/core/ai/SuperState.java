@@ -4,11 +4,12 @@ package com.z.core.ai;
 import cn.hutool.core.util.RandomUtil;
 import com.google.common.collect.Table;
 import com.z.core.ai.clear.ClearLowState;
-import com.z.core.ai.fish.SpecialState;
 import com.z.model.BetParam;
+import com.z.model.bo.slot.Rewardline;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
 import com.z.model.proto.CommonGame;
+import com.z.model.type.LineType;
 import com.z.model.type.PosType;
 import com.z.model.type.SlotState;
 import org.apache.commons.logging.Log;
@@ -21,8 +22,6 @@ public abstract class SuperState {
     private static final Log log = LogFactory.getLog(SuperState.class);
     public static final int diffW1 = 100;
     public static final int diffHighW1 = 5;
-
-    public static final Random RANDOM = new Random();
 
     protected SlotState k;
     /**
@@ -63,26 +62,19 @@ public abstract class SuperState {
         int continueC = param.getContinueC();
         //检测特定游戏
         list = checkGame(gameType, board, list, param.isFree());
-//        print(list,"random1");
         //检测每轴的个数
         checkCount(board, list, x);
-//        print(list,"random2");
         //检测位置
         checkPos(list, x);
-//        print(list,"random3");
         //检测连续的次数
         checkContinue(board, list, x, continueC);
-//        print(list,"random4");
         //高，中，低状态处理
 
         betStateFilter(board, list, param);
-//        print(list,"random5");
         //检查每列
         checkCol(slots, board, list, param);
-//        print(list,"random6");
         //动态修改权重
         var map = weight(slots, list, goals, param);
-//        print(list,"random7");
         //高，中，低状态处理
         betStateWight(board, map, slots, param);
         //选择符号
@@ -92,27 +84,6 @@ public abstract class SuperState {
     }
 
     public void checkContinue(Table<Integer, Integer, SlotModel> board, List<Slot> list, int x, int continueC) {
-        if (x < 1) return;
-        if (continueC < 2) return;
-        list.removeIf(e -> e.isScatter() || e.isBonus() || e.isBaida());
-        if (continueC < 4) return;
-        if (x == 1) {//不让符号连接的太多,最多三个连接
-            Set<Integer> set1 = new HashSet<>();
-            for (SlotModel m : board.row(0).values()) {
-                set1.add(m.getK());
-            }
-            Set<Integer> set2 = new HashSet<>();
-            for (SlotModel m : board.row(1).values()) {
-                set2.add(m.getK());
-            }
-            set2.retainAll(set1);
-            if (!set2.isEmpty()) {
-                if (!set2.isEmpty()) {
-                    list.removeIf(e -> set2.contains(e.getK()));
-                }
-            }
-        }
-
     }
 
     void betStateFilter(Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
@@ -159,11 +130,6 @@ public abstract class SuperState {
         double roomStateFactor = calculateRoomStateFactor(param.getRoomWinC(), param.getRoomTotalC(), param.getRoomBetGold(), param.getRoomWinGold());
         boolean win = calculateWinProbability(roomStateFactor);
         if(!win) return null;
-        StringJoiner sj = new StringJoiner(",");
-        for (Integer i : param.getLineSet()) {
-            sj.add(i+"");
-        }
-        log.info(sj.toString());
         SlotModel m = board.get(x-1,y);
         if(m == null) return null;
         for (Slot slot : list) {
@@ -266,32 +232,21 @@ public abstract class SuperState {
      * 计算房间状态影响因子，综合考虑房间的输赢数据
      *
      * @param winCount 房间内所有玩家的总赢次数
-     * @param loseCount 房间内所有玩家的总输次数
+     * @param totalC 房间内所有玩家的总次数
      * @param betAmount 房间内所有玩家的总投注金额
      * @param winAmount 房间内所有玩家的总赢得金额
      * @return 房间状态影响因子
      */
-    private  double calculateRoomStateFactor(long winCount, long loseCount, double betAmount, double winAmount) {
+    protected   double calculateRoomStateFactor(long winCount, long totalC, double betAmount, double winAmount) {
         // 基础参数系数（可以根据实际情况调整）
         // 房间状态因子 = C1 * (loseCount - winCount) + C2 * (betAmount - winAmount)
+        long loseCount= totalC -winCount;
        long radio1 =(loseCount - winCount);
        double radio2 =(betAmount - winAmount);
-        System.err.println(radio1+" :"+radio2);
         return roomC3 *radio1 + roomC4 * radio2;
     }
 
-    public static void main(String[] args) {
-        SuperState superState = new ClearLowState(null);
-        int winCount = 228;
-        int loseCount = 578-228;
-        double betAmount = 1787200;
-        double winAmount = 135505810;
-       double f1 = superState.calculateRoomStateFactor(winCount,loseCount,betAmount,winAmount);
-        System.err.println(f1);
 
-        System.err.println(superState.calculateWinProbability(f1,superState.C1));
-        System.err.println(superState.calculateWinProbability(f1,superState.C2));
-    }
     /**
      * 计算符号的出现概率并结合房间的输赢数据进行调整
      *
@@ -317,7 +272,7 @@ public abstract class SuperState {
      * @param limit 当前随机生成的中奖概率阈值（0~1之间）
      * @return 是否中奖
      */
-    private  boolean calculateWinProbability(double roomStateFactor, float limit) {
+    protected   boolean calculateWinProbability(double roomStateFactor, float limit) {
         // 基础中奖概率为 10%
         double baseProbability = 0.1;
 
@@ -372,7 +327,6 @@ public abstract class SuperState {
     public void freeWeight(Map<Integer, Integer> map, Map<Integer, Slot> slots, BetParam param) {
         int freeC = param.getFreeC();
         if (freeC < 1) return;
-
         if (freeC > 5) {
             for (Slot s : slots.values()) {
                 int k = s.getK();
@@ -418,7 +372,7 @@ public abstract class SuperState {
                 }
             }
             if (scatterC > 1) {
-                list.removeIf(slot -> slot.isScatter());
+                list.removeIf(Slot::isScatter);
             }
         } else if (gameType == CommonGame.GameType.SHAOLIN_ZUQIU) {
             //免费处理
@@ -462,7 +416,6 @@ public abstract class SuperState {
 
     /**
      * 检查每轴的个数
-     *
      * @param list
      * @param x
      * @return
@@ -540,22 +493,15 @@ public abstract class SuperState {
         return target;
     }
 
+    /**
+     * 打断相连
+     * @param board
+     * @param list
+     * @param index
+     */
     public void interrupt(Table<Integer, Integer, SlotModel> board, List<Slot> list, int index) {
-        Set<Integer> lastSet = new HashSet<>();
-        for (int i = 0; i < index; i++) {
-            Set<Integer> set = new HashSet<>();
-            for (SlotModel m : board.row(i).values()) {
-                set.add(m.getK());
-            }
-            if (i == 0) {
-                lastSet.addAll(set);
-            } else {
-                lastSet.retainAll(set);
-            }
-        }
-        list.removeIf(slot -> lastSet.contains(slot.getK()));
-    }
 
+    }
 
     public void print(List<Slot> list, String action) {
         StringJoiner sj = new StringJoiner(",");
@@ -564,6 +510,27 @@ public abstract class SuperState {
         }
         log.info(action + "--->" + sj);
     }
+    /**
+     * 冰球突破
+     * 大wild处理
+     */
+    public int bigWild(BetParam param){
+        return 0;
+    }
 
+    public List<Rewardline> getRandomline(Map<LineType,List<Rewardline>> lineMap, BetParam param) {
+        return null;
+    }
+    public static void main(String[] args) {
+        SuperState superState = new ClearLowState(null);
+        int winCount = 228;
+        int totaC = 578;
+        double betAmount = 1787200;
+        double winAmount = 135505810;
+        double f1 = superState.calculateRoomStateFactor(winCount,totaC,betAmount,winAmount);
+        System.err.println(f1);
 
+        System.err.println(superState.calculateWinProbability(f1,superState.C1));
+        System.err.println(superState.calculateWinProbability(f1,superState.C2));
+    }
 }

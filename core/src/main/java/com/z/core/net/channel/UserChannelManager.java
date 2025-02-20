@@ -3,8 +3,12 @@ package com.z.core.net.channel;
 import com.google.protobuf.AbstractMessageLite;
 import com.z.core.net.WebSocketServer;
 import com.z.core.service.game.game.RoomBizService;
+import com.z.core.service.user.UserService;
 import com.z.core.util.SpringContext;
+import com.z.model.bo.user.User;
+import com.z.model.proto.CommonGame;
 import com.z.model.proto.MyMessage;
+import com.z.model.type.GameName;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
@@ -58,17 +62,7 @@ public class UserChannelManager {
             channel.writeAndFlush(resFrame);
         }
     }
-    public static void  broad(AbstractMessageLite resObj, List<Long> idList) {
-        if(idList == null || idList.isEmpty()) return;
-        byte[] messageBytes = resObj.toByteArray();
-        // 创建 BinaryWebSocketFrame 并将字节数组写入其中
-        BinaryWebSocketFrame resFrame = new BinaryWebSocketFrame(Unpooled.wrappedBuffer(messageBytes));
-        for (Long id : idList) {
-            Channel channel = channelMap.get(id);
-            if(channel == null) continue;
-            channel.writeAndFlush(resFrame);
-        }
-    }
+
     public static boolean  sendMsg(long uid, MyMessage.MyMsgRes res) {
         StringJoiner sj = new StringJoiner(",").add("uid:"+uid).add(" msgId:"+res.getId());
         // 创建 BinaryWebSocketFrame 并将字节数组写入其中
@@ -81,5 +75,32 @@ public class UserChannelManager {
         logger.info(sj.add("sucess").toString());
         return true;
 
+    }
+    public static void  broad(AbstractMessageLite resObj, List<Long> idList) {
+        if(idList == null || idList.isEmpty()) return;
+        byte[] messageBytes = resObj.toByteArray();
+        // 创建 BinaryWebSocketFrame 并将字节数组写入其中
+        BinaryWebSocketFrame resFrame = new BinaryWebSocketFrame(Unpooled.wrappedBuffer(messageBytes));
+        for (Long id : idList) {
+            Channel channel = channelMap.get(id);
+            if(channel == null) continue;
+            channel.writeAndFlush(resFrame);
+        }
+    }
+    public static void  broadReward(CommonGame.GameType gameType,long uid,long gold) {
+        if(gold < 10000) return;
+        if(channelMap == null || channelMap.isEmpty()) return;
+        User user = UserService.ins.get(uid);
+        if(user == null) return;
+        String msg = "玩家:"+user.getUser().getName()+"在游戏"+ GameName.getType(gameType).getName()+"获得金币:"+gold;
+        for (Channel channel : channelMap.values()) {
+            AbstractMessageLite resObj = MyMessage.Broadcast.newBuilder()
+                    .setType(MyMessage.BroadType.BT_DEFAULT).setMsg(msg)
+                    .build();
+            byte[] messageBytes = resObj.toByteArray();
+            // 创建 BinaryWebSocketFrame 并将字节数组写入其中
+            BinaryWebSocketFrame resFrame = new BinaryWebSocketFrame(Unpooled.wrappedBuffer(messageBytes));
+            channel.writeAndFlush(resFrame);
+        }
     }
 }

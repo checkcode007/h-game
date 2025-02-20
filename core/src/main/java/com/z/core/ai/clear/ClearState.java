@@ -1,12 +1,13 @@
 package com.z.core.ai.clear;
 
+import cn.hutool.core.util.RandomUtil;
 import com.google.common.collect.Table;
 import com.z.core.ai.SuperState;
-import com.z.core.service.game.slot.SlotCommon;
 import com.z.model.BetParam;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
 import com.z.model.type.SlotState;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -17,6 +18,30 @@ public class ClearState extends SuperState {
 
     public ClearState(SlotState k) {
         super(k);
+    }
+    @Override
+    public void checkContinue(Table<Integer, Integer, SlotModel> board, List<Slot> list, int x, int continueC) {
+        if (x < 1) return;
+        if (continueC < 2) return;
+        list.removeIf(e -> e.isScatter() || e.isBonus() || e.isBaida());
+        if (continueC < 4) return;
+        if (x == 1) {//不让符号连接的太多,最多三个连接
+            Set<Integer> set1 = new HashSet<>();
+            for (SlotModel m : board.row(0).values()) {
+                set1.add(m.getK());
+            }
+            Set<Integer> set2 = new HashSet<>();
+            for (SlotModel m : board.row(1).values()) {
+                set2.add(m.getK());
+            }
+            set2.retainAll(set1);
+            if (!set2.isEmpty()) {
+                if (!set2.isEmpty()) {
+                    list.removeIf(e -> set2.contains(e.getK()));
+                }
+            }
+        }
+
     }
 
     @Override
@@ -45,8 +70,7 @@ public class ClearState extends SuperState {
         if(!param.isFree()  && param.getContinueC()<2){
             return;
         }
-        Set<Integer> set = board.row(x + 1).keySet();
-        list.removeIf(e->set.contains(e.getK()));
+        interrupt(board,list,x);
     }
 
     @Override
@@ -56,8 +80,7 @@ public class ClearState extends SuperState {
         if(!param.isFree()  && param.getContinueC()<2){
             return;
         }
-        Set<Integer> set = board.row(0).keySet();
-        list.removeIf(e->set.contains(e.getK()));
+        interrupt(board,list,x);
     }
 
     @Override
@@ -67,9 +90,7 @@ public class ClearState extends SuperState {
         if(!param.isFree()  && param.getContinueC()<2){
             return;
         }
-        Set<Integer> set1 = board.row(x-1).keySet();
-        Set<Integer> set2 = board.row(x+1).keySet();
-        list.removeIf(e->set1.contains(e.getK())|| set2.contains(e.getK()));
+        interrupt(board,list,x);
     }
 
     @Override
@@ -93,8 +114,6 @@ public class ClearState extends SuperState {
 
     @Override
     public void interrupt(Table<Integer, Integer, SlotModel> board, List<Slot> list, int index) {
-//        SlotCommon.ins.print(board,null,null,0,0);
-//        print(list,"interrupt--->start:"+index);
         if(index==0){
             Collection<SlotModel> tmpList=board.row(index+1).values();
             Set<Integer> set = new HashSet<>();
@@ -142,5 +161,17 @@ public class ClearState extends SuperState {
                 list.removeIf(e->e.getK() == k);
             }
         });
+    }
+    @Override
+    public int bigWild(BetParam param) {
+        if(param.isFree()) return 0;
+        //运动员划过的线(2,3,4轴)
+        long loss = param.getTotalC()-param.getWinC();
+        float radio = loss * 1f/param.getWinC();
+        radio = radio*0.2f;
+        if( RandomUtil.randomDouble()<radio){
+            return RandomUtils.nextInt(1, 4);
+        }
+        return 0;
     }
 }

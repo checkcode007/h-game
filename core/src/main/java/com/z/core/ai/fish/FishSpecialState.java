@@ -2,9 +2,9 @@ package com.z.core.ai.fish;
 
 import com.z.model.type.SlotState;
 
-public class SpecialState extends FishState {
+public class FishSpecialState extends FishState {
 
-    public SpecialState(SlotState k) {
+    public FishSpecialState(SlotState k) {
         super(k);
     }
 

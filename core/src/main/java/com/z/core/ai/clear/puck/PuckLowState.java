@@ -1,7 +1,8 @@
-package com.z.core.ai.clear;
+package com.z.core.ai.clear.puck;
 
 import cn.hutool.core.util.RandomUtil;
 import com.google.common.collect.Table;
+import com.z.core.ai.clear.ClearState;
 import com.z.model.BetParam;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
@@ -10,18 +11,21 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-public class ClearLowState extends ClearState {
-    private static final Log log = LogFactory.getLog(ClearLowState.class);
+public class PuckLowState extends ClearState {
+    private static final Log log = LogFactory.getLog(PuckLowState.class);
 
-    public ClearLowState(SlotState k) {
+    public PuckLowState(SlotState k) {
         super(k);
         C1 =0.2f;
         C2=0.03f;
         C3=0f;
         C4=0f;
-        roomC3 = 110;  // 房间输赢次数差的权重
+        roomC3 = 150;  // 房间输赢次数差的权重
         roomC4 = 0.0005;  // 房间输赢金额差的权重
     }
     @Override
@@ -77,9 +81,8 @@ public class ClearLowState extends ClearState {
 
     @Override
     public void col_1(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
-        super.col_1(slots, board, list, param);
         int x = param.getX();
-        if(!param.isFree()  && param.getContinueC()<1){
+        if(!param.isFree()  && param.getContinueC()<2){
             return;
         }
         interrupt(board,list,x);
@@ -95,18 +98,6 @@ public class ClearLowState extends ClearState {
         interrupt(board,list,x);
     }
 
-    @Override
-    public void col_3(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
-        super.col_3(slots, board, list, param);
-        int x = param.getX();
-        interrupt(board,list,x);
-    }
-    @Override
-    public void col_4(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
-        super.col_4(slots, board, list, param);
-        int x = param.getX();
-        interrupt(board,list,x);
-    }
 
     @Override
     public int bigWild(BetParam param) {

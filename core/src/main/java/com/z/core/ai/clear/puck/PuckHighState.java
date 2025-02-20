@@ -1,31 +1,27 @@
-package com.z.core.ai.clear;
+package com.z.core.ai.clear.puck;
 
 import cn.hutool.core.util.RandomUtil;
 import com.google.common.collect.Table;
+import com.z.core.ai.clear.ClearState;
 import com.z.model.BetParam;
 import com.z.model.bo.slot.Slot;
 import com.z.model.bo.slot.SlotModel;
 import com.z.model.type.SlotState;
 import org.apache.commons.lang3.RandomUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class ClearMidState extends ClearState {
-    public ClearMidState(SlotState k) {
+public class PuckHighState extends ClearState {
+
+    public PuckHighState(SlotState k) {
         super(k);
-        C1 =0.3f;
-        C2= 0.1f;
-        C3=0.01f;
-        C4=0f;
-        roomC3 = 150;  // 房间输赢次数差的权重
-        roomC4 = 0.001;  // 房间输赢金额差的权重
-
+        C1 =0.5f;
+        C2=0.1f;
+        C3=0.05f;
+        C4=0.01f;
+        roomC3 = 220;  // 房间输赢次数差的权重
+        roomC4 = 0.002;  // 房间输赢金额差的权重
     }
-
-
     @Override
     public Map<Integer, Integer> weight(Map<Integer, Slot> slots, List<Slot> list, Set<Integer> goals, BetParam param) {
         Map<Integer, Integer> map = new HashMap();
@@ -34,9 +30,7 @@ public class ClearMidState extends ClearState {
             boolean isGoal = goals != null && goals.contains(s.getK());
             // 动态调整权重变化：目标符号增加的幅度比非目标符号小
             int adjustFactor = isGoal ? diffW1 : (int) (diffW1 * 0.5); // 目标符号调整幅度小于非目标符号
-            if (s.isBaida()|| s.isBonus()) {
-                adjustFactor = isGoal ? diffW1 * 2 : diffW1 / 2;
-            }else if (s.isScatter()){
+            if (s.isScatter()){
                 adjustFactor = isGoal ? diffW1 * 3 : diffW1 /3 ;
             }
             if (isGoal) {
@@ -50,10 +44,8 @@ public class ClearMidState extends ClearState {
         return map;
     }
 
-
     @Override
     public void checkCol(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
-        super.checkCol(slots, board, list, param);
         interruptSameY(board,list,param.getX());
         int scatter=0,bonus= 0;
         for (SlotModel m : board.values()) {
@@ -63,35 +55,39 @@ public class ClearMidState extends ClearState {
                 bonus++;
             }
         }
-        if(scatter>1) {
+        if(scatter>2) {
             list.removeIf(Slot::isScatter);
         }
-        if (bonus>2) {
+        if (bonus>3) {
             list.removeIf(Slot::isBonus);
         }
         super.checkCol(slots, board, list, param);
     }
     @Override
-    public void col_0(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
-        super.col_0(slots, board, list, param);
-        int x = param.getX();
-        if(param.isFree()  || param.getContinueC()>0) {
-            interrupt(board,list,x);
-        }else{
-            list.removeIf(e->e.getK()>8);
+    public void interruptSameY(Table<Integer, Integer, SlotModel> board, List<Slot> list, int index) {
+//        log.info("index:"+index);
+        Collection<SlotModel> tmpList=board.row(index).values();
+        Map<Integer,Integer> map = new HashMap();
+        for (SlotModel i : tmpList) {
+            map.put(i.getK(),map.getOrDefault(i.getK(),0)+1);
         }
+        map.forEach((k,v)->{
+            if(v>3){
+                list.removeIf(e->e.getK() == k);
+            }
+        });
     }
-
     @Override
     public int bigWild(BetParam param) {
         if(param.isFree()) return 0;
         //运动员划过的线(2,3,4轴)
         long loss = param.getTotalC()-param.getWinC();
         float radio = loss * 1f/param.getWinC();
-        radio = radio*0.5f;
+        radio = radio*0.7f;
         if( RandomUtil.randomDouble()<radio){
             return RandomUtils.nextInt(1, 4);
         }
         return 0;
     }
+
 }

@@ -1,26 +1,20 @@
 package com.z.core.service.game.puck;
 
 
-import cn.hutool.core.util.RandomUtil;
 import com.z.core.service.game.clear.ClearRoom;
 import com.z.core.service.game.game.IRound;
-import com.z.core.service.game.room.RoomService;
-import com.z.model.bo.slot.SlotModel;
+import com.z.core.service.game.slot.SlotCommon;
 import com.z.model.mysql.cfg.CRoom;
-import com.z.model.proto.CommonGame;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
  * 冰球突破房间
  */
 public class PuckRoom extends ClearRoom {
-//    protected Logger log = LoggerFactory.getLogger(getClass());
     private static final Log log = LogFactory.getLog(PuckRoom.class);
+
 
     public PuckRoom(CRoom cRoom, long uid) {
         super(cRoom, uid);
@@ -44,16 +38,9 @@ public class PuckRoom extends ClearRoom {
      * 大wild处理
      */
     public void bigWild(long roundId){
-        wildIndex = 0;
-        if(free) return;
-        if(roundId % 10 < 3){
-            return;
+        wildIndex = SlotCommon.ins.puckBigWild(gameType,param);
+        if(wildIndex>0){
+            param.addBigWildC();
         }
-//        if(RandomUtil.randomInt(0,10)>6){
-//            return;
-//        }
-        //运动员划过的线(2,3,4轴)
-        wildIndex = RandomUtils.nextInt(1, COL_SIZE-1);
-        log.info("wildIndex----------->"+wildIndex);
     }
 }

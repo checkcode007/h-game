@@ -90,7 +90,15 @@ public class BetParam {
      * 百搭 个数
      */
     int baida;
+    /**
+     * 冰球大wild 个数（每次房间内统计）
+     */
+    int bigWildC;
 
+
+    public void  addBigWildC() {
+        bigWildC++;
+    }
     Set<Integer> lineSet = new HashSet<>();
     public void addLine(int type){
         lineSet.add(type);

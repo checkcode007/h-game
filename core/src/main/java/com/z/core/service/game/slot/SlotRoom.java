@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
+
 /**
  * 房间
  */
@@ -27,22 +28,22 @@ public class SlotRoom extends SuperRoom {
     /**
      * 是否免费轮
      */
-    protected  boolean free;
+    protected boolean free;
     /**
      * 免费次数
      */
-    protected  int freeC = 0;
+    protected int freeC = 0;
     /**
      * 总免费次数
      */
-    protected  int totalFreeC = 0;
+    protected int totalFreeC = 0;
 
     /**
      * 高级玩法次数
      */
-    protected  int highC = 0;
+    protected int highC = 0;
 
-    protected  int totalHighC = 0;
+    protected int totalHighC = 0;
 
     /**
      * 总奖励金额
@@ -55,12 +56,12 @@ public class SlotRoom extends SuperRoom {
     /**
      * 百搭符号
      */
-    protected int baida=0;
+    protected int baida = 0;
     /**
      * 全屏幕符号
      */
-    protected int fullType=0;
-    protected int fullRate=0;
+    protected int fullType = 0;
+    protected int fullRate = 0;
 
     /**
      * 中奖的支付线
@@ -69,43 +70,45 @@ public class SlotRoom extends SuperRoom {
     /**
      * 所有的坐标符号
      */
-    protected  List<Game.Spot> spots = new ArrayList<>();
+    protected List<Game.Spot> spots = new ArrayList<>();
 
     /**
      * 退出图标类型
      */
-    protected int quitType =0;
+    protected int quitType = 0;
 
     protected SlotMachine machine;
 
-    protected  Map<Integer,Rewardline> lineMap;
+    protected Map<Integer, Rewardline> lineMap;
 
 
-    public SlotRoom(CRoom cRoom,long uid) {
-        super(cRoom,uid);
+    public SlotRoom(CRoom cRoom, long uid) {
+        super(cRoom, uid);
         machineService = SpringContext.getBean(SlotMachineService.class);
         machine = machineService.getMachine(gameType);
         lineMap = new HashMap<>();
     }
+
     //todo 抽取到super
     @Override
     public void init(CRoom cRoom) {
         super.init(cRoom);
         CSlot slot = service.getQuit(gameType);
-        if(slot!=null){
+        if (slot != null) {
             quitType = slot.getSymbol();
         }
         roomWinGold = 0;
 
 
     }
-    public boolean checkPayLine(Rewardline line){
+
+    public boolean checkPayLine(Rewardline line) {
         for (Rewardline line1 : lineMap.values()) {
             for (SlotModel m : line1.getPoints()) {
                 for (SlotModel m1 : line.getPoints()) {
-                    if(m.getX() == m1.getX() && m.getY() == m1.getY()){
-                        if(line1.getK()!=line.getK()){
-                           return false;
+                    if (m.getX() == m1.getX() && m.getY() == m1.getY()) {
+                        if (line1.getK() != line.getK()) {
+                            return false;
                         }
                     }
                 }
@@ -113,60 +116,60 @@ public class SlotRoom extends SuperRoom {
         }
         return true;
     }
+
     /**
      * 生成符号
      */
     public void generate() {
         board.clear();
         initParam();
-        int num = RandomUtil.randomInt(0, 3);
         List<Slot> list = new ArrayList<>(slots.values());
-        list.removeIf(e->e.isBonus()|| e.isScatter()|| e.isBaida());
-
-        for (int i = 0; i < num; i++) {
-            Rewardline line = machine.randomLine();
-//            if(hadSet.contains(line.getK())){
-//                continue;
-//            }
-            if (!checkPayLine(line)) {
-               continue;
+        list.removeIf(e -> e.isBonus() || e.isScatter() || e.isBaida());
+        List<Rewardline> rewardlines = SlotCommon.ins.getRandomline(gameType,machine.getAllMap(),param);
+        if(rewardlines!=null){
+            for (Rewardline line : rewardlines) {
+                if (!checkPayLine(line)) {
+                    continue;
+                }
+                lineMap.put(line.getLineId(), line);
             }
-            lineMap.put(line.getLineId(), line);
         }
-
         for (Rewardline line : lineMap.values()) {
-            list.removeIf(e->e.getK()== line.getK());
+            list.removeIf(e -> e.getK() == line.getK());
             for (SlotModel m : line.getPoints()) {
                 board.put(m.getX(), m.getY(), m);
             }
         }
         for (int i = 0; i < COL_SIZE; i++) {
             for (int j = 0; j < ROW_SIZE; j++) {
-                SlotModel m =  board.get(i,j);
-                if(m!=null) continue;
+                SlotModel m = board.get(i, j);
+                if (m != null) continue;
                 Collections.shuffle(list);
                 Slot slot = list.get(0);
-                m = SlotCommon.ins.toModel(slot,i,j);
-                if(i == 0){
-                    list.removeIf(e->e.getK()== slot.getK());
+                m = SlotCommon.ins.toModel(slot, i, j);
+                if (i == 0) {
+                    list.removeIf(e -> e.getK() == slot.getK());
                 }
                 board.put(m.getX(), m.getY(), m);
             }
         }
     }
+
     /**
      * 是否变化牌的原点牌
      */
-    public boolean isOrigin(int type){
+    public boolean isOrigin(int type) {
         return false;
     }
-    public int  getChangeType(){
+
+    public int getChangeType() {
         return 0;
     }
+
     /**
      * 进入下一轮的初始化
      */
-    public void nextRound(){
+    public void nextRound() {
         freeC = 0;
         free = false;
         rewardGold = 0L;
@@ -177,17 +180,20 @@ public class SlotRoom extends SuperRoom {
         fullRate = 0;
         lineMap.clear();
     }
+
     /**
      * 创建轮数
+     *
      * @param uid
      * @param gold
      * @return
      */
     public IRound createRound(long uid, long gold) {//百变玛丽
-        Round round = new Round(roundIndex.incrementAndGet(),gameType,roomType);
+        Round round = new Round(roundIndex.incrementAndGet(), gameType, roomType);
         roundMap.put(uid, round);
         return round;
     }
+
     /**
      * 下注
      *
@@ -198,8 +204,8 @@ public class SlotRoom extends SuperRoom {
     public MsgResult bet(long uid, int type, long gold, boolean free) {
         nextRound();
         var round = createRound(uid, gold);
-        StringJoiner sj = new StringJoiner(",").add("gameType:"+gameType).add("roomType:"+roomType).add("uid:"+uid).add("rid:" + id).add("roundId:" + round.getId()).add("uid:" + uid).add("gold:" + gold);
-        log.info(sj.add("betState:"+user.getSlotState()).toString());
+        StringJoiner sj = new StringJoiner(",").add("gameType:" + gameType).add("roomType:" + roomType).add("uid:" + uid).add("rid:" + id).add("roundId:" + round.getId()).add("uid:" + uid).add("gold:" + gold);
+        log.info(sj.add("betState:" + user.getSlotState()).toString());
         var roundCheck = round.bet(uid, 0, gold, free);
         if (!roundCheck.isOk()) {
             log.error("roundCheck fail");
@@ -214,7 +220,7 @@ public class SlotRoom extends SuperRoom {
         long realGold = getBetGold();
         sj.add("lastG:" + betGold).add("realG:" + realGold);
         //生成符号
-        log.info("用户状态:"+user.getSlotState()+"生成------>:" + round.getId());
+        log.info("用户状态:" + user.getSlotState() + "生成------>:" + round.getId());
         generate();
         print();
         spots = toSpots();
@@ -226,9 +232,9 @@ public class SlotRoom extends SuperRoom {
             rate += payLine.getRate();
 //            highC += payLine.getHighC();
         }
-        if(fullType>0){
-            sj.add("fullType:"+fullType).add("fullRate:" + fullRate);
-            rewardGold +=getBetGold()*fullRate;
+        if (fullType > 0) {
+            sj.add("fullType:" + fullType).add("fullRate:" + fullRate);
+            rewardGold += getBetGold() * fullRate;
             rate += fullRate;
         }
         if (rewardGold > 0) {
@@ -240,7 +246,7 @@ public class SlotRoom extends SuperRoom {
                 user.addFree(freeC);
             }
         } else {
-            if(user.getGmFreeC()>0){
+            if (user.getGmFreeC() > 0) {
                 freeC = user.getGmFreeC();
                 user.resetGmFreeC();
             }
@@ -251,24 +257,24 @@ public class SlotRoom extends SuperRoom {
                 user.setFreeBetGold(0);
             }
         }
-        if(free){
+        if (free) {
             highC = 0;
         }
-        if(highC>0){
+        if (highC > 0) {
             user.addHighC(highC);
         }
-        totalFreeC  = user.getFree();
+        totalFreeC = user.getFree();
         totalHighC = user.getHighC();
 
         roomWinGold += realGold;
         roomBetGold += gold;
         param.setRoomWinGold(roomWinGold);
         param.setRoomBetGold(roomBetGold);
-        log.info(sj.add("free:"+freeC).add("highC:"+highC).add("rewardGold:" + rewardGold).add("success").toString());
+        log.info(sj.add("free:" + freeC).add("highC:" + highC).add("rewardGold:" + rewardGold).add("success").toString());
         return new MsgResult<Game.Line9BetMsg>(true);
     }
 
-    public void checkBounus(){
+    public void checkBounus() {
         int c = 0;
         int symbol = 0;
         for (SlotModel m : board.values()) {
@@ -277,31 +283,32 @@ public class SlotRoom extends SuperRoom {
             c++;
             symbol = m.getK();
         }
-        if(c<1) return;
+        if (c < 1) return;
         CSlot cSlot = service.get(gameType, symbol, c);
         if (cSlot == null) return;
-        if(cSlot.getFreeMax()>0){
-            freeC += RandomUtil.randomInt(cSlot.getFree(),cSlot.getFreeMax()+1);
-        }else{
+        if (cSlot.getFreeMax() > 0) {
+            freeC += RandomUtil.randomInt(cSlot.getFree(), cSlot.getFreeMax() + 1);
+        } else {
             freeC += cSlot.getFree();
         }
     }
+
     /**
      * 游戏上方奖池支付线处理
      */
     public void poolLine(Rewardline line) {
         long poolGold = PoolService.ins.get(gameType);
         line.setGold(poolGold * line.getRate() / 10000);
-        log.info("poolGold:" + poolGold +":"+ line.getGold());
+        log.info("poolGold:" + poolGold + ":" + line.getGold());
     }
+
     /**
      * 所有支付线
      */
     public void checklines() {
-        if(lineMap.isEmpty()){
+        if (lineMap.isEmpty()) {
             return;
         }
-        List<Rewardline> rewardlines = new ArrayList<>();
         long realGold = getBetGold();
         for (Rewardline line : lineMap.values()) {
             highC += line.getSpecialC();
@@ -314,28 +321,29 @@ public class SlotRoom extends SuperRoom {
 
     /**
      * 检查触发高级玩法的符号
+     *
      * @param line
      * @return
      */
-    public Rewardline checkHigher(Line line){
+    public Rewardline checkHigher(Line line) {
         Rewardline payline = null;
         int type = 0;
         for (SlotModel p : line.getPoints()) {
             int x = p.getX();
-            SlotModel m = board.get(x,p.getY());
+            SlotModel m = board.get(x, p.getY());
             type = m.getK();
-            if(!m.isScatter()) continue;
-            if(payline==null){
-                payline =new Rewardline(type,line.getLineId());
+            if (!m.isScatter()) continue;
+            if (payline == null) {
+                payline = new Rewardline(type, line.getLineId());
             }
             payline.addSpecicalC();
             payline.addPoint(p);
         }
-        if(payline == null){
+        if (payline == null) {
             return null;
         }
-        CSlot slot = service.get(gameType,type,payline.getSpecialC());
-        if(slot == null) return null;
+        CSlot slot = service.get(gameType, type, payline.getSpecialC());
+        if (slot == null) return null;
         return payline;
     }
 
@@ -344,7 +352,7 @@ public class SlotRoom extends SuperRoom {
         return false;
     }
 
-//    public Slot random (Map < Integer, Slot > slots) {
+    //    public Slot random (Map < Integer, Slot > slots) {
 //        Set<Integer> rewardSymbols = new HashSet<>();
 //        for (Rewardline line : rewardlines) {
 //            rewardSymbols.add(line.getK());
@@ -359,16 +367,17 @@ public class SlotRoom extends SuperRoom {
 //        }
 //        return slot;
 //    }
-    public void print () {
-        SlotCommon.ins.print(board,gameType,roomType,id,uid);
+    public void print() {
+        SlotCommon.ins.print(board, gameType, roomType, id, uid);
     }
-    public List<Game.Spot> toSpots(){
+
+    public List<Game.Spot> toSpots() {
         List<Game.Spot> list = new ArrayList<>(30);
         for (SlotModel m : board.values()) {
             Game.Spot.Builder b = Game.Spot.newBuilder();
             b.setSymbol(m.getK()).setX(m.getX()).setY(m.getY()).setChangeType(m.getChangeType());
             b.setC(m.getC());
-            if(m.getFromPoints()!=null){
+            if (m.getFromPoints() != null) {
                 for (Point p : m.getFromPoints()) {
                     b.addFrom(Game.Point.newBuilder().setX(p.getX()).setY(p.getY()));
                 }
@@ -377,10 +386,11 @@ public class SlotRoom extends SuperRoom {
         }
         return list;
     }
-    public List<Game.PayLine> toPayLines(){
+
+    public List<Game.PayLine> toPayLines() {
         List<Game.PayLine> list = new ArrayList<>();
         for (Rewardline m : lineMap.values()) {
-            Game.PayLine.Builder b= Game.PayLine.newBuilder();
+            Game.PayLine.Builder b = Game.PayLine.newBuilder();
             b.setLineId(m.getLineId()).setGold(m.getGold()).setRate(m.getRate()).setHighC(m.getSpecialC());
             for (SlotModel p : m.getPoints()) {
                 b.addSpots(Game.Spot.newBuilder().setSymbol(m.getK()).setX(p.getX()).setY(p.getY()).build());
@@ -395,6 +405,7 @@ public class SlotRoom extends SuperRoom {
         super.update(now);
 
     }
+
     public static void main(String[] args) {
         // 定义位置从 1 到 9，允许出现的位置为 1, 3, 5, 7
         // 使用一个 32 位整数来表示这些位置的状态

@@ -1,13 +1,14 @@
 package com.z.core.service.game.slot;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-import com.z.model.bo.slot.*;
+import com.z.model.bo.slot.Payline;
+import com.z.model.bo.slot.Point;
+import com.z.model.bo.slot.Rewardline;
+import com.z.model.bo.slot.SlotModel;
 import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonGame;
+import com.z.model.type.LineType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.security.crypto.keygen.StringKeyGenerator;
 
 import java.util.*;
 
@@ -20,8 +21,6 @@ public class SlotMachine {
     private double roomC3 = 1.0; // 房间内输赢次数的权重
     private double roomC4 = 1.0; // 房间内投注和赢得金额的权重
 
-    // 玩家状态
-    private double playerState = 0.5; // 初始状态值，0.5代表中等概率
 
     //col 第几列 row 第几排
     protected int COL_SIZE=5,ROW_SIZE=3;
@@ -32,6 +31,14 @@ public class SlotMachine {
      * 预生成支付线
      */
     protected List<Rewardline> lines = new ArrayList<>();
+
+    protected List<Rewardline> lowLines = new ArrayList<>();
+
+    protected List<Rewardline> midLines = new ArrayList<>();
+    protected List<Rewardline> highlines = new ArrayList<>();
+
+    protected Map<LineType,List<Rewardline>> allMap = new HashMap<>();
+
     public SlotMachine(CommonGame.GameType gameType, int colsize, int rowsize) {
         random = new Random();
         this.gameType = gameType;
@@ -44,9 +51,6 @@ public class SlotMachine {
 
         for (Payline payline : map.values()) {
             int lineId = payline.getLineId();
-//            if(gameType == CommonGame.GameType.SHAOLIN_ZUQIU){
-//               log.info("id:"+payline.getLineId() +" p: "+payline.getPoints());
-//            }
             for (int k : slotMap.keySet()) {
                 List<CSlot> list = slotMap.get(k);
                 for (CSlot slot : list) {
@@ -68,9 +72,19 @@ public class SlotMachine {
                     line.setSpecialC(slot.getC1());
                     lines.add(line);
                     line.addPoints(points);
+                    if(points.size()<4){
+                        lowLines.add(line);
+                    } else if (points.size()<5) {
+                        midLines.add(line);
+                    }else{
+                        highlines.add(line);
+                    }
                 }
             }
         }
+        allMap.put(LineType.LOW,lowLines);
+        allMap.put(LineType.MID,midLines);
+        allMap.put(LineType.HIGH,highlines);
 //        print();
 
     }
@@ -79,6 +93,23 @@ public class SlotMachine {
         int index = random.nextInt(lines.size());
         return  lines.get(index);
     }
+
+    // 从结果池中随机选择一个支付线结果
+    public Rewardline randomLowLine(){
+        int index = random.nextInt(lowLines.size());
+        return  lowLines.get(index);
+    }
+
+    public Rewardline randomMidLine(){
+        int index = random.nextInt(midLines.size());
+        return  midLines.get(index);
+    }
+
+    public Rewardline randomHighLine(){
+        int index = random.nextInt(highlines.size());
+        return  highlines.get(index);
+    }
+
 
 
 
@@ -101,5 +132,25 @@ public class SlotMachine {
             }
             log.info(line.getLineId()+"---->"+sj);
         }
+    }
+
+    public List<Rewardline> getLines() {
+        return lines;
+    }
+
+    public List<Rewardline> getLowLines() {
+        return lowLines;
+    }
+
+    public List<Rewardline> getMidLines() {
+        return midLines;
+    }
+
+    public List<Rewardline> getHighlines() {
+        return highlines;
+    }
+
+    public Map<LineType, List<Rewardline>> getAllMap() {
+        return allMap;
     }
 }
