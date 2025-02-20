@@ -306,9 +306,13 @@ public class SlotRoom extends SuperRoom {
         lineMap.clear();
         for (Payline payline : paylineService.getList(gameType)) {
             Rewardline rewardline = checkLine(payline);
-            lineMap.put(rewardline.getLineId(),rewardline);
+            if(rewardline!=null){
+                lineMap.put(rewardline.getLineId(),rewardline);
+            }
             rewardline = checkLine(payline);
-            lineMap.put(rewardline.getLineId(),rewardline);
+            if(rewardline!=null){
+                lineMap.put(rewardline.getLineId(),rewardline);
+            }
         }
         if (lineMap.isEmpty()) {
             return;
@@ -334,7 +338,6 @@ public class SlotRoom extends SuperRoom {
             if(first == null){
                 first = m;
                 sameC++;
-                break;
             }
             if(!isSame(p.getX(),first.getK(),m.getK())){
                 break;
