@@ -33,27 +33,6 @@ public class HighState extends CommonState {
     }
 
     @Override
-    public Map<Integer, Integer> weight(Map<Integer, Slot> slots, List<Slot> list, Set<Integer> goals, BetParam param) {
-        Map<Integer, Integer> map = new HashMap();
-        for (Slot s : list) {
-            // 降低的概率
-            boolean isGoal = goals != null && goals.contains(s.getK());
-            // 动态调整权重变化：目标符号增加的幅度比非目标符号小
-            int adjustFactor = isGoal ? diffW1 : (int) (diffW1 * 0.5); // 目标符号调整幅度小于非目标符号
-            if (s.isScatter()){
-                adjustFactor = isGoal ? diffW1 * 3 : diffW1 /3 ;
-            }
-            if (isGoal) {
-                s.subW1(adjustFactor);
-            } else {
-                s.addW1(adjustFactor);
-            }
-            map.put(s.getK(), s.getW1());
-        }
-        freeWeight( map,slots, param);
-        return map;
-    }
-    @Override
     public void col_0(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
         super.col_0(slots, board, list, param);
         int x = param.getX();
@@ -102,13 +81,6 @@ public class HighState extends CommonState {
     }
     @Override
     public List<Rewardline> getRandomline(Map<LineType, List<Rewardline>> lineMap, BetParam param) {
-//        double d = calculateAdjustedWinProbability(param.getWinC(),param.getTotalC(),param.getRoomWinC(),param.getRoomTotalC(),baseProbability);
-//        // 生成一个0到1之间的随机数
-//        double randomValue = Math.random();
-//        boolean win = isWin(d,randomValue);
-//        if(!win){
-//            return null;
-//        }
         double r = RandomUtil.randomDouble();
         log.info("r---->"+r);
         if( r> 0.6){

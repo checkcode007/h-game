@@ -43,26 +43,6 @@ public class LowState extends CommonState {
         }
     }
 
-
-    @Override
-    public Map<Integer, Integer> weight(Map<Integer, Slot> slots, List<Slot> list, Set<Integer> goals, BetParam param) {
-        Map<Integer, Integer> map = new HashMap();
-        for (Slot s : list) {
-            // 降低的概率
-            boolean isGoal = goals != null && goals.contains(s.getK());
-            // 动态调整权重变化：目标符号增加的幅度比非目标符号小
-            int adjustFactor = isGoal ? diffW1 : (int) (diffW1 * 0.2); // 目标符号调整幅度小于非目标符号
-            if (isGoal) {
-                s.subW1(adjustFactor);
-            } else {
-                s.addW1(adjustFactor);
-            }
-            map.put(s.getK(), s.getW1());
-        }
-        freeWeight(map, slots, param);
-        return map;
-    }
-
     @Override
     public Slot winSlot(Table<Integer, Integer, SlotModel> board, Map<Integer, Integer> map, Map<Integer, Slot> slots, List<Slot> list, BetParam param) {
         return null;

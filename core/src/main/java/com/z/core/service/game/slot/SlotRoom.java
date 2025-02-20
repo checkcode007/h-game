@@ -81,7 +81,6 @@ public class SlotRoom extends SuperRoom {
 
     protected Map<Integer, Rewardline> lineMap;
 
-
     public SlotRoom(CRoom cRoom, long uid) {
         super(cRoom, uid);
         machineService = SpringContext.getBean(SlotMachineService.class);
@@ -98,8 +97,6 @@ public class SlotRoom extends SuperRoom {
             quitType = slot.getSymbol();
         }
         roomWinGold = 0;
-
-
     }
 
     public boolean checkPayLine(Rewardline line) {
@@ -205,7 +202,7 @@ public class SlotRoom extends SuperRoom {
         nextRound();
         var round = createRound(uid, gold);
         StringJoiner sj = new StringJoiner(",").add("gameType:" + gameType).add("roomType:" + roomType).add("uid:" + uid).add("rid:" + id).add("roundId:" + round.getId()).add("uid:" + uid).add("gold:" + gold);
-        log.info(sj.add("betState:" + user.getSlotState()).toString());
+        log.info(sj.add("betState:" + user.getSlotState()));
         var roundCheck = round.bet(uid, 0, gold, free);
         if (!roundCheck.isOk()) {
             log.error("roundCheck fail");
@@ -306,6 +303,13 @@ public class SlotRoom extends SuperRoom {
      * 所有支付线
      */
     public void checklines() {
+        lineMap.clear();
+        for (Payline payline : paylineService.getList(gameType)) {
+            Rewardline rewardline = checkLine(payline);
+            lineMap.put(rewardline.getLineId(),rewardline);
+            rewardline = checkLine(payline);
+            lineMap.put(rewardline.getLineId(),rewardline);
+        }
         if (lineMap.isEmpty()) {
             return;
         }
@@ -318,10 +322,32 @@ public class SlotRoom extends SuperRoom {
         }
     }
 
-
+    public Rewardline checkLine(Payline line){
+        SlotModel first= null;
+        boolean b = true;
+        boolean baida = false;
+        for (Point p : line.getPoints()) {
+            SlotModel m = board.get(p.getX(),p.getY());
+            if(m.isBaida()){
+                baida = true;
+            }
+            if(first == null){
+                first = m;
+                break;
+            }
+            if(!isSame(p.getX(),first.getK(),m.getK())){
+                b=false;
+                break;
+            }
+        }
+        if(!b) return null;
+        Rewardline rewardline = new Rewardline(first.getK(),line.getLineId());
+        rewardline.setRate(rate);
+        rewardline.setHadBaida(baida);
+        return  rewardline;
+    }
     /**
      * 检查触发高级玩法的符号
-     *
      * @param line
      * @return
      */

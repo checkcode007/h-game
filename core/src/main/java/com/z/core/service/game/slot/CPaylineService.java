@@ -22,9 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * slot-配置
@@ -74,6 +72,9 @@ public class CPaylineService {
 
     public Map<Integer, Payline> getMap(CommonGame.GameType gameType) {
         return table.row(gameType);
+    }
+    public Collection<Payline> getList(CommonGame.GameType gameType) {
+        return table.row(gameType).values();
     }
 
     public Payline get(CommonGame.GameType gameType, int lineId) {

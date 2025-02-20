@@ -63,7 +63,6 @@ public enum UserService {
         if(bo.isLock()){
             bo.setSlotState(SlotState.LOW_BET);
             offer(bo.getId());
-
         }else{
             Wallet wallet = WalletService.ins.get(bo.getId());
             PlayerStateController.reload(wallet,bo);

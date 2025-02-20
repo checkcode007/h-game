@@ -20,9 +20,6 @@ import java.util.function.Predicate;
 
 public abstract class SuperState {
     private static final Log log = LogFactory.getLog(SuperState.class);
-    public static final int diffW1 = 100;
-    public static final int diffHighW1 = 5;
-
     protected SlotState k;
     /**
      * 每排相同的概率
@@ -184,7 +181,6 @@ public abstract class SuperState {
             int symbol = entry.getKey();
             int weight = entry.getValue();
             currentWeight += weight;
-
             if (random <= currentWeight) {
                 target = slots.get(symbol);
                 break;
@@ -303,20 +299,6 @@ public abstract class SuperState {
     public Map<Integer, Integer> weight(Map<Integer, Slot> slots, List<Slot> list, Set<Integer> goals, BetParam param) {
         Map<Integer, Integer> map = new HashMap();
         for (Slot s : list) {
-            // 降低的概率
-            boolean isGoal = goals != null && goals.contains(s.getK());
-            // 动态调整权重变化：目标符号增加的幅度比非目标符号小
-            int adjustFactor = isGoal ? diffW1 : (int) (diffW1 * 0.5); // 目标符号调整幅度小于非目标符号
-            if (s.isBaida() || s.isBonus()) {
-                adjustFactor = isGoal ? diffW1 * 2 : diffW1 / 2;
-            } else if (s.isScatter()) {
-                adjustFactor = isGoal ? diffW1 * 3 : diffW1 / 3;
-            }
-            if (isGoal) {
-                s.subW1(adjustFactor);
-            } else {
-                s.addW1(adjustFactor);
-            }
             map.put(s.getK(), s.getW1());
         }
         freeWeight(map, slots, param);
@@ -460,13 +442,6 @@ public abstract class SuperState {
         Map<Integer, Integer> map = new HashMap<>();
 
         for (Slot s : list) {
-            // 降低的概率
-            boolean isGoal = goals != null && goals.contains(s.getK());
-            if (isGoal) {
-                s.subW1(diffHighW1);
-            } else {
-                s.addW2(diffHighW1);
-            }
             map.put(s.getK(), s.getW1());
         }
 

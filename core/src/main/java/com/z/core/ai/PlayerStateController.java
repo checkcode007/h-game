@@ -78,8 +78,8 @@ public class PlayerStateController {
         double stateValue = calculateStateValue(winCount, loseCount, betAmount, winAmount);
         // 特殊情况：初始数据
 
-        log.info("stateValue: " + stateValue+" winC:"+winCount+" loseC:"+loseCount+" betAmount:"+betAmount+" winAmount:"+winAmount);
-        System.err.println(stateValue);
+//        log.info("stateValue: " + stateValue+" winC:"+winCount+" loseC:"+loseCount+" betAmount:"+betAmount+" winAmount:"+winAmount);
+//        log.info(stateValue);
         if (winCount == 0 && loseCount == 0 && betAmount == 0.0 && winAmount == 0.0) {
             return SlotState.MEDIUM_BET;
         }
@@ -88,7 +88,7 @@ public class PlayerStateController {
         } else if (stateValue >= T2) {
             return SlotState.MEDIUM_BET;
         } else {
-            return SlotState.LOW_BET;
+            return SlotState.MEDIUM_BET;
         }
     }
     public static void reload(Wallet wallet,User user) {
