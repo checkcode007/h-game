@@ -46,7 +46,29 @@ public class WMHigherRoom extends SlotRoom {
             log.info(s.getK() + "------>" + s.getW1());
         }
     }
-
+    @Override
+    public void generate() {
+        board.clear();
+        initParam();
+        List<Slot> list = new ArrayList<>(slots.values());
+        Map<Integer, Slot> slots1 = new HashMap<>();
+        for (Slot slot : list) {
+            slots1.put(slot.getK(),slot);
+        }
+        for (int i = 0; i < COL_SIZE; i++) {
+            for (int j = 0; j < ROW_SIZE; j++) {
+                SlotModel m = board.get(i, j);
+                if (m != null) continue;
+                param.setX(i);
+                Slot slot = random(slots1);
+                m = SlotCommon.ins.toModel(slot, i, j);
+                if (i == 0) {
+                    list.removeIf(e -> e.getK() == slot.getK());
+                }
+                board.put(m.getX(), m.getY(), m);
+            }
+        }
+    }
     @Override
     public MsgResult bet(long uid, int type, long gold, boolean free) {
         printslot();

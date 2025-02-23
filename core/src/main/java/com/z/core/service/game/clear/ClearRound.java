@@ -278,12 +278,6 @@ public class ClearRound extends SuperRound {
                 Map<Integer, Integer> colCMap = new HashMap();//每排个数
                 for (var e : lianjie) {
                     board.remove(e.getX(), e.getY());
-                    if (!e.isBaida() && e.isGold()) {
-                        CSlot wildSlot = service.getWild(gameType);
-                        Slot s = slots.get(wildSlot.getSymbol());
-                        SlotModel baida = SlotCommon.ins.toModel(s, e.getX(), e.getY());
-                        board.put(baida.getX(), baida.getY(), baida);
-                    }
                     colCMap.put(e.getX(), colCMap.getOrDefault(e.getX(), 0) + 1);
 //                    log.info("x:" + e.getX()+" c:"+colCMap.get(e.getX()));
                 }

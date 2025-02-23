@@ -25,7 +25,6 @@ public class ClearMidState extends ClearState {
 
     }
 
-
     @Override
     public Map<Integer, Integer> weight(Map<Integer, Slot> slots, List<Slot> list, Set<Integer> goals, BetParam param) {
         Map<Integer, Integer> map = new HashMap();

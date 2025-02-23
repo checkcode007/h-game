@@ -76,7 +76,7 @@ public class BallRoom extends SlotRoom {
     }
 
     @Override
-    public void checkBounus() {
+    public void checkBonus() {
         int c = 0;
         for (SlotModel m : board.values()) {
             Slot slot = slots.get(m.getK());

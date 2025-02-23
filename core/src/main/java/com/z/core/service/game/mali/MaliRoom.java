@@ -7,6 +7,7 @@ import com.z.model.bo.slot.*;
 import com.z.model.bo.user.Wallet;
 import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CRoom;
+import com.z.model.mysql.cfg.CSlot;
 import com.z.model.proto.CommonGame;
 import com.z.model.proto.Game;
 import org.apache.commons.logging.Log;
@@ -82,6 +83,19 @@ public class MaliRoom extends SlotRoom {
         }
     }
 
+    @Override
+    public void checklines() {
+        super.checklines();
+
+        for (Rewardline line : lineMap.values()) {
+            int baidaC = line.getSpecialC();
+            if(baidaC<3) continue;
+            CSlot slot = service.get(gameType, CommonGame.Mali.WILD_VALUE,baidaC);
+            if(slot == null) continue;
+            highC+=slot.getC1();
+        }
+
+    }
 
     @Override
     public Rewardline checkHigher(Payline line) {
@@ -89,11 +103,7 @@ public class MaliRoom extends SlotRoom {
         for (Point p : line.getPoints()) {
             int x = p.getX();
             SlotModel m = board.get(x,p.getY());
-            int type = m.getChangeType()>0 ?m.getChangeType():m.getK();
             if(!m.isBaida()) continue;
-            if(payline==null){
-                payline =new Rewardline(type,line.getLineId());
-            }
             payline.addSpecicalC();
             payline.addPoint(m);
         }

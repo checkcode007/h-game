@@ -27,7 +27,7 @@ public class MidState extends CommonState{
 
     @Override
     void betStateFilter(Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
-
+//        list.removeIf(e -> e.getK()<4);
     }
 
     @Override
@@ -37,7 +37,7 @@ public class MidState extends CommonState{
         if(param.isFree()) {
             interrupt(board,list,x);
         }else{
-            list.removeIf(e->e.getK()>8);
+            list.removeIf(Slot::isScatter);
         }
     }
 
@@ -79,17 +79,19 @@ public class MidState extends CommonState{
     @Override
     public List<Rewardline> getRandomline(Map<LineType, List<Rewardline>> lineMap, BetParam param) {
         double r = RandomUtil.randomDouble();
-        if( r > 0.5){
+        if( r > 0.4){
             return null;
         }
-        Map<Integer, Rewardline> map = new HashMap<>();
-        List<Rewardline> lines = lineMap.get(LineType.MID);
-        lines.addAll(lineMap.get(LineType.LOW));
-        for (int i = 0; i < 2; i++) {
+        if(RandomUtil.randomInt(10)%4 ==0){
+            List<Rewardline> lines = lineMap.get(LineType.MID);
             int index = RandomUtil.randomInt(lines.size());
             Rewardline line =  lines.get(index);
-            map.put(line.getLineId(), line);
+            return Collections.singletonList(line);
+        }else{
+            List<Rewardline> lines = lineMap.get(LineType.LOW);
+            int index = RandomUtil.randomInt(lines.size());
+            Rewardline line =  lines.get(index);
+            return Collections.singletonList(line);
         }
-        return new ArrayList<>(map.values());
     }
 }

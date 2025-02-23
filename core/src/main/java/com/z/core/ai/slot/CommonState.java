@@ -28,16 +28,6 @@ public abstract class CommonState extends SuperState {
     }
 
     abstract void betStateFilter(Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param);
-
-    @Override
-    public Map<Integer, Integer> weight(Map<Integer, Slot> slots, List<Slot> list, Set<Integer> goals, BetParam param) {
-        Map<Integer, Integer> map = new HashMap();
-        for (Slot s : list) {
-            map.put(s.getK(), s.getW1());
-        }
-        freeWeight( map,slots, param);
-        return map;
-    }
     @Override
     public void col_0(Map<Integer, Slot> slots, Table<Integer, Integer, SlotModel> board, List<Slot> list, BetParam param) {
         super.col_0(slots, board, list, param);

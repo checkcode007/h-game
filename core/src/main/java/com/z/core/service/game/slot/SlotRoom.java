@@ -121,7 +121,7 @@ public class SlotRoom extends SuperRoom {
         board.clear();
         initParam();
         List<Slot> list = new ArrayList<>(slots.values());
-        list.removeIf(e -> e.isBonus() || e.isScatter() || e.isBaida());
+//        list.removeIf(e -> e.isBonus() || e.isScatter() || e.isBaida());
         List<Rewardline> rewardlines = SlotCommon.ins.getRandomline(gameType,machine.getAllMap(),param);
         if(rewardlines!=null){
             for (Rewardline line : rewardlines) {
@@ -137,12 +137,19 @@ public class SlotRoom extends SuperRoom {
                 board.put(m.getX(), m.getY(), m);
             }
         }
+        Map<Integer, Slot> slots1 = new HashMap<>();
+        for (Slot slot : list) {
+            slots1.put(slot.getK(),slot);
+        }
         for (int i = 0; i < COL_SIZE; i++) {
             for (int j = 0; j < ROW_SIZE; j++) {
                 SlotModel m = board.get(i, j);
                 if (m != null) continue;
-                Collections.shuffle(list);
-                Slot slot = list.get(0);
+//                Collections.shuffle(list);
+//                Slot slot = list.get(0);
+//                m = SlotCommon.ins.toModel(slot, i, j);
+                param.setX(i);
+                Slot slot = random(slots1);
                 m = SlotCommon.ins.toModel(slot, i, j);
                 if (i == 0) {
                     list.removeIf(e -> e.getK() == slot.getK());
@@ -222,7 +229,7 @@ public class SlotRoom extends SuperRoom {
         print();
         spots = toSpots();
         checklines();
-        checkBounus();
+        checkBonus();
         payLines = toPayLines();
         for (Game.PayLine payLine : payLines) {
             rewardGold += payLine.getGold();
@@ -271,7 +278,7 @@ public class SlotRoom extends SuperRoom {
         return new MsgResult(true);
     }
 
-    public void checkBounus() {
+    public void checkBonus() {
         int c = 0;
         int symbol = 0;
         for (SlotModel m : board.values()) {
@@ -306,21 +313,15 @@ public class SlotRoom extends SuperRoom {
         lineMap.clear();
         for (Payline payline : paylineService.getList(gameType)) {
             Rewardline rewardline = checkLine(payline);
-            if(rewardline!=null){
-                lineMap.put(rewardline.getLineId(),rewardline);
-            }
-            rewardline = checkHigher(payline);
-            if(rewardline!=null){
-                lineMap.put(rewardline.getLineId(),rewardline);
-            }
+            if(rewardline==null) continue;
+            lineMap.put(rewardline.getLineId(),rewardline);
+            checkHigher(payline);
         }
         if (lineMap.isEmpty()) {
             return;
         }
         long realGold = getBetGold();
         for (Rewardline line : lineMap.values()) {
-            highC += line.getSpecialC();
-            line.setSpecialC(highC);
             line.setGold(realGold * line.getRate());
             log.info(line.toString());
         }
@@ -375,9 +376,6 @@ public class SlotRoom extends SuperRoom {
             SlotModel m = board.get(x, p.getY());
             type = m.getK();
             if (!m.isScatter()) continue;
-            if (payline == null) {
-                payline = new Rewardline(type, line.getLineId());
-            }
             payline.addSpecicalC();
             payline.addPoint(m);
         }
@@ -394,21 +392,21 @@ public class SlotRoom extends SuperRoom {
         return false;
     }
 
-    //    public Slot random (Map < Integer, Slot > slots) {
-//        Set<Integer> rewardSymbols = new HashSet<>();
-//        for (Rewardline line : rewardlines) {
+    public Slot random(Map<Integer, Slot> slots) {
+        Set<Integer> rewardSymbols = new HashSet<>();
+//        for (Rewardline line : lineMap.values()) {
 //            rewardSymbols.add(line.getK());
 //        }
-//        Slot slot =  SlotCommon.ins.random(gameType,board,slots, rewardSymbols, param);
-//        if(slot.isScatter()){
-//            param.addScatter();
-//        } else if (slot.isBonus()) {
-//            param.addBonus();
-//        } else if (slot.isBaida()) {
-//            param.addBaida();
-//        }
-//        return slot;
-//    }
+        Slot slot = SlotCommon.ins.random(gameType, board, slots, rewardSymbols, param);
+        if (slot.isScatter()) {
+            param.addScatter();
+        } else if (slot.isBonus()) {
+            param.addBonus();
+        } else if (slot.isBaida()) {
+            param.addBaida();
+        }
+        return slot;
+    }
     public void print() {
         SlotCommon.ins.print(board, gameType, roomType, id, uid);
     }

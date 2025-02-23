@@ -66,7 +66,6 @@ public abstract class SuperState {
         //检测连续的次数
         checkContinue(board, list, x, continueC);
         //高，中，低状态处理
-
         betStateFilter(board, list, param);
         //检查每列
         checkCol(slots, board, list, param);
@@ -297,7 +296,7 @@ public abstract class SuperState {
     }
 
     public Map<Integer, Integer> weight(Map<Integer, Slot> slots, List<Slot> list, Set<Integer> goals, BetParam param) {
-        Map<Integer, Integer> map = new HashMap();
+        Map<Integer, Integer> map = new HashMap<>();
         for (Slot s : list) {
             map.put(s.getK(), s.getW1());
         }

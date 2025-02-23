@@ -1,14 +1,10 @@
 package com.z.core.service.game.clear;
 
 
-import com.z.common.util.PbUtils;
 import com.z.core.service.game.game.IRound;
 import com.z.core.service.game.game.SuperRoom;
 import com.z.core.service.game.majiang.MaJiangRound;
-import com.z.core.service.game.slot.CSlotService;
 import com.z.core.service.user.UserService;
-import com.z.core.util.SpringContext;
-import com.z.model.bo.slot.Slot;
 import com.z.model.bo.user.User;
 import com.z.model.common.MsgResult;
 import com.z.model.mysql.cfg.CRoom;
