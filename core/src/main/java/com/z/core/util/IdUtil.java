@@ -11,4 +11,8 @@ public class IdUtil {
     public static long nextRoomId() {
         return RedisUtil.incr(RedisKey.ROOM_ID,1);
     }
+
+    public static long nextUserLogId() {
+        return RedisUtil.incr(RedisKey.USRLOG_ID,1);
+    }
 }

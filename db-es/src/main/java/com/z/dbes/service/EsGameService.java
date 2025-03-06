@@ -1,12 +1,10 @@
 package com.z.dbes.service;
 
 import co.elastic.clients.elasticsearch._types.Script;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import com.z.common.util.DateTimeUtil;
 import com.z.model.es.EsGame;
 import com.z.model.es.EsIndex;
-import com.z.model.es.EsUserLog;
 import com.z.model.type.AddType;
 import org.springframework.stereotype.Service;
 

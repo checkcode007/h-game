@@ -10,4 +10,7 @@ public class RedisKey {
 
     public static final String LINE9_RANK =G+"line9:rank";
 
+
+    public static final String USRLOG_ID =G+"userlogId";
+
 }

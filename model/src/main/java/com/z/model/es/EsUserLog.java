@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Data
 public class EsUserLog implements Serializable {
     private long id;
+    private long uid;
     private int type;
     private int robot;
     private String name;

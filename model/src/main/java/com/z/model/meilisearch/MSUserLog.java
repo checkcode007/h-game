@@ -21,6 +21,8 @@ import java.util.Date;
 public class MSUserLog implements Serializable {
     @MSFiled(openFilter = true, key = "id", openSort = true)
     private long id;
+    @MSFiled(openFilter = true, key = "uid", openSort = true)
+    private long uid;
     @MSFiled(openFilter = true, key = "type", openSort = true)
     private int type;
     private int robot;

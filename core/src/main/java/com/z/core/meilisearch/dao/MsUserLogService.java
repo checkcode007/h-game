@@ -3,6 +3,8 @@ package com.z.core.meilisearch.dao;
 import com.meilisearch.sdk.SearchRequest;
 import com.z.common.util.DateTimeUtil;
 import com.z.core.meilisearch.json.SearchResult;
+import com.z.core.util.IdUtil;
+import com.z.core.util.RedisUtil;
 import com.z.model.es.EsUserLog;
 import com.z.model.meilisearch.MSUserLog;
 import com.z.model.mysql.GUser;
@@ -22,7 +24,8 @@ public class MsUserLogService {
     public void reg(GUser user) {
         DateTime now = DateTime.now();
         MSUserLog record = new MSUserLog();
-        record.setId(user.getId());
+        record.setId(IdUtil.nextUserLogId());
+        record.setUid(user.getId());
         record.setPhone(user.getPhone());
         record.setT(now.getMillis());
         record.setAction(UserAction.REG.k);
@@ -37,10 +40,28 @@ public class MsUserLogService {
     public void login(GUser user) {
         DateTime now = DateTime.now();
         MSUserLog record = new MSUserLog();
-        record.setId(user.getId());
+        record.setId(IdUtil.nextUserLogId());
+        record.setUid(user.getId());
         record.setPhone(user.getPhone());
         record.setT(now.getMillis());
         record.setAction(UserAction.LOGIN.k);
+        record.setDay(DateTimeUtil.getDateShortInt(now));
+        record.setD(now.toDate());
+        record.setName(user.getName());
+        record.setRobot(user.getRobot());
+        record.setDeviceId(user.getDeviceId());
+        record.setIp(user.getIp());
+        mapper.add(record);
+    }
+
+    public void out(GUser user) {
+        DateTime now = DateTime.now();
+        MSUserLog record = new MSUserLog();
+        record.setId(IdUtil.nextUserLogId());
+        record.setUid(user.getId());
+        record.setPhone(user.getPhone());
+        record.setT(now.getMillis());
+        record.setAction(UserAction.LOGOUT.k);
         record.setDay(DateTimeUtil.getDateShortInt(now));
         record.setD(now.toDate());
         record.setName(user.getName());

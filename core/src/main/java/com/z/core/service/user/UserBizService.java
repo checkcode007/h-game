@@ -150,6 +150,15 @@ public class UserBizService {
         log.info(sj.add("res:"+PbUtils.pbToJson(b)).add("success").toString());
         return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
     }
+
+    public void logout(long uid) {
+        StringJoiner sj = new StringJoiner(",").add("uid:" + uid);
+        log.info(sj.toString());
+        User userBo = UserService.ins.get(uid);
+        if(userBo == null) return;
+        roomBizService.out(uid,"logout");
+        userLogBizService.out(userBo.getUser());
+    }
     public MyMessage.MyMsgRes reconnect(ChannelHandlerContext ctx, long uid, String pwd,CommonGame.GameType gameType, CommonGame.RoomType roomType) {
         StringJoiner sj = new StringJoiner(",").add("type:" + gameType).add("roomType:"+roomType).add("uid:" + uid).add("pwd:" + pwd);
         log.info(sj.toString());

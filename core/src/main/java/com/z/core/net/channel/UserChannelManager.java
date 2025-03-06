@@ -3,6 +3,7 @@ package com.z.core.net.channel;
 import com.google.protobuf.AbstractMessageLite;
 import com.z.core.net.WebSocketServer;
 import com.z.core.service.game.game.RoomBizService;
+import com.z.core.service.user.UserBizService;
 import com.z.core.service.user.UserService;
 import com.z.core.util.SpringContext;
 import com.z.model.bo.user.User;
@@ -41,7 +42,7 @@ public class UserChannelManager {
     public static void removeUser(long userId) {
         logger.info("delChannel------->"+userId);
         channelMap.remove(userId);
-        SpringContext.getBean(RoomBizService.class).out(userId,"logout");
+        SpringContext.getBean(UserBizService.class).logout(userId);
     }
     public static Collection<Channel> getAllChannel() {
         return channelMap.values();

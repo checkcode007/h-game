@@ -23,7 +23,7 @@ public class TestService {
     @Resource
     private MeiliSearchMapper meiliSearchMapper;
 
-    @Scheduled(cron = "*/10 * * * * ?" )
+//    @Scheduled(cron = "*/10 * * * * ?" )
     public void test() {
         log.info("test-->start");
 
