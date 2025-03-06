@@ -315,13 +315,9 @@ public class SlotRoom extends SuperRoom {
             Rewardline rewardline = checkLine(payline);
             if(rewardline==null) continue;
             lineMap.put(rewardline.getLineId(),rewardline);
+            checkHigher(rewardline);
+        }
 
-        }
-        for (Payline payline : paylineService.getList(gameType)) {
-            Rewardline rewardline =  checkHigher(payline);
-            if(rewardline==null) continue;
-            lineMap.put(rewardline.getLineId(),rewardline);
-        }
         if (lineMap.isEmpty()) {
             return;
         }
@@ -348,7 +344,9 @@ public class SlotRoom extends SuperRoom {
                 points.add(m);
                 continue;
             }
-            if(!isSame(p.getX(),first.getK(),m.getK())){
+            int k1 = first.getChangeType()>0?first.getChangeType():first.getK();
+            int k2 = m.getChangeType()>0?m.getChangeType():m.getK();
+            if(!isSame(p.getX(),k1,k2)){
                 break;
             }else{
                 sameC++;
@@ -370,22 +368,15 @@ public class SlotRoom extends SuperRoom {
     }
     /**
      * 检查触发高级玩法的符号
-     * @param line
      * @return
      */
-    public Rewardline checkHigher(Payline line) {
-        Rewardline payline = null;
+    public Rewardline checkHigher(Rewardline payline) {
         int type = 0;
-        for (Point p : line.getPoints()) {
-            int x = p.getX();
-            SlotModel m = board.get(x, p.getY());
+        for (SlotModel m : payline.getPoints()) {
             type = m.getK();
             if (!m.isScatter()) continue;
             payline.addSpecicalC();
             payline.addPoint(m);
-        }
-        if (payline == null) {
-            return null;
         }
         CSlot slot = service.get(gameType, type, payline.getSpecialC());
         if (slot == null) return null;
