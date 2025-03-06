@@ -2,8 +2,6 @@ package com.z.core.service.transfer;
 
 
 import com.google.protobuf.ByteString;
-import com.z.core.service.cfg.CCfgBizService;
-import com.z.dbes.service.EsBankLogService;
 import com.z.dbmysql.dao.banktransfer.GBankTransferDao;
 import com.z.dbmysql.dao.wallet.GWalletDao;
 import com.z.model.common.MsgId;
@@ -31,8 +29,7 @@ public class TransferBizService {
     GBankTransferDao dao;
     @Autowired
     GWalletDao walletDao;
-    @Autowired
-    EsBankLogService bankLogService;
+
 
     public List<User.TransforLog> getList(int type ,long uid){
         List<GBankTransfer> list = dao.find(uid,type);

@@ -6,6 +6,7 @@ import com.google.protobuf.ByteString;
 import com.z.common.util.CodeUtil;
 import com.z.common.util.NameUtils;
 import com.z.common.util.PbUtils;
+import com.z.core.meilisearch.dao.MsUserLogService;
 import com.z.core.net.channel.ChannelAttributes;
 import com.z.core.net.channel.UserChannelManager;
 import com.z.core.service.cfg.CCfgBizService;
@@ -28,8 +29,6 @@ import io.netty.channel.ChannelHandlerContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +43,7 @@ public class UserBizService {
 
 //    protected Logger log = LoggerFactory.getLogger(getClass());
     @Autowired
-    EsUserLogBizService esUserLogBizService;
+    MsUserLogService userLogBizService;
     @Autowired
     WalletBizService walletBizService;
 
@@ -105,7 +104,7 @@ public class UserBizService {
 
         b.setUid(user.getId()).setPwd(user.getPassword()).setName(user.getName()).setVisitor(isVisitor).setPhone(phone);
         log.info(sj.add("res:"+PbUtils.pbToJson(b)).add("success").toString());
-        esUserLogBizService.reg(user);
+        userLogBizService.reg(user);
         return res.addMsg(ByteString.copyFrom(b.build().toByteArray())).build();
     }
 
@@ -137,7 +136,7 @@ public class UserBizService {
             res.setOk(false).setFailMsg("密码不正确");
             return res.build();
         }
-        esUserLogBizService.login(user);
+        userLogBizService.login(user);
         addChannel(ctx, user.getId());
         com.z.model.proto.User.S_10004.Builder b = com.z.model.proto.User.S_10004.newBuilder()
                 .setVisitor(StringUtils.isEmpty(user.getPhone()))
@@ -170,7 +169,7 @@ public class UserBizService {
             res.setOk(false).setFailMsg("密码不正确");
             return res.build();
         }
-        esUserLogBizService.login(user);
+        userLogBizService.login(user);
         addChannel(ctx, user.getId());
         roomBizService.enter(uid,gameType,roomType);
         log.info(sj.add("success").toString());

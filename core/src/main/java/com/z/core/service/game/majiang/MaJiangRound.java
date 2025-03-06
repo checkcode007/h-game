@@ -39,7 +39,7 @@ public class MaJiangRound extends ClearRound {
                 Slot slot = random(slots);
                 SlotModel model = SlotCommon.ins.toModel(slot, i, j);
                 board.put(model.getX(), model.getY(), model);
-                if(!model.isBonus() && !model.isScatter()&& !model.isBaida()){
+                if(!free && !model.isBonus() && !model.isScatter()&& !model.isBaida()){
                     if(RandomUtil.randomInt(10)%5==0){
                         model.setGold(true);
                     }

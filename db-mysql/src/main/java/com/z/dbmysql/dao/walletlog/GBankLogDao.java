@@ -1,9 +1,7 @@
 package com.z.dbmysql.dao.walletlog;
 
 import com.z.dbmysql.common.AbstractMapperService;
-import com.z.dbmysql.common.IMapper;
 import com.z.model.mysql.GBankLog;
-import com.z.model.mysql.GUser;
 import com.z.model.type.user.UserState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

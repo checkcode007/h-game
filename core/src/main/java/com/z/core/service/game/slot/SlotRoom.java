@@ -315,7 +315,12 @@ public class SlotRoom extends SuperRoom {
             Rewardline rewardline = checkLine(payline);
             if(rewardline==null) continue;
             lineMap.put(rewardline.getLineId(),rewardline);
-            checkHigher(payline);
+
+        }
+        for (Payline payline : paylineService.getList(gameType)) {
+            Rewardline rewardline =  checkHigher(payline);
+            if(rewardline==null) continue;
+            lineMap.put(rewardline.getLineId(),rewardline);
         }
         if (lineMap.isEmpty()) {
             return;
