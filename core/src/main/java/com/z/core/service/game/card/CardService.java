@@ -2,10 +2,8 @@ package com.z.core.service.game.card;
 
 import com.z.common.util.SnowflakeId;
 import com.z.core.service.cfg.CCfgBizService;
-import com.z.core.service.game.game.EsGameBizService;
 import com.z.core.service.user.UserBizService;
 import com.z.core.service.user.UserService;
-import com.z.core.util.SpringContext;
 import com.z.model.mysql.GUser;
 import com.z.model.proto.CommonGame;
 import org.slf4j.LoggerFactory;
@@ -21,8 +19,6 @@ public class CardService {
 //    private static final Logger log = LogManager.getLogger(CardService.class);
     @Autowired
     UserBizService userBizService;
-    @Autowired
-    EsGameBizService esGameBizService;
 
     Map<Long,CardGame> map = new ConcurrentHashMap<>();
     Map<Long,List<CardGame>> roomMap = new ConcurrentHashMap<>();
@@ -90,7 +86,6 @@ public class CardService {
     }
     public void gameOver(CardGame game){
         if(game.getState() != CommonGame.GameState.RESULT) return;
-        esGameBizService.add(game);
     }
     public CardGame get(long id){
         return map.get(id);
