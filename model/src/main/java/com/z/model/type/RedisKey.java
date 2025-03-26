@@ -1,4 +1,4 @@
-package com.z.common.type;
+package com.z.model.type;
 
 public class RedisKey {
     public static final String G ="g:";
@@ -10,7 +10,8 @@ public class RedisKey {
 
     public static final String LINE9_RANK =G+"line9:rank";
 
-
     public static final String USRLOG_ID =G+"userlogId";
+
+    public static final String ONLINE_USERS =G+"onlineUsers";
 
 }

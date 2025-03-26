@@ -2,18 +2,17 @@ package com.z.core;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
 
 @SpringBootTest
 class CoreApplicationTests {
@@ -23,9 +22,9 @@ class CoreApplicationTests {
     static Set<Long> set1 = new HashSet<>();
    static long sum = 0l;
     public static void main(String[] args) {
-        String filePath = "/Users/mac/Downloads/PIC/a_19.log";  // 请替换为实际的文件路径
+        String filePath = "/Users/mac/Downloads/PIC/a1.log";  // 请替换为实际的文件路径
         readLogFile(filePath);
-        filePath = "/Users/mac/Downloads/PIC/a_19_2.log";  // 请替换为实际的文件路径
+        filePath = "/Users/mac/Downloads/PIC/a2.log";  // 请替换为实际的文件路径
         readLogFile(filePath);
         System.err.println("sum = " + sum);
 //        filePath = "/Users/mac/Downloads/PIC/11_b.log";  // 请替换为实际的文件路径

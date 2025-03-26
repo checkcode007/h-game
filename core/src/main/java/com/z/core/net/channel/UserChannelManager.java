@@ -1,10 +1,10 @@
 package com.z.core.net.channel;
 
 import com.google.protobuf.AbstractMessageLite;
-import com.z.core.net.WebSocketServer;
-import com.z.core.service.game.game.RoomBizService;
+import com.z.model.type.RedisKey;
 import com.z.core.service.user.UserBizService;
 import com.z.core.service.user.UserService;
+import com.z.core.util.RedisUtil;
 import com.z.core.util.SpringContext;
 import com.z.model.bo.user.User;
 import com.z.model.proto.CommonGame;
@@ -15,8 +15,8 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,17 +25,19 @@ import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
 
 // 全局管理类
-public class UserChannelManager {
+public class UserChannelManager implements ApplicationListener<ApplicationReadyEvent> {
     private static final Map<Long, Channel> channelMap = new ConcurrentHashMap<>();
 //    private static final Logger log = LogManager.getLogger(UserChannelManager.class);
     private static final Log logger = LogFactory.getLog(UserChannelManager.class);
 
     public static void bindUser(long userId, Channel channel) {
         channelMap.put(userId, channel);
+        RedisUtil.sadd(RedisKey.ONLINE_USERS,userId);
+        logger.info("addChannel------->"+userId);
     }
 
     public static Channel getChannel(long userId) {
-        logger.info("addChannel------->"+userId);
+
         return channelMap.get(userId);
     }
     //todo 离线后移除其他缓存
@@ -43,6 +45,7 @@ public class UserChannelManager {
         logger.info("delChannel------->"+userId);
         channelMap.remove(userId);
         SpringContext.getBean(UserBizService.class).logout(userId);
+        RedisUtil.setRemove(RedisKey.ONLINE_USERS,userId);
     }
     public static Collection<Channel> getAllChannel() {
         return channelMap.values();
@@ -103,5 +106,10 @@ public class UserChannelManager {
             BinaryWebSocketFrame resFrame = new BinaryWebSocketFrame(Unpooled.wrappedBuffer(messageBytes));
             channel.writeAndFlush(resFrame);
         }
+    }
+
+    @Override
+    public void onApplicationEvent(ApplicationReadyEvent event) {
+        RedisUtil.del(RedisKey.ONLINE_USERS);
     }
 }

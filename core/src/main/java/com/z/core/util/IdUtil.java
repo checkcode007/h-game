@@ -1,6 +1,6 @@
 package com.z.core.util;
 
-import com.z.common.type.RedisKey;
+import com.z.model.type.RedisKey;
 
 public class IdUtil {
 

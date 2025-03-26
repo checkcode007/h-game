@@ -1,18 +1,14 @@
 package com.z.dbmysql.dao.line9;
 
-import com.z.common.type.RedisKey;
+import com.z.model.type.RedisKey;
 import com.z.dbmysql.common.AbstractMapperService;
-import com.z.dbmysql.dao.walletlog.GBankLogMaper;
 import com.z.model.mysql.GLine9Rank;
-import com.z.model.type.user.UserState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class GLine9RankDao extends AbstractMapperService<GLine9Rank,Long> {
